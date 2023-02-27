@@ -47,12 +47,9 @@ fun MainScreen() {
             Home(navController = navController)
         }
 
-        composable(
-            NavRoutes.Welcome.route + "/{user}",
-            arguments = listOf(navArgument("user") { type = NavType.ReferenceType })
-        ) { backStackEntry ->
-            val user = backStackEntry.arguments?.get("user") as User
-            Welcome(navController = navController, user)
+        composable(NavRoutes.Welcome.route + "/{user}") { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("user") ?: "Unknown"
+            Welcome(navController = navController, userName = userName)
         }
 
         composable(NavRoutes.Profile.route) {

@@ -12,14 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.desh.NavRoutes
 import com.example.desh.api.RetrofitAPI
 import com.example.desh.domain.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,10 +33,10 @@ fun Home(navController: NavController) {
     val ctx = LocalContext.current
     var userEmail by remember { mutableStateOf("") }
     var userPassword by remember { mutableStateOf("") }
-    var response = remember { mutableStateOf(User()) }
+    var response: User? by remember { mutableStateOf(null) }
 
-    val onUserEmailChange = { text : String -> userEmail = text }
-    val onUserPasswordChange = { text : String -> userPassword = text }
+    val onUserEmailChange = { text: String -> userEmail = text }
+    val onUserPasswordChange = { text: String -> userPassword = text }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -51,16 +53,24 @@ fun Home(navController: NavController) {
             )
 
             Spacer(modifier = Modifier.size(30.dp))
-            
+
             Button(
                 onClick = {
-                    postData(
-                        ctx = ctx,
-                        userEmail = mutableStateOf(userEmail),
-                        userPassword = mutableStateOf(userPassword),
-                        result = response
-                    )
-                    navController.navigate(NavRoutes.Welcome.route + "/$response" )
+                    CoroutineScope(Dispatchers.IO).launch {
+                        postData(
+                            ctx = ctx,
+                            userEmail = mutableStateOf(userEmail),
+                            userPassword = mutableStateOf(userPassword),
+                            result = mutableStateOf(response)
+                        )
+                    }
+
+                    Log.w("코루틴~!", "코루틴 종료")
+                    Log.w("코루틴~!!", response?.email ?: "null")
+
+                    Log.w("코루틴~!", "nav")
+                    navController.navigate(NavRoutes.Welcome.route + "/${response?.email}")
+
                 }
             ) {
                 Text(text = "Sign In")
@@ -81,14 +91,13 @@ fun CustomTextField(title: String, textState: String, onTextChange: (String) -> 
     )
 }
 
-private fun postData(
+private suspend fun postData(
     ctx: Context,
     userEmail: MutableState<String>,
     userPassword: MutableState<String>,
-    result: MutableState<User>
+    result: MutableState<User?>
 ) {
-
-    val url = "http://localhost:8080/login"
+    val url = "https://32256697b2619a.lhr.life/"
 
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -103,25 +112,18 @@ private fun postData(
 
     val call: Call<User>? = retrofitAPI.loginUser(loginUser)
 
-    if (call == null) {
-        Log.d("Home", "api 호출 결과 : null")
-    }
-
     call?.enqueue(object : Callback<User> {
         override fun onResponse(call: Call<User>, response: Response<User>) {
-            val model = response.body()!!
+            val model = response.body()
             val findUser = User(
-                email = model.email,
-                password = model.password
+                email = model?.email ?: "unknown email",
+                password = model?.password ?: "unknown password"
             )
 
-            val resp = response.code()
-
-            if (resp == 200 && loginUser == findUser) {
-                Toast.makeText(ctx, "Login Success", Toast.LENGTH_SHORT).show()
-                result.value = findUser
+            if (loginUser == findUser) {
+                Toast.makeText(ctx, "${findUser.email}", Toast.LENGTH_SHORT).show()
+                result.value = User(findUser.email, findUser.password)
             }
-
         }
 
         override fun onFailure(call: Call<User>, t: Throwable) {

@@ -13,11 +13,10 @@ import com.example.desh.NavRoutes
 import com.example.desh.domain.User
 
 @Composable
-fun Welcome(navController: NavController, user: User) {
+fun Welcome(navController: NavController, userName: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            val uId = user.email?.substring(0, user.email?.indexOf('@')!!)
-            Text(text = "Welcome, $uId", style = MaterialTheme.typography.h5)
+            Text(text = "Welcome, $userName", style = MaterialTheme.typography.h5)
 
             Spacer(modifier = Modifier.size(30.dp))
 
