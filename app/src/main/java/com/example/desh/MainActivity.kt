@@ -6,10 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.desh.screens.Home
+import com.example.desh.screens.Profile
+import com.example.desh.screens.Welcome
 import com.example.desh.ui.theme.DeshTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +27,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+                    MainScreen()
                 }
             }
         }
@@ -30,14 +35,30 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun MainScreen() {
+    // nav controller instance
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = NavRoutes.Home.route) {
+        composable(NavRoutes.Home.route) {
+            Home(navController = navController)
+        }
+
+        composable(NavRoutes.Welcome.route + "/{userName}") { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("userName")
+            Welcome(navController = navController, userName)
+        }
+
+        composable(NavRoutes.Profile.route) {
+            Profile()
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     DeshTheme {
-        Greeting("Android")
+        MainScreen()
     }
 }
