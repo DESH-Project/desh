@@ -65,10 +65,6 @@ fun Home(navController: NavController) {
                         )
                     }
 
-                    Log.w("코루틴~!", "코루틴 종료")
-                    Log.w("코루틴~!!", response?.email ?: "null")
-
-                    Log.w("코루틴~!", "nav")
                     navController.navigate(NavRoutes.Welcome.route + "/${response?.email}")
 
                 }
