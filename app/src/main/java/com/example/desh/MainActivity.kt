@@ -9,12 +9,12 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.desh.domain.User
 import com.example.desh.screens.Home
 import com.example.desh.screens.Profile
 import com.example.desh.screens.Welcome
@@ -47,9 +47,9 @@ fun MainScreen() {
             Home(navController = navController)
         }
 
-        composable(NavRoutes.Welcome.route + "/{user}") { backStackEntry ->
-            val userName = backStackEntry.arguments?.getString("user") ?: "Unknown"
-            Welcome(navController = navController, userName = userName)
+        composable(route = NavRoutes.Welcome.route) { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("response") ?: "Unknown"
+            Welcome(navController = navController, msg = userName)
         }
 
         composable(NavRoutes.Profile.route) {

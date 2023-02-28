@@ -18,10 +18,7 @@ import androidx.navigation.NavController
 import com.example.desh.NavRoutes
 import com.example.desh.api.RetrofitAPI
 import com.example.desh.domain.User
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -33,10 +30,11 @@ fun Home(navController: NavController) {
     val ctx = LocalContext.current
     var userEmail by remember { mutableStateOf("") }
     var userPassword by remember { mutableStateOf("") }
-    var response: User? by remember { mutableStateOf(null) }
+    var response by remember { mutableStateOf("") }
 
     val onUserEmailChange = { text: String -> userEmail = text }
     val onUserPasswordChange = { text: String -> userPassword = text }
+    val onResponseChange = { text: String -> response = text }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -56,17 +54,26 @@ fun Home(navController: NavController) {
 
             Button(
                 onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        postData(
-                            ctx = ctx,
-                            userEmail = mutableStateOf(userEmail),
-                            userPassword = mutableStateOf(userPassword),
-                            result = mutableStateOf(response)
-                        )
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.IO) {
+                            postData(
+                                ctx = ctx,
+                                userEmail = mutableStateOf(userEmail),
+                                userPassword = mutableStateOf(userPassword),
+                                result = mutableStateOf(response),
+                                onResponseChange = onResponseChange
+                            )
+                        }
+
+                        if (response != "unknown") {
+                            navController.navigate(NavRoutes.Welcome.route)
+                        }
+
+                        else {
+                            Toast.makeText(ctx, "아이디 또는 비밀번호가 틀립니다 : $response", Toast.LENGTH_SHORT).show()
+                            navController.navigate(NavRoutes.Home.route)
+                        }
                     }
-
-                    navController.navigate(NavRoutes.Welcome.route + "/${response?.email}")
-
                 }
             ) {
                 Text(text = "Sign In")
@@ -87,13 +94,15 @@ fun CustomTextField(title: String, textState: String, onTextChange: (String) -> 
     )
 }
 
-private suspend fun postData(
+private fun postData(
     ctx: Context,
     userEmail: MutableState<String>,
     userPassword: MutableState<String>,
-    result: MutableState<User?>
+    result: MutableState<String>,
+    onResponseChange: (String) -> Unit
 ) {
-    val url = "https://32256697b2619a.lhr.life/"
+
+    val url = "https://gold-onions-hang-59-5-140-175.loca.lt/"
 
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -116,9 +125,13 @@ private suspend fun postData(
                 password = model?.password ?: "unknown password"
             )
 
-            if (loginUser == findUser) {
+            val statusCode = response.code()
+
+            if (statusCode == 200 && loginUser == findUser) {
                 Toast.makeText(ctx, "${findUser.email}", Toast.LENGTH_SHORT).show()
-                result.value = User(findUser.email, findUser.password)
+                onResponseChange(findUser.email!!)
+            } else {
+                onResponseChange("unknown")
             }
         }
 
