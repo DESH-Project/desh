@@ -102,7 +102,7 @@ private fun postData(
     onResponseChange: (String) -> Unit
 ) {
 
-    val url = "https://gold-onions-hang-59-5-140-175.loca.lt/"
+    val url = "https://six-knives-grow-222-120-178-113.loca.lt"
 
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -110,6 +110,7 @@ private fun postData(
         .build()
 
     val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
+
     val loginUser = User(
         email = userEmail.value,
         password = userPassword.value
