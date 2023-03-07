@@ -1,7 +1,6 @@
 package com.example.desh.screens
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -30,11 +29,11 @@ fun Home(navController: NavController) {
     val ctx = LocalContext.current
     var userEmail by remember { mutableStateOf("") }
     var userPassword by remember { mutableStateOf("") }
-    var response by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
 
     val onUserEmailChange = { text: String -> userEmail = text }
     val onUserPasswordChange = { text: String -> userPassword = text }
-    val onResponseChange = { text: String -> response = text }
+    val onNameChange = { text: String -> name = text }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -54,24 +53,17 @@ fun Home(navController: NavController) {
 
             Button(
                 onClick = {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.IO) {
+                    runBlocking {
+                        val job = launch {
                             postData(
                                 ctx = ctx,
-                                userEmail = mutableStateOf(userEmail),
-                                userPassword = mutableStateOf(userPassword),
-                                result = mutableStateOf(response),
-                                onResponseChange = onResponseChange
+                                userEmail = userEmail,
+                                userPassword = userPassword,
+                                onNameChange = onNameChange
                             )
-                        }
-
-                        if (response != "unknown") {
-                            navController.navigate(NavRoutes.Welcome.route)
-                        }
-
-                        else {
-                            Toast.makeText(ctx, "아이디 또는 비밀번호가 틀립니다 : $response", Toast.LENGTH_SHORT).show()
-                            navController.navigate(NavRoutes.Home.route)
+                            if (name == "") onNameChange("test")
+                            println("response = $name")
+                            navController.navigate("${NavRoutes.Welcome.route}/$name")
                         }
                     }
                 }
@@ -94,15 +86,13 @@ fun CustomTextField(title: String, textState: String, onTextChange: (String) -> 
     )
 }
 
-private fun postData(
+private suspend fun postData(
     ctx: Context,
-    userEmail: MutableState<String>,
-    userPassword: MutableState<String>,
-    result: MutableState<String>,
-    onResponseChange: (String) -> Unit
-) {
-
-    val url = "https://six-knives-grow-222-120-178-113.loca.lt"
+    userEmail: String,
+    userPassword: String,
+    onNameChange: (String) -> Unit
+): Long {
+    val url = "https://nine-clubs-grow-59-5-140-175.loca.lt"
 
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -112,8 +102,8 @@ private fun postData(
     val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
 
     val loginUser = User(
-        email = userEmail.value,
-        password = userPassword.value
+        email = userEmail,
+        password = userPassword
     )
 
     val call: Call<User>? = retrofitAPI.loginUser(loginUser)
@@ -122,17 +112,17 @@ private fun postData(
         override fun onResponse(call: Call<User>, response: Response<User>) {
             val model = response.body()
             val findUser = User(
-                email = model?.email ?: "unknown email",
-                password = model?.password ?: "unknown password"
+                email = model!!.email,
+                password = model.password
             )
 
             val statusCode = response.code()
 
             if (statusCode == 200 && loginUser == findUser) {
                 Toast.makeText(ctx, "${findUser.email}", Toast.LENGTH_SHORT).show()
-                onResponseChange(findUser.email!!)
+                onNameChange(findUser.email!!)
             } else {
-                onResponseChange("unknown")
+                onNameChange("unknown")
             }
         }
 
@@ -140,4 +130,6 @@ private fun postData(
             Toast.makeText(ctx, "Login Failed", Toast.LENGTH_SHORT).show()
         }
     })
+
+    return 1L
 }

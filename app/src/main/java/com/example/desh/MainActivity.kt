@@ -9,7 +9,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,8 +46,11 @@ fun MainScreen() {
             Home(navController = navController)
         }
 
-        composable(route = NavRoutes.Welcome.route) { backStackEntry ->
-            val userName = backStackEntry.arguments?.getString("response") ?: "Unknown"
+        composable(
+            "${NavRoutes.Welcome.route}/{name}",
+            arguments = listOf(navArgument("name") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("name") ?: "Unknown"
             Welcome(navController = navController, msg = userName)
         }
 
