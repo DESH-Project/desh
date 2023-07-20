@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
     val host = "15.164.105.26"
     val port = "8080"
-    val domain = "http://$host:$port"
+    val domain = "http://$host:$port/"
 
     private var retrofit: Retrofit? = null
 

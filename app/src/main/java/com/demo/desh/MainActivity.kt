@@ -1,6 +1,7 @@
 package com.demo.desh
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -25,7 +26,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.demo.desh.api.ApiService
 import com.demo.desh.api.RetrofitClient
+import com.demo.desh.dto.KakaoUser
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
@@ -33,10 +36,11 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 private const val TAG = "MainActivity"
-private var loginSuccess = false
-private lateinit var code: String
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,7 +111,11 @@ private fun kakaoLogin(context: Context) {
         else if (token != null) Log.e(TAG, "로그인 성공 ${token.accessToken}")
     }
 
+    var isSuccess = false
+    var getUserInfoSuccess = false
     val instance = UserApiClient.instance
+    var code: String? = null
+    var kakaoUser: KakaoUser? = null
 
     Log.d("kakaoLogin()", "Kakao Login 시도")
 
@@ -130,10 +138,8 @@ private fun kakaoLogin(context: Context) {
             // 로그인 성공
             else if (token != null) {
                 code = token.accessToken
-                loginSuccess = true
+                isSuccess = true
                 Log.e(TAG, "로그인 성공 ${code}}")
-
-                // TODO: 백엔드로 승인코드 전달하는 로직 작성
             }
         }
     }
@@ -151,11 +157,49 @@ private fun kakaoLogin(context: Context) {
             val profileImageUrl = account?.profile?.profileImageUrl
             val gender = account?.gender?.toString()
 
+            kakaoUser = KakaoUser(
+                nickname = nickname!!,
+                ageRange = ageRange!!,
+                email = email!!,
+                profileImageUrl = profileImageUrl!!,
+                gender = gender!!
+            )
+
+            getUserInfoSuccess = true
             println("$nickname $ageRange $email $profileImageUrl $gender")
         }
     }
+
+    if (isSuccess && getUserInfoSuccess && code != null && kakaoUser != null) {
+        sendToServer(context, code!!, kakaoUser!!)
+    }
 }
 
+private fun sendToServer(context: Context, code: String, kakaoUser: KakaoUser) {
+    val retrofit = RetrofitClient.getClient(RetrofitClient.domain)
+    val apiService = retrofit.create(ApiService::class.java)
+    val result = apiService.sendAuthCode(code)
+
+    result.enqueue(object : Callback<Long> {
+        override fun onResponse(call: Call<Long>, response: Response<Long>) {
+            val accessToken = response.headers()["Authorization"]
+            val refreshToken = response.headers()["Authorization-Refresh"]
+            val id = response.body()
+
+            kakaoUser.accessToken = accessToken
+            kakaoUser.refreshToken = refreshToken
+            kakaoUser.id = id
+
+            val intent = Intent(context, SurveyActivity::class.java)
+            intent.putExtra("user", kakaoUser)
+            context.startActivity(intent)
+        }
+
+        override fun onFailure(call: Call<Long>, t: Throwable) {
+            TODO("Not yet implemented")
+        }
+    })
+}
 
 @Preview(showBackground = true)
 @Composable

@@ -34,17 +34,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demo.desh.dto.KakaoUser
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 
 class SurveyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val user = intent.getSerializableExtra("user") as KakaoUser
+
         setContent {
             DeshprojectfeTheme{
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    SurveyActivityScreen()
+                    SurveyActivityScreen(user)
                 }
             }
         }
@@ -52,11 +55,14 @@ class SurveyActivity : ComponentActivity() {
 }
 
 @Composable
-fun SurveyActivityScreen() {
+fun SurveyActivityScreen(user: KakaoUser) {
     val toolbarText = "서비스 조사"
     val nextButtonText = "Next"
+    val context = LocalContext.current
 
-    ToolbarWithMenu(name = toolbarText)
+    showToast(context, user.toString())
+
+    //ToolbarWithMenu(name = toolbarText)
 
     Spacer(modifier = Modifier.padding(horizontal = 120.dp))
 
@@ -87,6 +93,7 @@ fun SurveyActivityScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolbarWithMenu(name: String) {
+    /*
     Scaffold(
         topBar = {
             TopAppBar(
@@ -111,6 +118,7 @@ fun ToolbarWithMenu(name: String) {
         }
     ) {
     }
+    */
 }
 
 @Composable
@@ -198,6 +206,5 @@ private fun showToast(context: Context, message: String){
 @Composable
 fun SurveyActivityPreview() {
     DeshprojectfeTheme(){
-        SurveyActivityScreen()
     }
 }
