@@ -81,6 +81,34 @@ fun MainActivityScreen() {
             imageResource = R.drawable.kakao_login_large_narrow,
             onClick = { kakaoLogin(context) }
         )
+        
+        Spacer(modifier = Modifier.padding(120.dp))
+
+        TestLoginButton(context = context)
+    }
+}
+
+@Composable
+private fun TestLoginButton(context: Context) {
+    val onButtonClick = {
+        val mockUser = KakaoUser(
+            id = -1L,
+            nickname = "황승수",
+            ageRange = "AGE_20_29",
+            profileImageUrl = "https://k.kakaocdn.net/dn/JEY2d/btsmuprjeuP/BZOMvMtSrWze5Ymq2hoJX1/img_640x640.jpg",
+            email = "h970126@gmail.com",
+            gender = "MAIL",
+            refreshToken = "test-refreshToken",
+            accessToken = "test-accessToken"
+        )
+
+        val intent = Intent(context, SurveyActivity::class.java)
+        intent.putExtra("user", mockUser)
+        context.startActivity(intent)
+    }
+
+    Button(onClick = onButtonClick) {
+        Text(text = "Test Button To Next Step")
     }
 }
 

@@ -27,6 +27,13 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SurveyActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Deshprojectfe">
+
+        </activity>
+
         <!--
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
