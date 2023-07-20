@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -22,16 +23,20 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,28 +66,33 @@ fun SurveyScreen() {
 
     ToolbarWithMenu(name = appBarText)
 
-    Spacer(modifier = Modifier.padding(horizontal = 120.dp))
+    Spacer(modifier = Modifier.padding(horizontal = 90.dp))
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
         Spacer(modifier = Modifier.padding(35.dp))
-
         SurveyText()
-
-        Survey()
-
-        Spacer(modifier = Modifier.padding(12.dp))
-
-        Button(
-            onClick = {},
-            shape = RoundedCornerShape(14.dp),
-            modifier = Modifier
-                .height(44.dp)
-                .width(99.dp)
+        Spacer(modifier = Modifier.padding(start = 0.dp, 35.dp, 0.dp, 0.dp))
+        Box(
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = nextButtonText, fontFamily = nanum, fontSize = 16.sp, color = Color.White)
+            CustomRadioGroup()
+            Button(
+                onClick = {},
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier
+                    .height(44.dp)
+                    .width(99.dp)
+            ) {
+                Text(
+                    text = nextButtonText,
+                    fontFamily = nanum,
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+            }
         }
     }
 }
@@ -144,65 +154,141 @@ private fun SurveyText() {
     )
 }
 
+//@Composable
+//private fun Survey() {
+//    val interactionSource = remember { MutableInteractionSource() }
+//    val isPressed by interactionSource.collectIsPressedAsState()
+//    val bgColor = if (isPressed) Color.White else Color.White
+//    val context = LocalContext.current
+//
+//
+//    for (i in 1..4) {
+//        val ageText = "${i}0대"
+//        val age = i * 10
+//
+//        Spacer(modifier = Modifier.padding(12.dp))
+//        TargetButton(
+//            context = context,
+//            interactionSource = interactionSource,
+//            bgColor = bgColor,
+//            text = ageText,
+//            age = age
+//        )
+//    }
+//}
 @Composable
-private fun Survey() {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val bgColor = if (isPressed) Color.White else Color.White
-    val context = LocalContext.current
-
-
-    for (i in 1..4) {
-        val ageText = "${i}0대"
-        val age = i * 10
-
-        Spacer(modifier = Modifier.padding(12.dp))
-        TargetButton(
-            context = context,
-            interactionSource = interactionSource,
-            bgColor = bgColor,
-            text = ageText,
-            age = age
-        )
+fun CustomRadioGroup() {
+    val options = listOf(
+        "10대",
+        "20대",
+        "30대",
+        "40대",
+    )
+    var selectedOption by remember {
+        mutableStateOf("")
     }
-}
+    val onSelectionChange = { text: String ->
+        selectedOption = text
+    }
 
-@Composable
-private fun TargetButton(
-    context: Context,
-    interactionSource: MutableInteractionSource,
-    bgColor: Color,
-    text: String,
-    age: Int,
-) {
-    val onClickText = "${age}대를 선택하셨네요!"
-    var selectedOptionText by remember { mutableStateOf<String?>(null) }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
 
-    val onSelectionChange = { selectionText: String ->
-        selectedOptionText = if (selectedOptionText == selectionText) {
-            null
-        } else {
-            selectionText // Select the new option
+            options.forEach { text ->
+                Row(
+                    modifier = Modifier
+                        .padding(
+                            all = 8.dp,
+                        ),
+                ) {
+                    Text(
+                        text = text,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .weight(0.7f)
+                            .clip(
+                                shape = RoundedCornerShape(
+                                    size = 12.dp,
+                                ),
+                            )
+                            .clickable {
+                                onSelectionChange(text)
+                            }
+                            .border(1.5.dp,
+                                if (text == selectedOption) {
+                                    Color.Blue
+                                } else {
+                                    Color.Black
+                                }, shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(
+                                vertical = 12.dp,
+                                horizontal = 16.dp,
+                            ),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
     }
 
+//
+//@Composable
+//private fun ToggleButton(
+//    text: String,
+//    isSelected: Boolean,
+//    onSelectionChange: () -> Unit,
+//) {
+//    // Use different colors to indicate the selection state
+//    val selectedColor = Color.Blue
+//    val unselectedColor = Color.Black
+//
+//    Button(
+//        onClick = { onSelectionChange() },
+//        colors = ButtonDefaults.buttonColors(if (isSelected) selectedColor else unselectedColor
+//        ),
+//        modifier = Modifier
+//            .fillMaxWidth(0.9f)
+//            .height(44.dp)
+//            .border(1.dp, selectedColor, RoundedCornerShape(14.dp)),
+//        shape = RoundedCornerShape(14.dp)
+//    ) {
+//        Text(text, fontFamily = nanum, fontSize = 15.sp, color = Color.White)
+//    }
+//}
 
-    OutlinedButton(
-        onClick = { onSelectionChange(text) },
-        border = BorderStroke(1.dp, Color.Blue),
-        interactionSource = interactionSource,
-        shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = bgColor),
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .height(44.dp)
-            .border(1.dp,if(selectedOptionText==text) Color.White else Color.Blue, shape = RoundedCornerShape(1.dp)
-            ),
-        enabled = true
-    ) {
-        Text(text, fontFamily = nanum, fontSize = 15.sp, color = Color.Black)
-    }
-}
+
+//@Composable
+//private fun TargetButton(
+//    isSelected: Boolean,
+//    ontab: ()->Unit,
+//    context: Context,
+//    interactionSource: MutableInteractionSource,
+//    bgColor: Color,
+//    text: String,
+//    age: Int,
+//) {
+//    val onClickText = "${age}대를 선택하셨네요!"
+//    var selectedIndex by rememberSaveable{mutableStateOf(0)}
+//    val color = if(isSelected) Color.Blue else Color.Black
+//
+//
+//
+//    OutlinedButton(
+//        border = BorderStroke(1.dp,if(selectedOptionText==text) Color.Blue else Color.Black),
+//        interactionSource = interactionSource,
+//        shape = RoundedCornerShape(14.dp),
+//        colors = ButtonDefaults.buttonColors(containerColor = bgColor),
+//        modifier = Modifier
+//            .fillMaxWidth(0.9f)
+//            .height(44.dp)
+//            .clickable { ontab }
+//    ) {
+//        Text(text, fontFamily = nanum, fontSize = 15.sp, color = Color.Black)
+//    }
+//}
 
 private fun showToast(context: Context, message: String){
     Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
@@ -211,7 +297,7 @@ private fun showToast(context: Context, message: String){
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    DeshprojectfeTheme(){
+    DeshprojectfeTheme {
         SurveyScreen()
     }
 }
