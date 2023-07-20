@@ -36,6 +36,12 @@ android {
     buildFeatures {
         compose true
     }
+    buildscript {
+        dependencies {
+            classpath 'com.android.tools.build:gradle:7.4.2'
+        }
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion '1.3.2'
     }

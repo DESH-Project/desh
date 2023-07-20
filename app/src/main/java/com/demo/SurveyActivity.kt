@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demo.desh.ui.theme.DeshprojectfeTheme
+import com.demo.desh.ui.theme.nanum
 
 class SurveyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,7 +80,7 @@ fun SurveyScreen() {
                 .height(44.dp)
                 .width(99.dp)
         ) {
-            Text(text = nextButtonText, fontSize = 15.sp, color = Color.White)
+            Text(text = nextButtonText, fontFamily = nanum, fontSize = 16.sp, color = Color.White)
         }
     }
 }
@@ -125,6 +126,7 @@ private fun SurveyText() {
 
     Text(
         text = firstGuideText,
+        fontFamily = nanum,
         fontSize = 15.sp,
         color = Color.Gray
     )
@@ -133,6 +135,7 @@ private fun SurveyText() {
 
     Text(
         text = secondGuideText,
+        fontFamily = nanum,
         fontSize = 17.sp,
         color = Color.Black
     )
@@ -184,9 +187,8 @@ private fun TargetButton(
                 onClick = {}, interactionSource = interactionSource,
                 indication = rememberRipple(bounded = false)
             )
-
     ) {
-        Text(text = text, fontSize = 15.sp, color = Color.Black)
+        Text(text, fontFamily = nanum, fontSize = 15.sp, color = Color.Black)
     }
 }
 
