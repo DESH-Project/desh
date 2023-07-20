@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">desh-project-fe</string>
+    <string name="google_client_id">1049948984062-mfadcg2sg1eqjdkh6cp93ispd906cskt.apps.googleusercontent.com</string>
+    <string name="KAKAO_NATIVE_APP_KEY">1aa31583a22732c5cc0147ada0c859de</string>
 </resources>

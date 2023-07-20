@@ -53,10 +53,10 @@ class SurveyActivity : ComponentActivity() {
 
 @Composable
 fun SurveyScreen() {
-    val appBarText = "서비스 조사"
+    val toolbarText = "서비스 조사"
     val nextButtonText = "Next"
 
-    ToolbarWithMenu(name = appBarText)
+    ToolbarWithMenu(name = toolbarText)
 
     Spacer(modifier = Modifier.padding(horizontal = 120.dp))
 
