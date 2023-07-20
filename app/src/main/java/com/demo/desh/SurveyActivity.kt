@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.ui.theme.nanum
+import kotlinx.coroutines.selects.select
 
 class SurveyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,7 +123,7 @@ private fun SurveyText() {
     val firstGuideText = "상권 추천을 위해 설문에 답변해주세요!"
     val secondGuideText = "타겟층 연령을 선택하세요!"
 
-    Text(text = logoText, fontSize = 23.sp, color = Color.Blue)
+    Text(text = logoText, fontFamily = nanum, fontSize = 23.sp, color = Color.Blue)
 
     Spacer(modifier = Modifier.padding(18.dp))
 
@@ -149,12 +151,12 @@ private fun Survey() {
     val bgColor = if (isPressed) Color.White else Color.White
     val context = LocalContext.current
 
+
     for (i in 1..4) {
         val ageText = "${i}0대"
         val age = i * 10
 
         Spacer(modifier = Modifier.padding(12.dp))
-
         TargetButton(
             context = context,
             interactionSource = interactionSource,
@@ -171,12 +173,22 @@ private fun TargetButton(
     interactionSource: MutableInteractionSource,
     bgColor: Color,
     text: String,
-    age: Int
+    age: Int,
 ) {
     val onClickText = "${age}대를 선택하셨네요!"
+    var selectedOptionText by remember { mutableStateOf<String?>(null) }
+
+    val onSelectionChange = { selectionText: String ->
+        selectedOptionText = if (selectedOptionText == selectionText) {
+            null
+        } else {
+            selectionText // Select the new option
+        }
+    }
+
 
     OutlinedButton(
-        onClick = { showToast(context, onClickText) },
+        onClick = { onSelectionChange(text) },
         border = BorderStroke(1.dp, Color.Blue),
         interactionSource = interactionSource,
         shape = RoundedCornerShape(14.dp),
@@ -184,10 +196,9 @@ private fun TargetButton(
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .height(44.dp)
-            .clickable(
-                onClick = {}, interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false)
-            )
+            .border(1.dp,if(selectedOptionText==text) Color.White else Color.Blue, shape = RoundedCornerShape(1.dp)
+            ),
+        enabled = true
     ) {
         Text(text, fontFamily = nanum, fontSize = 15.sp, color = Color.Black)
     }
