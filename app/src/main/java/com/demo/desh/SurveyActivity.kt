@@ -44,7 +44,7 @@ class SurveyActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    SurveyScreen()
+                    SurveyActivityScreen()
                 }
             }
         }
@@ -52,7 +52,7 @@ class SurveyActivity : ComponentActivity() {
 }
 
 @Composable
-fun SurveyScreen() {
+fun SurveyActivityScreen() {
     val toolbarText = "서비스 조사"
     val nextButtonText = "Next"
 
@@ -110,7 +110,6 @@ fun ToolbarWithMenu(name: String) {
             )
         }
     ) {
-        it.calculateTopPadding()
     }
 }
 
@@ -197,8 +196,8 @@ private fun showToast(context: Context, message: String){
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun SurveyActivityPreview() {
     DeshprojectfeTheme(){
-        SurveyScreen()
+        SurveyActivityScreen()
     }
 }

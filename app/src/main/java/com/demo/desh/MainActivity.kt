@@ -25,20 +25,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.demo.desh.api.RetrofitClient
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 
 private const val TAG = "MainActivity"
+private var loginSuccess = false
+private lateinit var code: String
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val nativeAppKey = applicationContext.resources.getString(R.string.KAKAO_NATIVE_APP_KEY)
+        KakaoSdk.init(this, nativeAppKey)
 
         Log.d(TAG, "keyhash : ${Utility.getKeyHash(this)}")
+        Log.d(TAG, "kakao_native_app_key : $nativeAppKey")
 
         setContent {
             DeshprojectfeTheme {
@@ -56,18 +63,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainActivityScreen() {
     val toolbarText = "로그인"
+    val loginWithKakaoText = "Login With Kakao"
     val context = LocalContext.current
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        ToolbarWithMenu(name = toolbarText)
-
-        Spacer(modifier = Modifier.padding(16.dp))
+        //ToolbarWithMenu(name = toolbarText)
 
         SocialLoginButton(
-            text = "Login With Kakao",
+            text = loginWithKakaoText,
             imageResource = R.drawable.kakao_login_large_narrow,
             onClick = { kakaoLogin(context) }
         )
@@ -88,7 +94,10 @@ fun SocialLoginButton(
             .padding(start = 16.dp, end = 16.dp),
         shape = RoundedCornerShape(6.dp)
     ) {
-        Image(painter = painterResource(id = imageResource), contentDescription = text)
+        Image(
+            painter = painterResource(id = imageResource),
+            contentDescription = text
+        )
     }
 }
 
@@ -98,8 +107,12 @@ private fun kakaoLogin(context: Context) {
         else if (token != null) Log.e(TAG, "로그인 성공 ${token.accessToken}")
     }
 
-    if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-        UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+    val instance = UserApiClient.instance
+
+    Log.d("kakaoLogin()", "Kakao Login 시도")
+
+    if (instance.isKakaoTalkLoginAvailable(context)) {
+        instance.loginWithKakaoTalk(context) { token, error ->
             // 로그인 실패
             if (error != null) {
                 Log.e(TAG, "로그인 실패 $error")
@@ -110,29 +123,33 @@ private fun kakaoLogin(context: Context) {
                 }
 
                 else {
-                    UserApiClient.instance.loginWithKakaoAccount(context, callback = mCallback)
+                    instance.loginWithKakaoAccount(context, callback = mCallback)
                 }
             }
 
             // 로그인 성공
             else if (token != null) {
-                Log.e(TAG, "로그인 성공 ${token.accessToken}")
+                code = token.accessToken
+                loginSuccess = true
+                Log.e(TAG, "로그인 성공 ${code}}")
+
+                // TODO: 백엔드로 승인코드 전달하는 로직 작성
             }
         }
-    } else {
-        UserApiClient.instance.loginWithKakaoAccount(context, callback = mCallback)
     }
 
-    UserApiClient.instance.me { user, error ->
+    instance.me { user, error ->
         if (error != null) Log.e(TAG, "사용자 정보 요청 실패 $error")
         else if (user != null) {
             Log.e(TAG, "사용자 정보 요청 성공 $user")
 
-            val nickname = user.kakaoAccount?.profile?.nickname
-            val ageRange = user.kakaoAccount?.ageRange?.toString()
-            val email = user.kakaoAccount?.email
-            val profileImageUrl = user.kakaoAccount?.profile?.profileImageUrl
-            val gender = user.kakaoAccount?.gender?.toString()
+            val account = user.kakaoAccount
+
+            val nickname = account?.profile?.nickname
+            val ageRange = account?.ageRange?.toString()
+            val email = account?.email
+            val profileImageUrl = account?.profile?.profileImageUrl
+            val gender = account?.gender?.toString()
 
             println("$nickname $ageRange $email $profileImageUrl $gender")
         }
