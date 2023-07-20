@@ -1,4 +1,4 @@
-package com.demo
+package com.demo.desh
 
 import android.content.Context
 import android.os.Bundle
@@ -110,6 +110,7 @@ fun ToolbarWithMenu(name: String) {
             )
         }
     ) {
+        it.calculateTopPadding()
     }
 }
 
