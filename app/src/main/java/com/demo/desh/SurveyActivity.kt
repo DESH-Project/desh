@@ -60,7 +60,7 @@ fun SurveyActivityScreen(user: KakaoUser) {
     val nextButtonText = "Next"
     val context = LocalContext.current
 
-    showToast(context, user.toString())
+    //showToast(context, user.toString())
 
     //ToolbarWithMenu(name = toolbarText)
 
@@ -70,8 +70,6 @@ fun SurveyActivityScreen(user: KakaoUser) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Spacer(modifier = Modifier.padding(35.dp))
-
         SurveyText()
 
         Survey()
@@ -90,10 +88,10 @@ fun SurveyActivityScreen(user: KakaoUser) {
     }
 }
 
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolbarWithMenu(name: String) {
-    /*
     Scaffold(
         topBar = {
             TopAppBar(
@@ -118,8 +116,8 @@ fun ToolbarWithMenu(name: String) {
         }
     ) {
     }
-    */
 }
+*/
 
 @Composable
 private fun SurveyText() {
@@ -127,23 +125,31 @@ private fun SurveyText() {
     val firstGuideText = "상권 추천을 위해 설문에 답변해주세요!"
     val secondGuideText = "타겟층 연령을 선택하세요!"
 
-    Text(text = logoText, fontSize = 23.sp, color = Color.Blue)
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+    ) {
+        Spacer(modifier = Modifier.padding(35.dp))
 
-    Spacer(modifier = Modifier.padding(18.dp))
+        Text(text = logoText, fontSize = 23.sp, color = Color.Blue)
 
-    Text(
-        text = firstGuideText,
-        fontSize = 15.sp,
-        color = Color.Gray
-    )
+        Spacer(modifier = Modifier.padding(18.dp))
 
-    Spacer(modifier = Modifier.padding(8.dp))
+        Text(
+            text = firstGuideText,
+            fontSize = 15.sp,
+            color = Color.Gray
+        )
 
-    Text(
-        text = secondGuideText,
-        fontSize = 17.sp,
-        color = Color.Black
-    )
+        Spacer(modifier = Modifier.padding(8.dp))
+
+        Text(
+            text = secondGuideText,
+            fontSize = 17.sp,
+            color = Color.Black
+        )
+    }
 }
 
 @Composable
@@ -205,6 +211,18 @@ private fun showToast(context: Context, message: String){
 @Preview(showBackground = true)
 @Composable
 fun SurveyActivityPreview() {
-    DeshprojectfeTheme(){
+    val mockUser = KakaoUser(
+        id = -1L,
+        nickname = "황승수",
+        ageRange = "AGE_20_29",
+        profileImageUrl = "https://k.kakaocdn.net/dn/JEY2d/btsmuprjeuP/BZOMvMtSrWze5Ymq2hoJX1/img_640x640.jpg",
+        email = "h970126@gmail.com",
+        gender = "MAIL",
+        refreshToken = "test-refreshToken",
+        accessToken = "test-accessToken"
+    )
+
+    DeshprojectfeTheme() {
+        SurveyActivityScreen(user = mockUser)
     }
 }

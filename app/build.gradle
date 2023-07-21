@@ -59,7 +59,8 @@ dependencies {
 
     // OAuth2 Library
     implementation "com.kakao.sdk:v2-user:2.15.0" // 카카오 로그인
-    implementation 'com.google.android.gms:play-services-auth:20.6.0'
+    implementation 'com.google.android.gms:play-services-auth:20.1.0' // 구글 로그인
+
 
     // Retrofit2
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
