@@ -40,6 +40,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.demo.desh.navigation.NavGraph
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.ui.theme.nanum
 import kotlinx.coroutines.selects.select
@@ -52,7 +55,7 @@ class SurveyActivity2 : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    SurveyScreen2()
+                    SurveyActivity2()
                 }
             }
         }
@@ -60,7 +63,7 @@ class SurveyActivity2 : ComponentActivity() {
 }
 
 @Composable
-fun SurveyScreen2() {
+fun SurveyScreen2(navController: NavController) {
     val appBarText = "서비스 조사"
     val submitButtonText = "Submit"
 
@@ -96,6 +99,8 @@ fun SurveyScreen2() {
         }
     }
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -216,7 +221,8 @@ fun CustomRadioGroup2() {
                         .clickable {
                             onSelectionChange(text)
                         }
-                        .border(1.5.dp,
+                        .border(
+                            1.5.dp,
                             if (text == selectedOption) {
                                 Color.Blue
                             } else {
@@ -298,6 +304,5 @@ private fun showToast(context: Context, message: String){
 @Composable
 fun DefaultPreview2() {
     DeshprojectfeTheme {
-        SurveyScreen2()
     }
 }
