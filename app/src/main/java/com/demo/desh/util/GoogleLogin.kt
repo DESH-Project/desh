@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.demo.desh.MainActivity
+import com.demo.desh.LoginActivity
 import com.demo.desh.R
 import com.demo.desh.SurveyActivity
 import com.demo.desh.api.ApiService
@@ -35,8 +35,8 @@ object GoogleLogin: SocialLogin {
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso)
     }
 
-    fun getSignInIntent(): Intent {
-        return mGoogleSignInClient.signInIntent
+    fun getSignInClient(): GoogleSignInClient {
+        return mGoogleSignInClient
     }
 
     fun alreadyLoginCheck(context: Context): GoogleSignInAccount? {
@@ -45,8 +45,8 @@ object GoogleLogin: SocialLogin {
 
     fun handleLoginTask(context: Context, task: Task<GoogleSignInAccount>) {
         val account = task.result
-        Log.d(MainActivity.LOGIN_TAG, "구글 로그인 성공")
-        Log.d(MainActivity.LOGIN_TAG, account.toString())
+        Log.d(LoginActivity.LOGIN_TAG, "구글 로그인 성공")
+        Log.d(LoginActivity.LOGIN_TAG, account.toString())
 
         val user = User(
             email = account.email!!,
@@ -75,8 +75,8 @@ object GoogleLogin: SocialLogin {
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
-                Log.e(MainActivity.LOGIN_TAG, "Google 로그인에 실패했습니다.")
-                Log.e(MainActivity.LOGIN_TAG, t.message!!)
+                Log.e(LoginActivity.LOGIN_TAG, "Google 로그인에 실패했습니다.")
+                Log.e(LoginActivity.LOGIN_TAG, t.message!!)
             }
         })
     }

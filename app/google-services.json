@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1049948984062",
+    "project_id": "iconic-hue-383104",
+    "storage_bucket": "iconic-hue-383104.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1049948984062:android:6772aa3147f2335f630baf",
+        "android_client_info": {
+          "package_name": "com.demo.desh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1049948984062-mfadcg2sg1eqjdkh6cp93ispd906cskt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.demo.desh",
+            "certificate_hash": "a691e56afb0be5cfce09e02aa345d35b3eab8736"
+          }
+        },
+        {
+          "client_id": "1049948984062-pkpmivtje9l57ve9pcjomnhj8q1qh7mb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-Gbm8stQaDBs9gpJdCzqz1MrLL6KfEDc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1049948984062-pkpmivtje9l57ve9pcjomnhj8q1qh7mb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

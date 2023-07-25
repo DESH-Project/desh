@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.demo.desh.MainActivity.Companion.LOGIN_TAG
+import com.demo.desh.LoginActivity.Companion.LOGIN_TAG
 import com.demo.desh.R
 import com.demo.desh.SurveyActivity
 import com.demo.desh.api.ApiService
