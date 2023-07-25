@@ -66,6 +66,7 @@ class SurveyActivity2 : ComponentActivity() {
 fun SurveyScreen2(navController: NavController) {
     val appBarText = "서비스 조사"
     val submitButtonText = "Submit"
+    val prevButtonText = "Previous"
 
     ToolbarWithMenu2(name = appBarText)
 
@@ -82,23 +83,45 @@ fun SurveyScreen2(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             CustomRadioGroup2()
-            Button(
-                onClick = {},
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .height(44.dp)
-                    .width(99.dp)
-            ) {
-                Text(
-                    text = submitButtonText,
-                    fontFamily = nanum,
-                    fontSize = 16.sp,
-                    color = Color.White
-                )
+
+            Row() {
+                Arrangement.Center
+
+                Button(
+                    onClick = {},
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .height(44.dp)
+                        .width(120.dp)
+                ) {
+                    Text(
+                        text = prevButtonText,
+                        fontFamily = nanum,
+                        fontSize = 13.sp,
+                        color = Color.White
+                    )
+                }
+                Button(
+                    onClick = {},
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .height(44.dp)
+                        .width(120.dp)
+                        .padding(start = 16.dp)
+                ) {
+                    Text(
+                        text = submitButtonText,
+                        fontFamily = nanum,
+                        fontSize = 13.sp,
+                        color = Color.White
+                    )
+                }
+
             }
         }
     }
 }
+
 
 
 

@@ -150,28 +150,6 @@ private fun SurveyText() {
     )
 }
 
-//@Composable
-//private fun Survey() {
-//    val interactionSource = remember { MutableInteractionSource() }
-//    val isPressed by interactionSource.collectIsPressedAsState()
-//    val bgColor = if (isPressed) Color.White else Color.White
-//    val context = LocalContext.current
-//
-//
-//    for (i in 1..4) {
-//        val ageText = "${i}0대"
-//        val age = i * 10
-//
-//        Spacer(modifier = Modifier.padding(12.dp))
-//        TargetButton(
-//            context = context,
-//            interactionSource = interactionSource,
-//            bgColor = bgColor,
-//            text = ageText,
-//            age = age
-//        )
-//    }
-//}
 @Composable
 fun CustomRadioGroup() {
     val options = listOf(
@@ -230,62 +208,6 @@ fun CustomRadioGroup() {
             }
         }
     }
-
-//
-//@Composable
-//private fun ToggleButton(
-//    text: String,
-//    isSelected: Boolean,
-//    onSelectionChange: () -> Unit,
-//) {
-//    // Use different colors to indicate the selection state
-//    val selectedColor = Color.Blue
-//    val unselectedColor = Color.Black
-//
-//    Button(
-//        onClick = { onSelectionChange() },
-//        colors = ButtonDefaults.buttonColors(if (isSelected) selectedColor else unselectedColor
-//        ),
-//        modifier = Modifier
-//            .fillMaxWidth(0.9f)
-//            .height(44.dp)
-//            .border(1.dp, selectedColor, RoundedCornerShape(14.dp)),
-//        shape = RoundedCornerShape(14.dp)
-//    ) {
-//        Text(text, fontFamily = nanum, fontSize = 15.sp, color = Color.White)
-//    }
-//}
-
-
-//@Composable
-//private fun TargetButton(
-//    isSelected: Boolean,
-//    ontab: ()->Unit,
-//    context: Context,
-//    interactionSource: MutableInteractionSource,
-//    bgColor: Color,
-//    text: String,
-//    age: Int,
-//) {
-//    val onClickText = "${age}대를 선택하셨네요!"
-//    var selectedIndex by rememberSaveable{mutableStateOf(0)}
-//    val color = if(isSelected) Color.Blue else Color.Black
-//
-//
-//
-//    OutlinedButton(
-//        border = BorderStroke(1.dp,if(selectedOptionText==text) Color.Blue else Color.Black),
-//        interactionSource = interactionSource,
-//        shape = RoundedCornerShape(14.dp),
-//        colors = ButtonDefaults.buttonColors(containerColor = bgColor),
-//        modifier = Modifier
-//            .fillMaxWidth(0.9f)
-//            .height(44.dp)
-//            .clickable { ontab }
-//    ) {
-//        Text(text, fontFamily = nanum, fontSize = 15.sp, color = Color.Black)
-//    }
-//}
 
 
 @Preview(showBackground = true)
