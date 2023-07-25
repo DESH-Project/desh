@@ -1,6 +1,5 @@
 package com.demo.desh
 
-
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -29,12 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.demo.desh.navigation.NavGraph
-import com.demo.desh.navigation.Screen
 import androidx.compose.ui.unit.dp
 import com.demo.desh.api.ApiService
 import com.demo.desh.api.RetrofitClient
@@ -55,7 +49,6 @@ import com.kakao.sdk.user.UserApiClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 
 @SuppressLint("StaticFieldLeak")
 private lateinit var mGoogleSignInClient: GoogleSignInClient

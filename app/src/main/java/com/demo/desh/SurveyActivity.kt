@@ -9,19 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -33,11 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.navigation.NavGraph
 import com.demo.desh.navigation.Screen
@@ -64,14 +48,11 @@ class SurveyActivity : ComponentActivity() {
 }
 
 @Composable
-fun SurveyActivityScreen(user: KakaoUser) {
-    val toolbarText = "서비스 조사"
+fun SurveyScreen(navController: NavHostController) {
+    val appBarText = "서비스 조사"
     val nextButtonText = "Next"
-    val context = LocalContext.current
 
-    //showToast(context, user.toString())
-
-    //ToolbarWithMenu(name = toolbarText)
+    //ToolbarWithMenu(name = appBarText)
 
     Spacer(modifier = Modifier.padding(horizontal = 90.dp))
 
@@ -80,7 +61,6 @@ fun SurveyActivityScreen(user: KakaoUser) {
         modifier = Modifier.fillMaxSize()
     ) {
         Spacer(modifier = Modifier.padding(35.dp))
-
         SurveyText()
         Spacer(modifier = Modifier.padding(start = 0.dp, 35.dp, 0.dp, 0.dp))
         Box(
@@ -229,6 +209,5 @@ private fun showToast(context: Context, message: String){
 @Composable
 fun DefaultPreview() {
     DeshprojectfeTheme {
-        SurveyScreen(navController = rememberNavController())
     }
 }
