@@ -10,21 +10,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +37,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
@@ -95,7 +93,6 @@ class MainActivity : ComponentActivity() {
             DeshprojectfeTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
                     MainActivityScreen()
                 }
@@ -109,12 +106,8 @@ fun MainActivityScreen() {
     val loginWithKakaoText = "Sign In With Kakao"
     val loginWithGoogleText = "Sign In With Google"
     val context = LocalContext.current
-//    val intent = Intent(context, SurveyActivity::class.java)
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
+    Column {
         SocialLoginButton(
             text = loginWithKakaoText,
             imageResource = R.drawable.kakao_login_large_narrow,
@@ -132,14 +125,7 @@ fun MainActivityScreen() {
         Spacer(modifier = Modifier.padding(120.dp))
 
         TestLoginButtonWithMockUser(context = context)
-
     }
-}
-
-@Composable
-fun TestCICDRequest() {
-    val client = RetrofitClient.getClient(RetrofitClient.domain)
-    val create = client.create(ApiException::class.java)
 }
 
 @Composable
@@ -148,17 +134,18 @@ fun SocialLoginButton(
     imageResource: Int,
     onClick: () -> Unit = {}
 ) {
-    Button(
+    IconButton(
         onClick = onClick,
         modifier = Modifier
-            .fillMaxWidth()
-            .height(90.dp)
-            .padding(start = 16.dp, end = 16.dp),
-        shape = RoundedCornerShape(6.dp)
+            .width(240.dp)
+            .height(48.dp)
+            .background(Color.White)
     ) {
         Image(
             painter = painterResource(id = imageResource),
-            contentDescription = text
+            contentDescription = text,
+            modifier = Modifier
+                .fillMaxSize()
         )
     }
 }
