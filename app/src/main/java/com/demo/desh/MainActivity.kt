@@ -189,10 +189,6 @@ private fun kakaoLogin(context: Context) {
                     instance.loginWithKakaoAccount(context, callback = mCallback)
                 }
             }
-
-            // 로그인 성공
-            else if (token != null) {
-            }
         }
     }
 
