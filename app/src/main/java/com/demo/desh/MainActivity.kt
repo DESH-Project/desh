@@ -37,6 +37,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
@@ -47,6 +48,7 @@ import com.kakao.sdk.user.UserApiClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
 
 @SuppressLint("StaticFieldLeak")
 private lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -128,7 +130,14 @@ fun MainActivityScreen() {
         Spacer(modifier = Modifier.padding(120.dp))
 
         TestLoginButtonWithMockUser(context = context)
+
     }
+}
+
+@Composable
+fun TestCICDRequest() {
+    val client = RetrofitClient.getClient(RetrofitClient.domain)
+    val create = client.create(ApiException::class.java)
 }
 
 @Composable
@@ -231,6 +240,7 @@ private fun sendToServer(context: Context, kakaoUser: KakaoUser) {
 
         override fun onFailure(call: Call<Long>, t: Throwable) {
             Log.e(LOGIN_TAG, "로그인에 실패했습니다.")
+            Log.e(LOGIN_TAG, t.message!!)
         }
     })
 }

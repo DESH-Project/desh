@@ -18,4 +18,7 @@ interface ApiService {
 
     @POST("login")
     fun login(@Body user: KakaoUser): Call<Long>
+
+    @GET("cicd")
+    fun test(): Call<String>
 }
