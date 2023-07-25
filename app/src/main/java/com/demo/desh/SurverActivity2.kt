@@ -210,9 +210,9 @@ private fun SurveyText2() {
 fun CustomRadioGroup2() {
     val options = listOf(
         "요식업",
-        "요식업",
-        "요식업",
-        "요식업",
+        "요식업1",
+        "요식업2",
+        "요식업3",
     )
     var selectedOption by remember {
         mutableStateOf("")
