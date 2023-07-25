@@ -4,8 +4,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val host = "good-place"
-    const val domain = "http://$host/"
+    private const val host = "good-place.shop"
+    private const val port = "8080"
+    const val domain = "http://$host:$port/"
 
     private var retrofit: Retrofit? = null
 
