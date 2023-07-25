@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">desh-project-fe</string>
+    <string name="APP_NAME">DESH</string>
+    <string name="GOOGLE_CLIENT_ID">1049948984062-mfadcg2sg1eqjdkh6cp93ispd906cskt.apps.googleusercontent.com</string>
+    <string name="KAKAO_NATIVE_APP_KEY">1aa31583a22732c5cc0147ada0c859de</string>
+    <string name="KAKAO_REST_API_KEY">7505a47ea62f6bec77a08c119022b8cf</string>
+    <string name="NAVER_CLIENT_ID">cMZYdqsebw6CRa545w0n</string>
+    <string name="NAVER_CLIENT_SECRET">CywJNMVVUn</string>
 </resources>
