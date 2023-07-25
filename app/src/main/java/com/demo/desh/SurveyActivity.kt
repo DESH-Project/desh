@@ -1,6 +1,8 @@
 package com.demo.desh
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -208,7 +210,9 @@ fun CustomRadioGroup() {
             }
         }
     }
-
+private fun showToast(context: Context, message: String){
+    Toast.makeText(context,message, Toast.LENGTH_SHORT).show()
+}
 
 @Preview(showBackground = true)
 @Composable

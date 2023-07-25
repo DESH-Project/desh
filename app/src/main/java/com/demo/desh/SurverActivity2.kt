@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.navigation.NavGraph
+import com.demo.desh.navigation.Screen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.ui.theme.nanum
 import kotlinx.coroutines.selects.select
@@ -88,7 +89,8 @@ fun SurveyScreen2(navController: NavController) {
                 Arrangement.Center
 
                 Button(
-                    onClick = {},
+                    onClick = {navController.navigate(Screen.Survey1.route)
+                    },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .height(44.dp)
