@@ -5,9 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -24,10 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,9 +34,10 @@ import com.demo.desh.api.RetrofitClient
 import com.demo.desh.dto.KakaoUser
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
@@ -51,14 +47,39 @@ import com.kakao.sdk.user.UserApiClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.math.sign
 
 @SuppressLint("StaticFieldLeak")
 private lateinit var mGoogleSignInClient: GoogleSignInClient
 private const val TAG = "MainActivity"
-private const val RC_SIGN_IN = 10
 
 class MainActivity : ComponentActivity() {
+    private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestEmail()
+        .build()
+
+    private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == 1) {
+            val data = result.data
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
+        }
+    }
+
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        val account = completedTask.result
+        val email = account?.email
+        val familyName = account?.familyName
+
+        Log.d(TAG, "구글 로그인 성공")
+        Log.d(TAG, "email=$email, familyName=$familyName")
+    }
+
+    fun signIn(context: Context) {
+        mGoogleSignInClient = GoogleSignIn.getClient(context, gso)
+        val signInIntent = mGoogleSignInClient.signInIntent
+        resultLauncher.launch(signInIntent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val nativeAppKey = applicationContext.resources.getString(R.string.KAKAO_NATIVE_APP_KEY)
@@ -90,8 +111,6 @@ fun MainActivityScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        //ToolbarWithMenu(name = toolbarText)
-
         SocialLoginButton(
             text = loginWithKakaoText,
             imageResource = R.drawable.kakao_login_large_narrow,
@@ -100,7 +119,11 @@ fun MainActivityScreen() {
 
         Spacer(modifier = Modifier.padding(16.dp))
 
-        GoogleLoginButton(context, loginWithGoogleText)
+        SocialLoginButton(
+            text = loginWithGoogleText,
+            imageResource = R.drawable.btn_google_signin_light_focus_web,
+            onClick = { MainActivity().signIn(context) }
+        )
 
         Spacer(modifier = Modifier.padding(120.dp))
 
@@ -109,34 +132,10 @@ fun MainActivityScreen() {
 }
 
 @Composable
-private fun TestLoginButtonWithMockUser(context: Context) {
-    val onButtonClick = {
-        val mockUser = KakaoUser(
-            id = -1L,
-            nickname = "황승수",
-            ageRange = "AGE_20_29",
-            profileImageUrl = "https://k.kakaocdn.net/dn/JEY2d/btsmuprjeuP/BZOMvMtSrWze5Ymq2hoJX1/img_640x640.jpg",
-            email = "h970126@gmail.com",
-            gender = "MAIL",
-            refreshToken = "test-refreshToken",
-            accessToken = "test-accessToken"
-        )
-
-        val intent = Intent(context, SurveyActivity::class.java)
-        intent.putExtra("user", mockUser)
-        context.startActivity(intent)
-    }
-
-    Button(onClick = onButtonClick) {
-        Text(text = "Test Button To Next Step")
-    }
-}
-
-@Composable
 fun SocialLoginButton(
     text: String,
     imageResource: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
     Button(
         onClick = onClick,
@@ -153,65 +152,15 @@ fun SocialLoginButton(
     }
 }
 
-@Composable
-private fun GoogleLoginButton(
-    context: Context,
-    text: String
-) {
-    val onLoginFailed = { Log.e(TAG, "구글 로그인 실패") }
-    val onAuthorizationCodeReceived = { code: String ->
-        Log.d(TAG, "code = $code")
-    }
-
-    val signInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            if (account != null) {
-                // 승인 코드(Authorization Code)를 얻어옴
-                val authCode = account.serverAuthCode
-                if (authCode != null) {
-                    onAuthorizationCodeReceived(authCode)
-                } else {
-                    onLoginFailed()
-                }
-            } else {
-                Log.e(TAG, "Account is Null")
-                onLoginFailed()
-            }
-        } catch (e: ApiException) {
-            Log.e(TAG, "ApiException Occurred : ${e.message}")
-            onLoginFailed()
-        }
-    }
-
-    SocialLoginButton(
-        onClick = {
-            val clientId = context.getString(R.string.GOOGLE_CLIENT_ID)
-
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestServerAuthCode(clientId, false) // 여기에 구글 콘솔에서 발급받은 웹 클라이언트 ID를 입력하세요.
-                .requestEmail()
-                .build()
-            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            val signInIntent = googleSignInClient.signInIntent
-            signInLauncher.launch(signInIntent)
-        },
-        text = text,
-        imageResource = R.drawable.btn_google_signin_light_focus_web
-    )
-}
-
 private fun kakaoLogin(context: Context) {
     val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) Log.e(TAG, "로그인 실패 $error")
-        else if (token != null) Log.e(TAG, "로그인 성공 ${token.accessToken}")
+        else if (token != null) Log.e(TAG, "로그인 성공 ${token.accessToken} ${token.idToken}")
     }
 
     var isSuccess = false
     var getUserInfoSuccess = false
     val instance = UserApiClient.instance
-    var code: String? = null
     var kakaoUser: KakaoUser? = null
 
     Log.d("kakaoLogin()", "Kakao Login 시도")
@@ -234,9 +183,7 @@ private fun kakaoLogin(context: Context) {
 
             // 로그인 성공
             else if (token != null) {
-                code = token.accessToken
                 isSuccess = true
-                Log.e(TAG, "로그인 성공 ${code}}")
             }
         }
     }
@@ -263,39 +210,59 @@ private fun kakaoLogin(context: Context) {
             )
 
             getUserInfoSuccess = true
-            println("$nickname $ageRange $email $profileImageUrl $gender")
+            Log.d(TAG, "$nickname $ageRange $email $profileImageUrl $gender")
         }
     }
 
-    if (isSuccess && getUserInfoSuccess && code != null && kakaoUser != null) {
-        sendToServer(context, code!!, kakaoUser!!)
+    if (isSuccess && getUserInfoSuccess  && kakaoUser != null) {
+        sendToServer(context, kakaoUser!!)
     }
 }
 
-private fun sendToServer(context: Context, code: String, kakaoUser: KakaoUser) {
+private fun sendToServer(context: Context, kakaoUser: KakaoUser) {
     val retrofit = RetrofitClient.getClient(RetrofitClient.domain)
     val apiService = retrofit.create(ApiService::class.java)
-    val result = apiService.sendAuthCode(code)
+    val result = apiService.login(kakaoUser)
 
     result.enqueue(object : Callback<Long> {
         override fun onResponse(call: Call<Long>, response: Response<Long>) {
-            val accessToken = response.headers()["Authorization"]
-            val refreshToken = response.headers()["Authorization-Refresh"]
             val id = response.body()
 
-            kakaoUser.accessToken = accessToken
-            kakaoUser.refreshToken = refreshToken
             kakaoUser.id = id
+            Toast.makeText(context, kakaoUser.toString(), Toast.LENGTH_SHORT).show()
 
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra("user", kakaoUser)
             context.startActivity(intent)
+
         }
 
         override fun onFailure(call: Call<Long>, t: Throwable) {
             TODO("Not yet implemented")
         }
     })
+}
+
+@Composable
+private fun TestLoginButtonWithMockUser(context: Context) {
+    val onButtonClick = {
+        val mockUser = KakaoUser(
+            id = -1L,
+            nickname = "황승수",
+            ageRange = "AGE_20_29",
+            profileImageUrl = "https://k.kakaocdn.net/dn/JEY2d/btsmuprjeuP/BZOMvMtSrWze5Ymq2hoJX1/img_640x640.jpg",
+            email = "h970126@gmail.com",
+            gender = "MAIL"
+        )
+
+        val intent = Intent(context, SurveyActivity::class.java)
+        intent.putExtra("user", mockUser)
+        context.startActivity(intent)
+    }
+
+    Button(onClick = onButtonClick) {
+        Text(text = "Test Button To Next Step")
+    }
 }
 
 @Preview(showBackground = true)
