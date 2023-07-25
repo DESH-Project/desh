@@ -1,5 +1,6 @@
 package com.demo.desh
 
+
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -28,6 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.demo.desh.navigation.NavGraph
+import com.demo.desh.navigation.Screen
 import androidx.compose.ui.unit.dp
 import com.demo.desh.api.ApiService
 import com.demo.desh.api.RetrofitClient
@@ -91,6 +98,7 @@ class MainActivity : ComponentActivity() {
         Log.d(LOGIN_TAG, "kakao_native_app_key : $nativeAppKey")
 
         setContent {
+            val navController = rememberNavController()
             DeshprojectfeTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -108,6 +116,7 @@ fun MainActivityScreen() {
     val loginWithKakaoText = "Sign In With Kakao"
     val loginWithGoogleText = "Sign In With Google"
     val context = LocalContext.current
+//    val intent = Intent(context, SurveyActivity::class.java)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
