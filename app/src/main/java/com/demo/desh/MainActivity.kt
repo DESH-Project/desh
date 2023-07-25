@@ -50,7 +50,7 @@ import retrofit2.Response
 
 @SuppressLint("StaticFieldLeak")
 private lateinit var mGoogleSignInClient: GoogleSignInClient
-private const val TAG = "MainActivity"
+private const val LOGIN_TAG = "MainActivity_LOGIN"
 
 class MainActivity : ComponentActivity() {
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -70,8 +70,8 @@ class MainActivity : ComponentActivity() {
         val email = account?.email
         val familyName = account?.familyName
 
-        Log.d(TAG, "구글 로그인 성공")
-        Log.d(TAG, "email=$email, familyName=$familyName")
+        Log.d(LOGIN_TAG, "구글 로그인 성공")
+        Log.d(LOGIN_TAG, "email=$email, familyName=$familyName")
     }
 
     fun signIn(context: Context) {
@@ -85,8 +85,8 @@ class MainActivity : ComponentActivity() {
         val nativeAppKey = applicationContext.resources.getString(R.string.KAKAO_NATIVE_APP_KEY)
         KakaoSdk.init(this, nativeAppKey)
 
-        Log.d(TAG, "keyhash : ${Utility.getKeyHash(this)}")
-        Log.d(TAG, "kakao_native_app_key : $nativeAppKey")
+        Log.d(LOGIN_TAG, "keyhash : ${Utility.getKeyHash(this)}")
+        Log.d(LOGIN_TAG, "kakao_native_app_key : $nativeAppKey")
 
         setContent {
             DeshprojectfeTheme {
@@ -154,22 +154,20 @@ fun SocialLoginButton(
 
 private fun kakaoLogin(context: Context) {
     val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        if (error != null) Log.e(TAG, "로그인 실패 $error")
-        else if (token != null) Log.e(TAG, "로그인 성공 ${token.accessToken} ${token.idToken}")
+        if (error != null) Log.e(LOGIN_TAG, "로그인 실패 $error")
+        else if (token != null) Log.e(LOGIN_TAG, "로그인 성공 ${token.accessToken} ${token.idToken}")
     }
 
-    var isSuccess = false
-    var getUserInfoSuccess = false
     val instance = UserApiClient.instance
     var kakaoUser: KakaoUser? = null
 
-    Log.d("kakaoLogin()", "Kakao Login 시도")
+    Log.d(LOGIN_TAG, "Kakao Login 시도")
 
     if (instance.isKakaoTalkLoginAvailable(context)) {
         instance.loginWithKakaoTalk(context) { token, error ->
             // 로그인 실패
             if (error != null) {
-                Log.e(TAG, "로그인 실패 $error")
+                Log.e(LOGIN_TAG, "로그인 실패 $error")
 
                 // 사용자가 취소 버튼을 눌렀을 때
                 if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
@@ -183,15 +181,14 @@ private fun kakaoLogin(context: Context) {
 
             // 로그인 성공
             else if (token != null) {
-                isSuccess = true
             }
         }
     }
 
     instance.me { user, error ->
-        if (error != null) Log.e(TAG, "사용자 정보 요청 실패 $error")
+        if (error != null) Log.e(LOGIN_TAG, "사용자 정보 요청 실패 $error")
         else if (user != null) {
-            Log.e(TAG, "사용자 정보 요청 성공 $user")
+            Log.e(LOGIN_TAG, "사용자 정보 요청 성공 $user")
 
             val account = user.kakaoAccount
 
@@ -209,13 +206,9 @@ private fun kakaoLogin(context: Context) {
                 gender = gender!!
             )
 
-            getUserInfoSuccess = true
-            Log.d(TAG, "$nickname $ageRange $email $profileImageUrl $gender")
+            Log.d(LOGIN_TAG, "서버에 전송합니다")
+            sendToServer(context, kakaoUser!!)
         }
-    }
-
-    if (isSuccess && getUserInfoSuccess  && kakaoUser != null) {
-        sendToServer(context, kakaoUser!!)
     }
 }
 
@@ -234,11 +227,10 @@ private fun sendToServer(context: Context, kakaoUser: KakaoUser) {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra("user", kakaoUser)
             context.startActivity(intent)
-
         }
 
         override fun onFailure(call: Call<Long>, t: Throwable) {
-            TODO("Not yet implemented")
+            Log.e(LOGIN_TAG, "로그인에 실패했습니다.")
         }
     })
 }
