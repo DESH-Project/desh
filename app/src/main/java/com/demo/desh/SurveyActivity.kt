@@ -25,14 +25,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.navigation.NavGraph
 import com.demo.desh.navigation.Screen
-import com.demo.desh.dto.KakaoUser
+import com.demo.desh.dto.User
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.ui.theme.nanum
 
 class SurveyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val user = intent.getSerializableExtra("user") as KakaoUser
+        val user = intent.getSerializableExtra("user") as User
 
         setContent {
             DeshprojectfeTheme{

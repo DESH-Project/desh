@@ -9,7 +9,7 @@ import com.demo.desh.R
 import com.demo.desh.SurveyActivity
 import com.demo.desh.api.ApiService
 import com.demo.desh.api.RetrofitClient
-import com.demo.desh.dto.KakaoUser
+import com.demo.desh.dto.User
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
@@ -20,8 +20,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-object KakaoLogin {
-    fun init(context: Context) {
+object KakaoLogin: SocialLogin {
+    override fun init(context: Context) {
         val nativeAppKey = context.resources.getString(R.string.KAKAO_NATIVE_APP_KEY)
         KakaoSdk.init(context, nativeAppKey)
 
@@ -29,14 +29,14 @@ object KakaoLogin {
         Log.d(LOGIN_TAG, "kakao_native_app_key : $nativeAppKey")
     }
 
-    fun kakaoLogin(context: Context) {
+    fun login(context: Context) {
         val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) Log.e(LOGIN_TAG, "로그인 실패 $error")
             else if (token != null) Log.e(LOGIN_TAG, "로그인 성공 ${token.accessToken} ${token.idToken}")
         }
 
         val instance = UserApiClient.instance
-        var kakaoUser: KakaoUser? = null
+        var kakaoUser: User? = null
 
         Log.d(LOGIN_TAG, "Kakao Login 시도")
 
@@ -66,44 +66,40 @@ object KakaoLogin {
                 val account = user.kakaoAccount
 
                 val nickname = account?.profile?.nickname
-                val ageRange = account?.ageRange?.toString()
                 val email = account?.email
                 val profileImageUrl = account?.profile?.profileImageUrl
-                val gender = account?.gender?.toString()
 
-                kakaoUser = KakaoUser(
+                kakaoUser = User(
                     nickname = nickname!!,
-                    ageRange = ageRange!!,
                     email = email!!,
                     profileImageUrl = profileImageUrl!!,
-                    gender = gender!!
                 )
 
                 Log.d(LOGIN_TAG, "서버에 전송합니다")
-                sendToServer(context, kakaoUser!!)
+                send(context, kakaoUser!!)
             }
         }
     }
 
-    private fun sendToServer(context: Context, kakaoUser: KakaoUser) {
+    override fun send(context: Context, user: User) {
         val retrofit = RetrofitClient.getClient(RetrofitClient.domain)
         val apiService = retrofit.create(ApiService::class.java)
-        val result = apiService.login(kakaoUser)
+        val result = apiService.login(user)
 
         result.enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
                 val id = response.body()
 
-                kakaoUser.id = id
-                Toast.makeText(context, kakaoUser.toString(), Toast.LENGTH_SHORT).show()
+                user.id = id
+                Toast.makeText(context, user.toString(), Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(context, SurveyActivity::class.java)
-                intent.putExtra("user", kakaoUser)
+                intent.putExtra("user", user)
                 context.startActivity(intent)
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
-                Log.e(LOGIN_TAG, "로그인에 실패했습니다.")
+                Log.e(LOGIN_TAG, "Kakao 로그인에 실패했습니다.")
                 Log.e(LOGIN_TAG, t.message!!)
             }
         })

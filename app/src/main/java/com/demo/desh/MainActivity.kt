@@ -1,10 +1,15 @@
 package com.demo.desh
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,15 +33,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demo.desh.dto.KakaoUser
+import com.demo.desh.dto.User
 import com.demo.desh.ui.theme.DeshprojectfeTheme
+import com.demo.desh.util.GoogleLogin
 import com.demo.desh.util.KakaoLogin
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.tasks.Task
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         KakaoLogin.init(this)
+        GoogleLogin.init(this)
 
         setContent {
             DeshprojectfeTheme {
@@ -96,6 +106,23 @@ fun SocialLoginButtons(context: Context) {
     val loginWithGoogleText = "Sign In With Google"
     val loginGuideText = "아래 계정으로 서비스 시작하기"
 
+    val startForResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            Log.d(MainActivity.LOGIN_TAG, "startForResult() 실행 ${result.resultCode} ${Activity.RESULT_OK}")
+            Log.d(MainActivity.LOGIN_TAG, result.data?.dataString ?: "null")
+
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+
+                if (intent != null) {
+                    val task: Task<GoogleSignInAccount> =
+                        GoogleSignIn.getSignedInAccountFromIntent(intent)
+
+                    GoogleLogin.handleLoginTask(context, task)
+                }
+            }
+        }
+
     Text(
         text = loginGuideText,
         color = Color.Black.copy(alpha = 0.7f),
@@ -108,7 +135,7 @@ fun SocialLoginButtons(context: Context) {
     SocialLoginButton(
         text = loginWithKakaoText,
         imageResource = R.drawable.kakao_login_large_narrow,
-        onClick = { KakaoLogin.kakaoLogin(context) }
+        onClick = { KakaoLogin.login(context) }
     )
 
     Spacer(modifier = Modifier.padding(4.dp))
@@ -116,6 +143,7 @@ fun SocialLoginButtons(context: Context) {
     SocialLoginButton(
         text = loginWithGoogleText,
         imageResource = R.drawable.btn_google_signin_light_focus_web,
+        onClick = { startForResult.launch(GoogleLogin.getSignInIntent()) }
     )
 
     Spacer(modifier = Modifier.padding(4.dp))
@@ -147,13 +175,11 @@ fun SocialLoginButton(
 @Composable
 private fun TestLoginButtonWithMockUser(context: Context) {
     val onButtonClick = {
-        val mockUser = KakaoUser(
+        val mockUser = User(
             id = -1L,
             nickname = "황승수",
-            ageRange = "AGE_20_29",
             profileImageUrl = "https://k.kakaocdn.net/dn/JEY2d/btsmuprjeuP/BZOMvMtSrWze5Ymq2hoJX1/img_640x640.jpg",
             email = "h970126@gmail.com",
-            gender = "MAIL"
         )
 
         val intent = Intent(context, SurveyActivity::class.java)

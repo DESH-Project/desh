@@ -1,6 +1,6 @@
 package com.demo.desh.api
 
-import com.demo.desh.dto.KakaoUser
+import com.demo.desh.dto.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -17,8 +17,5 @@ interface ApiService {
     )
 
     @POST("login")
-    fun login(@Body user: KakaoUser): Call<Long>
-
-    @GET("cicd")
-    fun test(): Call<String>
+    fun login(@Body user: User): Call<Long>
 }
