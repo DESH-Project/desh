@@ -41,7 +41,14 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Deshprojectfe">
+            android:theme="@style/Theme.AppCompat">
+
+        </activity>
+
+        <activity
+            android:name=".SurveyActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat">
 
         </activity>
     </application>

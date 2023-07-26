@@ -5,10 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.demo.desh.LoginActivity
+import com.demo.desh.MainActivity
 import com.demo.desh.R
-import com.demo.desh.SurveyActivity
-import com.demo.desh.api.ApiService
 import com.demo.desh.api.RetrofitClient
 import com.demo.desh.dto.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -23,6 +21,7 @@ import retrofit2.Response
 object GoogleLogin: SocialLogin {
     @SuppressLint("StaticFieldLeak")
     private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private const val TAG = "GoogleLLoginObject"
 
     override fun init(context: Context) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -45,8 +44,8 @@ object GoogleLogin: SocialLogin {
 
     fun handleLoginTask(context: Context, task: Task<GoogleSignInAccount>) {
         val account = task.result
-        Log.d(LoginActivity.LOGIN_TAG, "구글 로그인 성공")
-        Log.d(LoginActivity.LOGIN_TAG, account.toString())
+        Log.d(TAG, "구글 로그인 성공")
+        Log.d(TAG, account.toString())
 
         val user = User(
             email = account.email!!,
@@ -58,26 +57,29 @@ object GoogleLogin: SocialLogin {
     }
 
     override fun send(context: Context, user: User) {
-        val retrofit = RetrofitClient.getClient(RetrofitClient.domain)
-        val apiService = retrofit.create(ApiService::class.java)
-        val login = apiService.login(user)
+        val userService = RetrofitClient.userService
+        val login = userService.login(user)
 
         login.enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
-                val id = response.body()
-
-                user.id = id
-                Toast.makeText(context, user.toString(), Toast.LENGTH_SHORT).show()
-
-                val intent = Intent(context, SurveyActivity::class.java)
-                intent.putExtra("user", user)
-                context.startActivity(intent)
+                user.id = response.body()
+                intentNext(context, user)
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
-                Log.e(LoginActivity.LOGIN_TAG, "Google 로그인에 실패했습니다.")
-                Log.e(LoginActivity.LOGIN_TAG, t.message!!)
+                val loginFailText = "Google Login에 실패하였습니다"
+
+                Log.e(TAG, loginFailText)
+                Log.e(TAG, t.message!!)
+                Toast.makeText(context, loginFailText, Toast.LENGTH_SHORT).show()
+
             }
         })
+    }
+
+    override fun intentNext(context: Context, user: User) {
+        val intent = Intent(context, MainActivity::class.java)
+        intent.putExtra("user", user)
+        context.startActivity(intent)
     }
 }

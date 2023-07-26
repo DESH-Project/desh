@@ -6,18 +6,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
     private const val host = "good-place.shop"
     private const val port = "8080"
-    const val domain = "http://$host:$port/"
+    private const val domain = "http://$host:$port/"
 
-    private var retrofit: Retrofit? = null
+    private val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(domain)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    internal fun getClient(baseUrl: String) : Retrofit {
-        if (retrofit == null) {
-            retrofit = Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-        }
-
-        return retrofit!!
+    val userService: UserService by lazy {
+        retrofit.create(UserService::class.java)
     }
 }

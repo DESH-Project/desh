@@ -1,4 +1,4 @@
-package com.demo.desh.ui
+package com.demo.desh.ui.screen
 
 import android.content.Context
 import android.content.Intent
@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demo.desh.LoginActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.demo.desh.R
 import com.demo.desh.SurveyActivity
 import com.demo.desh.dto.User
@@ -35,11 +35,14 @@ import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.util.AuthResultContract
 import com.demo.desh.util.GoogleLogin
 import com.demo.desh.util.KakaoLogin
+import com.demo.desh.viewmodel.UserViewModel
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 
+private const val TAG = "LoginScreen"
+
 @Composable
-fun LoginActivityScreen() {
+fun LoginActivityScreen(viewModel: UserViewModel) {
     val context = LocalContext.current
 
     Column(
@@ -80,7 +83,7 @@ private fun SocialLoginButtons(context: Context) {
     val loginWithGoogleText = "Sign In With Google"
     val loginGuideText = "아래 계정으로 서비스 시작하기"
 
-    val handleOnError = { Log.e(LoginActivity.LOGIN_TAG, "구글 로그인 에러")}
+    val handleOnError = { Log.e(TAG, "구글 로그인 에러")}
     val googleSignInClient = GoogleLogin.getSignInClient()
     val signInRequestCode = 1
     val coroutineScope = rememberCoroutineScope()
@@ -90,7 +93,7 @@ private fun SocialLoginButtons(context: Context) {
             try {
                 val account = it?.getResult(ApiException::class.java)
                 if (account == null) {
-                    Log.e(LoginActivity.LOGIN_TAG, "account is null")
+                    Log.e(TAG, "account is null")
                     handleOnError()
                 } else {
                     coroutineScope.launch {
@@ -98,7 +101,7 @@ private fun SocialLoginButtons(context: Context) {
                     }
                 }
             } catch (e: ApiException) {
-                Log.e(LoginActivity.LOGIN_TAG, "ApiException Occurred")
+                Log.e(TAG, "ApiException Occurred")
                 handleOnError()
             }
         }
@@ -112,15 +115,15 @@ private fun SocialLoginButtons(context: Context) {
 
     Spacer(modifier = Modifier.padding(4.dp))
 
-    SocialLoginButton(
+    SocialLoginIconButton(
         text = loginWithKakaoText,
         imageResource = R.drawable.kakao_login_large_narrow,
-        onClick = { KakaoLogin.login(context) }
+        onClick = { coroutineScope.launch {KakaoLogin.login(context) } }
     )
 
     Spacer(modifier = Modifier.padding(4.dp))
 
-    SocialLoginButton(
+    SocialLoginIconButton(
         text = loginWithGoogleText,
         imageResource = R.drawable.btn_google_signin_light_focus_web,
         onClick = { authResultLauncher.launch(signInRequestCode) }
@@ -132,7 +135,7 @@ private fun SocialLoginButtons(context: Context) {
 }
 
 @Composable
-private fun SocialLoginButton(
+private fun SocialLoginIconButton(
     text: String,
     imageResource: Int,
     onClick: () -> Unit = {}
@@ -176,6 +179,6 @@ private fun TestLoginButtonWithMockUser(context: Context) {
 @Composable
 private fun LoginActivityScreenPreview() {
     DeshprojectfeTheme {
-        LoginActivityScreen()
+        LoginActivityScreen(viewModel())
     }
 }

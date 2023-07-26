@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.demo.desh.util.GoogleLogin
-import com.demo.desh.util.LoginViewModel
+import com.demo.desh.viewmodel.LoginViewModel
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {

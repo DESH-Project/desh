@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface ApiService {
+interface UserService {
     @GET("oauth/authorize")
     fun getAuthCode(
         @Query("client_id") client_id: String,
