@@ -1,4 +1,4 @@
-package com.demo.desh.viewmodel
+package com.demo.desh.viewModels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

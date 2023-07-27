@@ -7,7 +7,7 @@ import android.widget.Toast
 import com.demo.desh.MainActivity
 import com.demo.desh.R
 import com.demo.desh.api.RetrofitClient
-import com.demo.desh.dto.User
+import com.demo.desh.model.User
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError

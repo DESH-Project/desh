@@ -15,7 +15,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.demo.desh.util.GoogleLogin
-import com.demo.desh.viewmodel.LoginViewModel
+import com.demo.desh.util.KakaoLogin
+import com.demo.desh.viewModels.LoginViewModel
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -32,6 +33,9 @@ class SplashActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         val context = this
+
+        GoogleLogin.init(this)
+        KakaoLogin.init(this)
 
         lifecycleScope.launchWhenCreated {
             viewModel.loginResult.collect { isLogin ->

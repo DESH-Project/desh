@@ -1,7 +1,7 @@
 package com.demo.desh.util
 
 import android.content.Context
-import com.demo.desh.dto.User
+import com.demo.desh.model.User
 
 interface SocialLogin {
     fun init(context: Context)

@@ -1,4 +1,4 @@
-package com.demo.desh.dto
+package com.demo.desh.model
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

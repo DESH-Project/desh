@@ -8,7 +8,7 @@ import android.widget.Toast
 import com.demo.desh.MainActivity
 import com.demo.desh.R
 import com.demo.desh.api.RetrofitClient
-import com.demo.desh.dto.User
+import com.demo.desh.model.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient

@@ -1,6 +1,6 @@
 package com.demo.desh.api
 
-import com.demo.desh.dto.User
+import com.demo.desh.model.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
