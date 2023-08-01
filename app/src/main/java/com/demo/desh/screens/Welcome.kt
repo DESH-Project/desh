@@ -1,5 +1,6 @@
 package com.demo.desh.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.demo.desh.NavRoutes
+import com.demo.desh.model.User
 
 sealed class WelcomeNavRoutes(val route: String) {
     object Home : WelcomeNavRoutes("home")
@@ -75,13 +78,12 @@ fun Welcome(navController: NavController, userName: String?) {
 }
 
 @Composable
-fun NavHome() {
+fun NavHome(user: User) {
     Box(modifier = Modifier.fillMaxSize()) {
-        Icon(
-            imageVector = Icons.Filled.Home,
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = rememberAsyncImagePainter(model = user.profileImageUrl),
             contentDescription = "home",
-            tint = Color.Blue,
-            modifier = Modifier.size(150.dp).align(Alignment.Center)
         )
     }
 }
@@ -93,7 +95,9 @@ fun NavContacts() {
             imageVector = Icons.Filled.Face,
             contentDescription = "contacts",
             tint = Color.Blue,
-            modifier = Modifier.size(150.dp).align(Alignment.Center)
+            modifier = Modifier
+                .size(150.dp)
+                .align(Alignment.Center)
         )
     }
 }
@@ -105,7 +109,9 @@ fun NavFavorites() {
             imageVector = Icons.Filled.Favorite,
             contentDescription = "favorites",
             tint = Color.Blue,
-            modifier = Modifier.size(150.dp).align(Alignment.Center)
+            modifier = Modifier
+                .size(150.dp)
+                .align(Alignment.Center)
         )
     }
 }

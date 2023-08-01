@@ -82,16 +82,16 @@ fun MainActivityScreen(user: User) {
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(text = "Bottom Nav")}) },
-        content = { NavigationHost(navController = navController) },
+        content = { NavigationHost(navController = navController, user = user) },
         bottomBar = { BottomNavigationBar(navController = navController)}
     )
 }
 
 @Composable
-fun NavigationHost(navController: NavHostController) {
+fun NavigationHost(navController: NavHostController, user: User) {
     NavHost(navController = navController, startDestination = WelcomeNavRoutes.Home.route) {
         composable(route = WelcomeNavRoutes.Home.route) {
-            NavHome()
+            NavHome(user)
         }
 
         composable(route = WelcomeNavRoutes.Contacts.route) {
