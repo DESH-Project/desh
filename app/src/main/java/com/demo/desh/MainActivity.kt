@@ -81,9 +81,9 @@ fun MainActivityScreen(user: User) {
     val navController = rememberNavController()
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = "Bottom Nav")}) },
+        topBar = { TopAppBar(title = { Text(text = "Bottom Nav") }) },
         content = { NavigationHost(navController = navController, user = user) },
-        bottomBar = { BottomNavigationBar(navController = navController)}
+        bottomBar = { BottomNavigationBar(navController = navController) }
     )
 }
 

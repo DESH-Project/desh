@@ -136,7 +136,7 @@ private fun SocialLoginButtons(context: Context) {
     SocialLoginIconButton(
         text = loginWithKakaoText,
         imageResource = R.drawable.kakao_login_large_narrow,
-        onClick = { coroutineScope.launch {KakaoLogin.login(context) } }
+        onClick = { coroutineScope.launch { KakaoLogin.login(context) } }
     )
 
     Spacer(modifier = Modifier.padding(4.dp))
