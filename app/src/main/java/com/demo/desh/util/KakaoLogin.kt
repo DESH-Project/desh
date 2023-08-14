@@ -5,14 +5,11 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import com.demo.desh.MainActivity
-import com.demo.desh.R
 import com.demo.desh.api.RetrofitClient
 import com.demo.desh.model.User
 import com.kakao.sdk.auth.model.OAuthToken
-import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
-import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,15 +18,7 @@ import retrofit2.Response
 object KakaoLogin: SocialLogin {
     private const val TAG = "KakaoLoginObject"
 
-    override fun init(context: Context) {
-        val nativeAppKey = context.resources.getString(R.string.KAKAO_NATIVE_APP_KEY)
-        KakaoSdk.init(context, nativeAppKey)
-
-        Log.d(TAG, "keyhash : ${Utility.getKeyHash(context)}")
-        Log.d(TAG, "kakao_native_app_key : $nativeAppKey")
-    }
-
-    suspend fun login(context: Context) {
+    fun login(context: Context) {
         val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) Log.e(TAG, "로그인 실패 $error")
             else if (token != null) Log.e(TAG, "로그인 성공 ${token.accessToken} ${token.idToken}")
@@ -37,8 +26,6 @@ object KakaoLogin: SocialLogin {
 
         val instance = UserApiClient.instance
         var kakaoUser: User? = null
-
-        Log.d(TAG, "Kakao Login 시도")
 
         if (instance.isKakaoTalkLoginAvailable(context)) {
             instance.loginWithKakaoTalk(context) { token, error ->
@@ -89,7 +76,7 @@ object KakaoLogin: SocialLogin {
         result.enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
                 user.id = response.body()
-                intentNext(context, user)
+                intentMain(context, user)
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
@@ -102,8 +89,7 @@ object KakaoLogin: SocialLogin {
         })
     }
 
-    override fun intentNext(context: Context, user: User) {
-        Toast.makeText(context, user.toString(), Toast.LENGTH_SHORT).show()
+    override fun intentMain(context: Context, user: User) {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("user", user)
         context.startActivity(intent)

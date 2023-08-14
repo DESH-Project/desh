@@ -4,7 +4,6 @@ import android.content.Context
 import com.demo.desh.model.User
 
 interface SocialLogin {
-    fun init(context: Context)
     fun send(context: Context, user: User)
-    fun intentNext(context: Context, user: User)
+    fun intentMain(context: Context, user: User)
 }

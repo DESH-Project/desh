@@ -5,8 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     private const val host = "good-place.shop"
-    private const val port = "8080"
-    private const val domain = "http://$host:$port/"
+    private const val domain = "http://$host/"
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()

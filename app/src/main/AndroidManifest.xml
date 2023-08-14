@@ -5,6 +5,9 @@
     <!-- 인터넷 사용 권한 설정 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,6 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Deshprojectfe"
         tools:targetApi="31">
+
+        <!-- Naver Map을 위한 CLIENT META DATA -->
+        <meta-data
+            android:name="com.naver.maps.CLIENT_ID"
+            android:value="@string/NAVER_MAP_SDK_CLIENT_ID"
+        />
 
         <activity
             android:name=".SplashActivity"
@@ -36,13 +45,6 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat">
-
-        </activity>
-
-        <activity
-            android:name=".SurveyActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat">
 
