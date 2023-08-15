@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
+import com.navercorp.nid.NaverIdLoginSDK
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +23,11 @@ class SplashActivity : AppCompatActivity() {
         val keyHash = Utility.getKeyHash(this)
 
         Log.d(TAG, "keyHash : $keyHash")
+
+        val naverClientId = getString(R.string.NAVER_OAUTH_CLIENT_ID)
+        val naverClientSecret = getString(R.string.NAVER_OAUTH_CLIENT_SECRET)
+        val naverClientName = getString(R.string.APP_NAME)
+        NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret, naverClientName)
 
         startActivity(Intent(this, LoginActivity::class.java))
     }

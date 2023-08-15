@@ -4,5 +4,7 @@
     <string name="KAKAO_NATIVE_APP_KEY">1aa31583a22732c5cc0147ada0c859de</string>
     <string name="NAVER_MAP_SDK_CLIENT_ID">pgu2rm57n1</string>
     <string name="NAVER_MAP_SDK_CLIENT_SECRET">7tOGWVtFljekMj7iPtYvKqNWU8fFeX0ZSt7kt9HN</string>
+    <string name="NAVER_OAUTH_CLIENT_ID">GZzwPhhomwHz6A04o8BZ</string>
+    <string name="NAVER_OAUTH_CLIENT_SECRET">lP5OAhKtFU</string>
 
 </resources>
