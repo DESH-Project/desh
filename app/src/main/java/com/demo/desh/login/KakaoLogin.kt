@@ -59,6 +59,5 @@ object KakaoLogin: SocialLogin {
                 send(context, kakaoUser!!)
             }
         }
-
     }
 }

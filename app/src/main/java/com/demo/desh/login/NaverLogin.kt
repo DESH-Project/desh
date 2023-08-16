@@ -44,7 +44,6 @@ object NaverLogin : SocialLogin {
         }
 
         val oauthLoginCallback = object : OAuthLoginCallback {
-
             override fun onError(errorCode: Int, message: String) {
                 onFailure(errorCode, message)
             }
@@ -54,6 +53,7 @@ object NaverLogin : SocialLogin {
                 val errorDesc = NaverIdLoginSDK.getLastErrorDescription()
                 Toast.makeText(context, "errorCode=$errorCode, errorDesc=$errorDesc", Toast.LENGTH_SHORT).show()
             }
+
             override fun onSuccess() {
                 val accessToken = NaverIdLoginSDK.getAccessToken()
                 val refreshToken = NaverIdLoginSDK.getRefreshToken()

@@ -2,13 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- 인터넷 사용 권한 설정 -->
+    <!-- 사용 권한 설정 -->
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,14 +17,10 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Deshprojectfe"
+        android:theme="@style/Base.Theme.Deshprojectfe"
         tools:targetApi="31">
 
-        <!-- Naver Map을 위한 CLIENT META DATA -->
-        <meta-data
-            android:name="com.naver.maps.CLIENT_ID"
-            android:value="@string/NAVER_MAP_SDK_CLIENT_ID"
-        />
+        <meta-data android:name="com.kakao.sdk.AppKey" android:value="@string/KAKAO_NATIVE_APP_KEY"/>
 
         <activity
             android:name=".SplashActivity"

@@ -4,9 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -41,7 +39,6 @@ fun App(user: User) {
     val navController = rememberNavController()
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = "Bottom Nav") }) },
         content = { it
             MainNavigationHost(navController = navController, user = user)
         },

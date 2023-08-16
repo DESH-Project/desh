@@ -3,5 +3,8 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">15.164.105.26</domain>
         <domain includeSubdomains="true">good-place.shop</domain>
+        <domain includeSubdomains="true">ot0.maps.daum-img.net</domain>
+        <domain includeSubdomains="true">ot1.maps.daum-img.net</domain>
+        <domain includeSubdomains="true">ot2.maps.daum-img.net</domain>
     </domain-config>
 </network-security-config>
