@@ -3,6 +3,7 @@ package com.demo.desh
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
@@ -33,6 +34,8 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             val mapView = MapCreator.getMapView()
+
+            Log.e("MainActivity", "mapView = $mapView")
 
             runOnUiThread {
                 setContent {
