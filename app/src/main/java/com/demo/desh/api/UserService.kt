@@ -4,6 +4,7 @@ import com.demo.desh.model.Realty
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.User
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -16,7 +17,7 @@ interface UserService {
 
     /* 건물 정보 등록 */
     @POST("/realty")
-    suspend fun sendRealtyInfo(@Body realty: Realty): Call<Long>
+    fun sendRealtyInfo(@Body realty: Realty): Call<Long>
 
     /* 내가 본 매물 정보 프리뷰 */
 
@@ -24,9 +25,9 @@ interface UserService {
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
     @GET("recommend-all")
-    suspend fun getRecommendationAllInfo() : RecommendInfo
+    suspend fun getRecommendationAllInfo() : Response<RecommendInfo>
 
     /* 상권 추천 정보 */
     @GET("recommend")
-    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): RecommendInfo
+    fun getRecommendationInfo(@Query("service") encodedServiceName: String): Call<RecommendInfo>
 }
