@@ -50,7 +50,7 @@ fun App(user: User) {
 fun MainNavigationHost(navController: NavHostController, user: User) {
     NavHost(navController = navController, startDestination = MainBottomBarNav.Home.route) {
         composable(route = MainBottomBarNav.Home.route) {
-            MainScreen(user)
+            MainScreen()
         }
 
         composable(route = MainBottomBarNav.Profile.route) {
