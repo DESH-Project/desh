@@ -1,10 +1,11 @@
-package com.demo.desh.nav
+package com.demo.desh.util
 
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ sealed class MainBottomBarNav(
     val icon: ImageVector
 ) {
     object Home : MainBottomBarNav("home", "Home", Icons.Outlined.Home)
+    object Map : MainBottomBarNav("map", "Map", Icons.Outlined.Phone)
     object Profile : MainBottomBarNav("profile", "Profile", Icons.Outlined.AccountCircle)
     object Settings : MainBottomBarNav("settings", "Settings", Icons.Outlined.Settings)
 
