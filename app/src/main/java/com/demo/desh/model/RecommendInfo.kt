@@ -4,11 +4,13 @@ import java.io.Serializable
 
 data class RecommendInfo(
     val size: Int,
-    val recommend: List<Recommend>
+    val list: List<Recommend>
 ): Serializable
 
 data class Recommend(
     val lat: Double,
     val lng: Double,
-    val name: String
+    val service: String,
+    val district: String,
+    val predict: Long
 ): Serializable

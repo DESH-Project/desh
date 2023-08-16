@@ -16,15 +16,17 @@ interface UserService {
 
     /* 건물 정보 등록 */
     @POST("/realty")
-    fun sendRealtyInfo(@Body realty: Realty): Call<Long>
+    suspend fun sendRealtyInfo(@Body realty: Realty): Call<Long>
 
     /* 내가 본 매물 정보 프리뷰 */
 
     /* 내가 본 매물 정보 상세 */
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
+    @GET("recommend-all")
+    suspend fun getRecommendationAllInfo() : RecommendInfo
 
     /* 상권 추천 정보 */
     @GET("recommend")
-    fun getRecommendationInfo(@Query("service") encodedServiceName: String): Call<RecommendInfo>
+    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): RecommendInfo
 }

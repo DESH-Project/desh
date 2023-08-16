@@ -6,5 +6,6 @@
         <domain includeSubdomains="true">ot0.maps.daum-img.net</domain>
         <domain includeSubdomains="true">ot1.maps.daum-img.net</domain>
         <domain includeSubdomains="true">ot2.maps.daum-img.net</domain>
+        <domain includeSubdomains="true">ot3.maps.daum-img.net</domain>
     </domain-config>
 </network-security-config>
