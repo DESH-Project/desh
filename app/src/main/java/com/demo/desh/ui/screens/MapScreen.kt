@@ -29,6 +29,7 @@ fun MapScreen(mapView: (context: Context) -> MapView, serviceList: List<String>)
     }
 }
 
+// ref: https://www.geeksforgeeks.org/horizontal-listview-in-android-using-jetpack-compose/
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CreateListButton(serviceList: List<String>) {
