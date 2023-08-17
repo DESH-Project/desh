@@ -6,7 +6,7 @@ import android.util.Log
 import com.demo.desh.api.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import net.daum.mf.map.api.CameraUpdateFactory
 import net.daum.mf.map.api.MapCircle
 import net.daum.mf.map.api.MapPOIItem
@@ -21,7 +21,7 @@ object MapCreator {
     )
 
     suspend fun getMapView() : (context: Context) -> MapView {
-        val mapMetaData = getMapCircles()
+        val mapMetaData = getMapItems()
         return createMapView(mapMetaData)
     }
 
@@ -48,12 +48,12 @@ object MapCreator {
         }
     }
 
-    private suspend fun getMapCircles() : MapMetaData {
+    private suspend fun getMapItems() : MapMetaData {
         val userService = RetrofitClient.userService
         val circles = mutableListOf<MapCircle>()
         val markers = mutableListOf<MapPOIItem>()
 
-        CoroutineScope(Dispatchers.IO).async {
+        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
             val response = userService.getRecommendationAllInfo()
 
             if (response.isSuccessful) {
@@ -63,7 +63,7 @@ object MapCreator {
 
                 Log.d("전체 추천 DTO 응답 성공", "size = $size, list = $list")
 
-                list.forEachIndexed { idx, res ->
+                list.forEachIndexed { _, res ->
                     val circle = MapCircle(
                         MapPoint.mapPointWithGeoCoord(res.lat, res.lng),
                         1000,
@@ -74,7 +74,7 @@ object MapCreator {
                     circles.add(circle)
                 }
             }
-        }.await()
+        }
 
         return MapMetaData(circles, markers)
     }
