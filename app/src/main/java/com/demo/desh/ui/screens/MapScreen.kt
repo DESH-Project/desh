@@ -11,12 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import net.daum.mf.map.api.MapView
 
-@Composable
-fun MapScreen(mapView: (context: Context) -> MapView) {
-    val dumList = listOf("의류", "제빵", "문구", "의료", "카페", "치킨")
 
+@Composable
+fun MapScreen(mapView: (context: Context) -> MapView, serviceList: List<String>) {
     Column {
-        CreateListButton(dumList)
+        CreateListButton(serviceList)
 
         AndroidView(
             factory = mapView,
@@ -26,8 +25,8 @@ fun MapScreen(mapView: (context: Context) -> MapView) {
 }
 
 @Composable
-private fun CreateListButton(dums: List<String>) {
+private fun CreateListButton(serviceList: List<String>) {
     Row {
-        dums.forEach { dum -> TextButton(onClick = { }, content = { Text(text = dum) }) }
+        serviceList.forEach { item -> TextButton(onClick = { }, content = { Text(text = item) }) }
     }
 }

@@ -14,3 +14,8 @@ data class Recommend(
     val district: String,
     val predict: Long
 ): Serializable
+
+data class ServiceList(
+    val size: Int,
+    val list: List<String>
+): Serializable

@@ -2,6 +2,7 @@ package com.demo.desh.api
 
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RecommendInfo
+import com.demo.desh.model.ServiceList
 import com.demo.desh.model.User
 import retrofit2.Call
 import retrofit2.Response
@@ -24,6 +25,10 @@ interface UserService {
     /* 내가 본 매물 정보 상세 */
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
+    @GET("/service")
+    fun getServiceList(): Call<ServiceList>
+
+    /* 전체 상권 추천 정보 */
     @GET("recommend-all")
     suspend fun getRecommendationAllInfo() : Response<RecommendInfo>
 
