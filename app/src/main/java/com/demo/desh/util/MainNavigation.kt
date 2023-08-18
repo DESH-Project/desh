@@ -51,6 +51,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         restoreState = true
                     }
                 },
+
                 icon = { Icon(imageVector = navItem.icon, contentDescription = navItem.title) },
                 label = { Text(text = navItem.title) }
             )
