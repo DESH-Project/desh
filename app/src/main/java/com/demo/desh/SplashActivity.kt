@@ -1,15 +1,15 @@
 package com.demo.desh
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
+import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.common.util.Utility
+import com.navercorp.nid.NaverIdLoginSDK
 
-@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
@@ -19,12 +19,20 @@ class SplashActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launchWhenCreated {
-            delay(2500)
+        KakaoSdk.init(this, getString(R.string.KAKAO_NATIVE_APP_KEY))
+        val keyHash = Utility.getKeyHash(this)
 
-            val intent = Intent(this@SplashActivity, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+        Log.d(TAG, "keyHash : $keyHash")
+
+        val naverClientId = getString(R.string.NAVER_OAUTH_CLIENT_ID)
+        val naverClientSecret = getString(R.string.NAVER_OAUTH_CLIENT_SECRET)
+        val naverClientName = getString(R.string.APP_NAME)
+        NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret, naverClientName)
+
+        startActivity(Intent(this, LoginActivity::class.java))
+    }
+
+    companion object {
+        const val TAG = "SplashActivity"
     }
 }

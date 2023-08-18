@@ -2,7 +2,9 @@
     <string name="APP_NAME">DESH</string>
     <string name="GOOGLE_CLIENT_ID">1049948984062-mfadcg2sg1eqjdkh6cp93ispd906cskt.apps.googleusercontent.com</string>
     <string name="KAKAO_NATIVE_APP_KEY">1aa31583a22732c5cc0147ada0c859de</string>
-    <string name="KAKAO_REST_API_KEY">7505a47ea62f6bec77a08c119022b8cf</string>
-    <string name="NAVER_CLIENT_ID">cMZYdqsebw6CRa545w0n</string>
-    <string name="NAVER_CLIENT_SECRET">CywJNMVVUn</string>
+    <string name="NAVER_MAP_SDK_CLIENT_ID">pgu2rm57n1</string>
+    <string name="NAVER_MAP_SDK_CLIENT_SECRET">7tOGWVtFljekMj7iPtYvKqNWU8fFeX0ZSt7kt9HN</string>
+    <string name="NAVER_OAUTH_CLIENT_ID">GZzwPhhomwHz6A04o8BZ</string>
+    <string name="NAVER_OAUTH_CLIENT_SECRET">lP5OAhKtFU</string>
+
 </resources>
