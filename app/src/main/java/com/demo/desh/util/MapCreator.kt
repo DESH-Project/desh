@@ -95,6 +95,10 @@ object MapCreator {
         return MapMetaData(circles, markers)
     }
 
+    fun getMapItemsWithServiceName(serviceName: String) {
+
+    }
+
     /*
     suspend fun getMapView() : (context: Context) -> MapView {
         val markers = getMapMarkers()
