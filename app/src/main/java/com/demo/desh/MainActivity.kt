@@ -18,7 +18,7 @@ import com.demo.desh.model.Recommend
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.User
 import com.demo.desh.util.BottomNavigationBar
-import com.demo.desh.util.MainBottomBarNav
+import com.demo.desh.util.MainNavigation
 import com.demo.desh.ui.screens.MainScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun App(user: User, mapView: (context: Context) -> MapView, serviceList: List<String>) {
     val navController = rememberNavController()
-    val onMapButtonClick = { navController.navigate(MainBottomBarNav.Map.route) {
+    val onMapButtonClick = { navController.navigate(MainNavigation.Map.route) {
         restoreState = true
     } }
 
@@ -99,20 +99,20 @@ fun MainNavigationHost(
     onMapButtonClick: () -> Unit,
     serviceList: List<String>
 ) {
-    NavHost(navController = navController, startDestination = MainBottomBarNav.Home.route) {
-        composable(route = MainBottomBarNav.Home.route) {
+    NavHost(navController = navController, startDestination = MainNavigation.Home.route) {
+        composable(route = MainNavigation.Home.route) {
             MainScreen(navController)
         }
 
-        composable(route = MainBottomBarNav.Profile.route) {
+        composable(route = MainNavigation.Profile.route) {
             ProfileScreen()
         }
 
-        composable(route = MainBottomBarNav.Settings.route) {
+        composable(route = MainNavigation.Settings.route) {
             SettingsScreen()
         }
 
-        composable(route = MainBottomBarNav.Map.route) {
+        composable(route = MainNavigation.Map.route) {
             MapScreen(mapView, serviceList)
         }
     }

@@ -17,15 +17,15 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
-sealed class MainBottomBarNav(
+sealed class MainNavigation(
     val route: String,
     val title: String,
     val icon: ImageVector
 ) {
-    object Home : MainBottomBarNav("home", "Home", Icons.Outlined.Home)
-    object Map : MainBottomBarNav("map", "Map", Icons.Outlined.Phone)
-    object Profile : MainBottomBarNav("profile", "Profile", Icons.Outlined.AccountCircle)
-    object Settings : MainBottomBarNav("settings", "Settings", Icons.Outlined.Settings)
+    object Home : MainNavigation("home", "Home", Icons.Outlined.Home)
+    object Map : MainNavigation("map", "Map", Icons.Outlined.Phone)
+    object Profile : MainNavigation("profile", "Profile", Icons.Outlined.AccountCircle)
+    object Settings : MainNavigation("settings", "Settings", Icons.Outlined.Settings)
 
     companion object {
         val items = listOf(Home, Profile, Settings)
@@ -41,7 +41,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = backStackEntry?.destination?.route
 
-        MainBottomBarNav.items.forEach { navItem ->
+        MainNavigation.items.forEach { navItem ->
             BottomNavigationItem(
                 selected = currentRoute == navItem.route,
                 onClick = {

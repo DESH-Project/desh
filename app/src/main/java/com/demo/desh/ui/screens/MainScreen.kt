@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.demo.desh.util.MainBottomBarNav
+import com.demo.desh.util.MainNavigation
 
 @Composable
 fun MainScreen(navController: NavHostController) {
@@ -112,7 +112,7 @@ fun Bottom(navController: NavController){
             Box(
             ) {
                 FloatingActionButton(
-                    onClick = { navController.navigate(MainBottomBarNav.Map.route)
+                    onClick = { navController.navigate(MainNavigation.Map.route)
                     }) {
                     Text(text = "AI 추천받기")
                 }
