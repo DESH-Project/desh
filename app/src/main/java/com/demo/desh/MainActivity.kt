@@ -68,6 +68,8 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+
+
 @Composable
 fun App(user: User, mapView: (context: Context) -> MapView, serviceList: List<String>) {
     val navController = rememberNavController()
@@ -99,7 +101,7 @@ fun MainNavigationHost(
 ) {
     NavHost(navController = navController, startDestination = MainBottomBarNav.Home.route) {
         composable(route = MainBottomBarNav.Home.route) {
-            MainScreen(user, onMapButtonClick)
+            MainScreen(navController)
         }
 
         composable(route = MainBottomBarNav.Profile.route) {
