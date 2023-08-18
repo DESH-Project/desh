@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Color.argb
 import android.util.Log
 import com.demo.desh.api.RetrofitClient
+import com.demo.desh.model.Recommend
+import com.demo.desh.model.RecommendInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,8 +22,8 @@ object MapCreator {
         val markers: List<MapPOIItem>
     )
 
-    suspend fun getMapView() : (context: Context) -> MapView {
-        val mapMetaData = getMapItems()
+    suspend fun getMapView(map: MutableMap<String, RecommendInfo?>) : (context: Context) -> MapView {
+        val mapMetaData = getMapItems(map)
         return createMapView(mapMetaData)
     }
 
@@ -48,7 +50,7 @@ object MapCreator {
         }
     }
 
-    private suspend fun getMapItems() : MapMetaData {
+    private suspend fun getMapItems(map: MutableMap<String, RecommendInfo?>) : MapMetaData {
         val userService = RetrofitClient.userService
         val circles = mutableListOf<MapCircle>()
         val markers = mutableListOf<MapPOIItem>()
@@ -60,6 +62,8 @@ object MapCreator {
                 val body = response.body()!!
                 val size = body.size
                 val list = body.list
+                val serviceName = "전체"
+                val recommendList = mutableListOf<Recommend>()
 
                 Log.d("전체 추천 DTO 응답 성공", "size = $size, list = $list")
 
@@ -72,7 +76,19 @@ object MapCreator {
                     )
 
                     circles.add(circle)
+
+                    val recommend = Recommend(
+                        lat = res.lat,
+                        lng = res.lng,
+                        service = res.service,
+                        district = res.district,
+                        predict = res.predict
+                    )
+
+                    recommendList.add(recommend)
                 }
+
+                map[serviceName] = RecommendInfo(recommendList.size, recommendList)
             }
         }
 

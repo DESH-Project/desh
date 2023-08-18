@@ -8,12 +8,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.api.RetrofitClient
-import com.demo.desh.model.ServiceList
+import com.demo.desh.model.Recommend
+import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.User
 import com.demo.desh.util.BottomNavigationBar
 import com.demo.desh.util.MainBottomBarNav
@@ -25,36 +28,32 @@ import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.util.MapCreator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import java.net.URLEncoder
+
+private val mapFlow = MutableStateFlow(mutableStateMapOf<String, RecommendInfo?>())
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val user = intent.getSerializableExtra("user") as User
+        val map = mapFlow.value
 
         CoroutineScope(Dispatchers.IO).launch {
-            val mapView = MapCreator.getMapView()
+            val mapView = MapCreator.getMapView(map)
+            val serviceList = getServiceList()
 
-            val userService = RetrofitClient.userService
-            val result = userService.getServiceList()
-            val serviceList = mutableListOf<String>()
-
-            result.enqueue(object : Callback<ServiceList> {
-                override fun onResponse(call: Call<ServiceList>, response: Response<ServiceList>) {
-                    val body = response.body()
-                    val list = body!!.list
-                    list.forEach { serviceList.add(it) }
+            serviceList.forEach { serviceName ->
+                if (map[serviceName] == null) {
+                    val recommendInfo = getRecommendInfo(map, serviceName)
+                    map[serviceName] = recommendInfo
+                    Log.e("MainActivity", "$serviceName = ${recommendInfo.toString()}")
                 }
+            }
 
-                override fun onFailure(call: Call<ServiceList>, t: Throwable) {
-                    TODO("Not yet implemented")
-                }
-            })
             Log.e("MainActivity", "mapView = $mapView")
 
             runOnUiThread {
@@ -116,4 +115,50 @@ fun MainNavigationHost(
             MapScreen(mapView, serviceList)
         }
     }
+}
+
+private suspend fun getServiceList() : List<String> {
+    val userService = RetrofitClient.userService
+    val result = userService.getServiceList()
+    val serviceList = mutableListOf<String>()
+
+    if (result.isSuccessful) {
+        val body = result.body()!!
+        val list = body.list
+        list.forEach { serviceList.add(it) }
+    }
+
+    return serviceList
+}
+
+private suspend fun getRecommendInfo(map: MutableMap<String, RecommendInfo?>, serviceName: String) : RecommendInfo {
+    if (map[serviceName] != null) {
+        return map[serviceName]!!
+    }
+
+    val userService = RetrofitClient.userService
+    val res = userService.getRecommendationInfo(URLEncoder.encode(serviceName, "UTF-8"))
+    val recommendInfoList = mutableListOf<Recommend>()
+
+    if (res.isSuccessful) {
+        val body = res.body()!!
+        val list = body.list
+
+        list.forEach {
+            val recommend = Recommend(
+                lat = it.lat,
+                lng = it.lng,
+                service = it.service,
+                district = it.district,
+                predict = it.predict
+            )
+
+            recommendInfoList.add(recommend)
+        }
+    }
+
+    val recommendInfo = RecommendInfo(recommendInfoList.size, recommendInfoList)
+    map[serviceName] = recommendInfo
+
+    return recommendInfo
 }
