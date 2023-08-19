@@ -4,43 +4,35 @@ import android.content.Context
 import android.graphics.Color.argb
 import android.util.Log
 import com.demo.desh.api.RetrofitClient
-import com.demo.desh.model.Recommend
 import com.demo.desh.model.RecommendInfo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import net.daum.mf.map.api.CameraUpdateFactory
 import net.daum.mf.map.api.MapCircle
-import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapPointBounds
 import net.daum.mf.map.api.MapView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.net.URLEncoder
 
 object MapCreator {
-    data class MapMetaData(
-        val circles: List<MapCircle>,
-        val markers: List<MapPOIItem>
-    )
+    private const val DEFAULT_SERVICE_NAME = "전체"
 
-    suspend fun getMapView(map: MutableMap<String, RecommendInfo?>) : (context: Context) -> MapView {
-        val mapMetaData = getMapItems(map)
-        return createMapView(mapMetaData)
+    fun getCommonMapView(serviceName: String = DEFAULT_SERVICE_NAME) : (context: Context) -> MapView {
+        val commonCircles = getMapItems(serviceName)
+        return createMapView(commonCircles)
     }
 
-    private fun createMapView(metaData: MapMetaData) : (context: Context) -> MapView {
+    private fun createMapView(circles: List<MapCircle>) : (context: Context) -> MapView {
         return { context: Context ->
             val mv = MapView(context)
+            mv.removeAllCircles()
             val mapPointBoundsArray = mutableListOf<MapPointBounds>()
-
-            val circles = metaData.circles
-            val markers = metaData.markers
 
             circles.forEach { circle ->
                 mv.addCircle(circle)
                 mapPointBoundsArray.add(circle.bound)
             }
-
-            mv.addPOIItems(markers.toTypedArray())
 
             val mapPointBounds = MapPointBounds(mapPointBoundsArray.toTypedArray())
             val padding = 150
@@ -50,22 +42,24 @@ object MapCreator {
         }
     }
 
-    private suspend fun getMapItems(map: MutableMap<String, RecommendInfo?>) : MapMetaData {
+    private fun getMapItems(serviceName: String) : List<MapCircle> {
         val userService = RetrofitClient.userService
         val circles = mutableListOf<MapCircle>()
-        val markers = mutableListOf<MapPOIItem>()
 
-        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
-            val response = userService.getRecommendationAllInfo()
+        val response = if (serviceName == DEFAULT_SERVICE_NAME) {
+            userService.getRecommendationAllInfo()
+        } else {
+            val encodedServiceName = URLEncoder.encode(serviceName, "UTF-8")
+            userService.getRecommendationInfo(encodedServiceName)
+        }
 
-            if (response.isSuccessful) {
+        response.enqueue(object : Callback<RecommendInfo> {
+            override fun onResponse(call: Call<RecommendInfo>, response: Response<RecommendInfo>) {
                 val body = response.body()!!
                 val size = body.size
                 val list = body.list
-                val serviceName = "전체"
-                val recommendList = mutableListOf<Recommend>()
 
-                Log.d("전체 추천 DTO 응답 성공", "size = $size, list = $list")
+                Log.d("추천 DTO 응답 성공", "service = $serviceName, size = $size, list = $list")
 
                 list.forEachIndexed { _, res ->
                     val circle = MapCircle(
@@ -76,76 +70,13 @@ object MapCreator {
                     )
 
                     circles.add(circle)
-
-                    val recommend = Recommend(
-                        lat = res.lat,
-                        lng = res.lng,
-                        service = res.service,
-                        district = res.district,
-                        predict = res.predict
-                    )
-
-                    recommendList.add(recommend)
-                }
-
-                map[serviceName] = RecommendInfo(recommendList.size, recommendList)
-            }
-        }
-
-        return MapMetaData(circles, markers)
-    }
-
-    fun getMapItemsWithServiceName(serviceName: String) {
-
-    }
-
-    /*
-    suspend fun getMapView() : (context: Context) -> MapView {
-        val markers = getMapMarkers()
-        Log.e("getMapView()", "${markers.size}")
-
-        return { context: Context ->
-            val mv = MapView(context)
-
-            markers.forEach { marker ->
-                mv.addPOIItem(marker)
-            }
-
-            mv
-        }
-    }
-
-    private suspend fun getMapMarkers() : List<MapPOIItem> {
-        val userService = RetrofitClient.userService
-        val markers = mutableListOf<MapPOIItem>()
-
-        CoroutineScope(Dispatchers.IO).async {
-            val response = userService.getRecommendationAllInfo()
-
-            if (response.isSuccessful) {
-                val body = response.body()!!
-                val size = body.size
-                val list = body.list
-
-                Log.d("전체 추천 DTO 응답 성공", "size = $size, list = $list")
-
-                list.forEachIndexed { idx, res ->
-                    val marker = MapPOIItem()
-
-                    marker.tag = idx
-                    marker.itemName = "(${res.service}) ${res.district}\n평균 추정매출: ${res.predict}"
-                    marker.mapPoint = MapPoint.mapPointWithGeoCoord(res.lat, res.lng)
-                    marker.markerType = MapPOIItem.MarkerType.RedPin
-                    marker.selectedMarkerType = MapPOIItem.MarkerType.BluePin
-
-                    Log.e("marker 생성", marker.toString())
-
-                    markers.add(marker)
                 }
             }
-        }.await()
 
-        return markers
+            override fun onFailure(call: Call<RecommendInfo>, t: Throwable) {
+            }
+        })
+
+        return circles
     }
-    */
 }

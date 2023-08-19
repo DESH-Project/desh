@@ -26,13 +26,13 @@ interface UserService {
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
     @GET("/service")
-    suspend fun getServiceList(): Response<ServiceList>
+    fun getServiceList(): Call<ServiceList>
 
     /* 전체 상권 추천 정보 */
     @GET("recommend-all")
-    suspend fun getRecommendationAllInfo() : Response<RecommendInfo>
+    fun getRecommendationAllInfo() : Call<RecommendInfo>
 
     /* 상권 추천 정보 */
     @GET("recommend")
-    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<RecommendInfo>
+    fun getRecommendationInfo(@Query("service") encodedServiceName: String): Call<RecommendInfo>
 }
