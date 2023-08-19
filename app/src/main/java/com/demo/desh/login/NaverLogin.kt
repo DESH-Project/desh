@@ -9,7 +9,7 @@ import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 
-object NaverLogin : SocialLogin {
+object NaverLogin : SocialLogin() {
     override fun login(context: Context) {
         fun getUserInfo() {
             NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {

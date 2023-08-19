@@ -3,21 +3,20 @@ package com.demo.desh.login
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.runtime.rememberCoroutineScope
 import com.demo.desh.MainActivity
-import com.demo.desh.api.RetrofitClient
 import com.demo.desh.model.User
-import kotlinx.coroutines.coroutineScope
+import com.demo.desh.repository.UserRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-interface SocialLogin {
-    fun login(context: Context)
+abstract class SocialLogin {
+    private val userRepository = UserRepository()
 
-    fun send(context: Context, user: User) {
-        val userService = RetrofitClient.userService
-        val result = userService.login(user)
+    abstract fun login(context: Context)
+
+    protected fun send(context: Context, user: User) {
+        val result = userRepository.login(user)
 
         result.enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
@@ -32,7 +31,7 @@ interface SocialLogin {
         })
     }
 
-    fun intentMain(context: Context, user: User) {
+    private fun intentMain(context: Context, user: User) {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("user", user)
         context.startActivity(intent)

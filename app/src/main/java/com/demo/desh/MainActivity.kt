@@ -3,10 +3,10 @@ package com.demo.desh
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,7 +22,7 @@ import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var mainViewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,22 +30,23 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             val user = intent.getSerializableExtra("user") as User
-            mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
             DeshprojectfeTheme {
                 Surface {
-                    App(user = user)
+                    App(
+                        user = user,
+                        viewModel = viewModel
+                    )
                 }
             }
         }
     }
 }
 
-
-
 @Composable
 fun App(
-    user: User
+    user: User,
+    viewModel: MainViewModel
 ) {
     val navController = rememberNavController()
 
@@ -53,7 +54,8 @@ fun App(
         content = { it
             MainNavigationHost(
                 navController = navController,
-                user = user
+                user = user,
+                viewModel = viewModel
             )
         },
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -64,6 +66,7 @@ fun App(
 fun MainNavigationHost(
     navController: NavHostController,
     user: User,
+    viewModel: MainViewModel
 ) {
     NavHost(navController = navController, startDestination = MainNavigation.Home.route) {
         composable(route = MainNavigation.Home.route) {
@@ -79,7 +82,7 @@ fun MainNavigationHost(
         }
 
         composable(route = MainNavigation.Map.route) {
-            MapScreen()
+            MapScreen(viewModel)
         }
     }
 }

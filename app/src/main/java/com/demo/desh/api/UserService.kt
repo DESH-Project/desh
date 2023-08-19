@@ -18,7 +18,7 @@ interface UserService {
 
     /* 건물 정보 등록 */
     @POST("/realty")
-    fun sendRealtyInfo(@Body realty: Realty): Call<Long>
+    suspend fun sendRealtyInfo(@Body realty: Realty): Response<Long>
 
     /* 내가 본 매물 정보 프리뷰 */
 
@@ -26,13 +26,13 @@ interface UserService {
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
     @GET("/service")
-    fun getServiceList(): Call<ServiceList>
+    suspend fun getServiceList(): Response<ServiceList>
 
     /* 전체 상권 추천 정보 */
     @GET("recommend-all")
-    fun getRecommendationAllInfo() : Call<RecommendInfo>
+    suspend fun getRecommendationAllInfo(): Response<RecommendInfo>
 
     /* 상권 추천 정보 */
     @GET("recommend")
-    fun getRecommendationInfo(@Query("service") encodedServiceName: String): Call<RecommendInfo>
+    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<RecommendInfo>
 }
