@@ -1,14 +1,18 @@
 package com.demo.desh.ui.screens
 
 import android.graphics.Color
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,7 +28,10 @@ import kotlin.random.Random
 
 
 @Composable
-fun MapScreen(viewModel: MainViewModel) {
+fun MapScreen(
+    viewModel: MainViewModel,
+    onBackButtonClick: () -> Unit
+) {
     val serviceList by viewModel.serviceList.observeAsState()
     val mv by viewModel.mapView.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
@@ -36,6 +43,10 @@ fun MapScreen(viewModel: MainViewModel) {
 
     Column {
         CreateListButton(serviceList) { viewModel.fetchMapView(it) }
+
+        IconButton(onClick = onBackButtonClick) {
+            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = "뒤로가기")
+        }
 
         AndroidView(
             factory = mv ?: MapViewCreator.createMapView(),

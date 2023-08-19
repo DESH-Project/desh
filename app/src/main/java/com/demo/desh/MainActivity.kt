@@ -66,7 +66,7 @@ fun App(
 fun MainNavigationHost(
     navController: NavHostController,
     user: User,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
 ) {
     NavHost(navController = navController, startDestination = MainNavigation.Home.route) {
         composable(route = MainNavigation.Home.route) {
@@ -82,7 +82,8 @@ fun MainNavigationHost(
         }
 
         composable(route = MainNavigation.Map.route) {
-            MapScreen(viewModel)
+            val onBackButtonClick = { navController.navigate(MainNavigation.Home.route) }
+            MapScreen(viewModel, onBackButtonClick)
         }
     }
 }
