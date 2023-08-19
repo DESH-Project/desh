@@ -1,5 +1,6 @@
 package com.demo.desh.ui.screens
 
+import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,19 +18,21 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.demo.desh.model.ServiceList
 import com.demo.desh.util.MapViewCreator
 import com.demo.desh.viewModel.MainViewModel
+import net.daum.mf.map.api.MapCircle
+import net.daum.mf.map.api.MapPoint
+import kotlin.random.Random
 
 
 @Composable
 fun MapScreen(viewModel: MainViewModel) {
     val serviceList by viewModel.serviceList.observeAsState()
     val mv by viewModel.mapView.observeAsState()
+    val recommendInfo by viewModel.recommendInfo.observeAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
         viewModel.fetchServiceList()
     }
-
-    Log.e("MapScreen", "viewModel = $viewModel, serviceList = $serviceList, mapView = $mv")
 
     Column {
         CreateListButton(serviceList) { viewModel.fetchMapView(it) }
@@ -37,6 +40,36 @@ fun MapScreen(viewModel: MainViewModel) {
         AndroidView(
             factory = mv ?: MapViewCreator.createMapView(),
             modifier = Modifier.fillMaxSize(),
+            update = { mv ->
+                mv.removeAllCircles()
+
+                var lats: Double = 0.0
+                var lngs: Double = 0.0
+                val size = recommendInfo?.list?.size ?: 1
+
+                recommendInfo?.list?.forEach {
+                    lats += it.lat
+                    lngs += it.lng
+
+                    val circle = MapCircle(
+                        MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
+                        1500,
+                        randomArgbColor(),
+                        randomArgbColor()
+                    )
+
+                    circle.tag = it.predict.toInt()
+
+                    mv.addCircle(circle)
+                }
+
+                mv.setMapCenterPointAndZoomLevel(
+                    MapPoint.mapPointWithGeoCoord(lats / size, lngs / size),
+                    7,
+                    true
+                )
+
+            }
         )
     }
 }
@@ -55,4 +88,14 @@ private fun CreateListButton(
             }
         }
     }
+}
+
+private fun randomArgbColor() : Int {
+    val random = Random.Default
+    val alpha = random.nextInt(256)
+    val red = random.nextInt(256)
+    val green = random.nextInt(256)
+    val blue = random.nextInt(256)
+
+    return Color.argb(alpha, red, green, blue)
 }
