@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.repository.UserRepository
-import com.demo.desh.util.MapViewCreator
+import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
 import java.net.URLEncoder
@@ -36,7 +36,7 @@ class MainViewModel(private val repository: UserRepository = UserRepository()) :
 
             if (res.isSuccessful) {
                 val body = res.body()!!
-                _mapView.value = MapViewCreator.createMapView(body)
+                _mapView.value = MapViewManager.createMapView(body)
                 _recommendInfo.value = body
             }
         }

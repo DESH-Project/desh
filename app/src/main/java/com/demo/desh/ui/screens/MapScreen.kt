@@ -18,10 +18,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.demo.desh.model.ServiceList
-import com.demo.desh.util.MapViewCreator
+import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
-import net.daum.mf.map.api.MapCircle
-import net.daum.mf.map.api.MapPoint
 
 
 @Composable
@@ -46,37 +44,9 @@ fun MapScreen(
         }
 
         AndroidView(
-            factory = mv ?: MapViewCreator.createMapView(recommendInfo),
+            factory = mv ?: MapViewManager.createMapView(recommendInfo),
             modifier = Modifier.fillMaxSize(),
-            update = { mv ->
-                mv.removeAllCircles()
-
-                var lats: Double = 0.0
-                var lngs: Double = 0.0
-                val size = recommendInfo?.list?.size ?: 1
-
-                recommendInfo?.list?.forEach {
-                    lats += it.lat
-                    lngs += it.lng
-
-                    val circle = MapCircle(
-                        MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
-                        1500,
-                        MapViewCreator.randomArgbColor(),
-                        MapViewCreator.randomArgbColor()
-                    )
-
-                    circle.tag = it.predict.toInt()
-
-                    mv.addCircle(circle)
-                }
-
-                mv.setMapCenterPointAndZoomLevel(
-                    MapPoint.mapPointWithGeoCoord(lats / size, lngs / size),
-                    8,
-                    true
-                )
-            }
+            update = { mv -> MapViewManager.onMapViewUpdate(mv, recommendInfo)}
         )
     }
 }

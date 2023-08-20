@@ -10,7 +10,37 @@ import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 import kotlin.random.Random
 
-object MapViewCreator {
+object MapViewManager {
+    fun onMapViewUpdate(mv: MapView, recommendInfo: RecommendInfo?) {
+        mv.removeAllCircles()
+
+        var lats: Double = 0.0
+        var lngs: Double = 0.0
+        val size = recommendInfo?.list?.size ?: 1
+
+        recommendInfo?.list?.forEach {
+            lats += it.lat
+            lngs += it.lng
+
+            val circle = MapCircle(
+                MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
+                1500,
+                randomArgbColor(),
+                randomArgbColor()
+            )
+
+            circle.tag = it.predict.toInt()
+
+            mv.addCircle(circle)
+        }
+
+        mv.setMapCenterPointAndZoomLevel(
+            MapPoint.mapPointWithGeoCoord(lats / size, lngs / size),
+            8,
+            true
+        )
+    }
+
     fun createMapView(recommendInfo: RecommendInfo?) : (context: Context) -> MapView {
         val circles = if (recommendInfo == null) getMapItems() else getMapItems(recommendInfo.list)
         return makeMapView(circles)
