@@ -1,11 +1,9 @@
 package com.demo.desh.ui.screens
 
-import android.graphics.Color
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -24,7 +22,6 @@ import com.demo.desh.util.MapViewCreator
 import com.demo.desh.viewModel.MainViewModel
 import net.daum.mf.map.api.MapCircle
 import net.daum.mf.map.api.MapPoint
-import kotlin.random.Random
 
 
 @Composable
@@ -49,7 +46,7 @@ fun MapScreen(
         }
 
         AndroidView(
-            factory = mv ?: MapViewCreator.createMapView(),
+            factory = mv ?: MapViewCreator.createMapView(recommendInfo),
             modifier = Modifier.fillMaxSize(),
             update = { mv ->
                 mv.removeAllCircles()
@@ -65,8 +62,8 @@ fun MapScreen(
                     val circle = MapCircle(
                         MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
                         1500,
-                        randomArgbColor(),
-                        randomArgbColor()
+                        MapViewCreator.randomArgbColor(),
+                        MapViewCreator.randomArgbColor()
                     )
 
                     circle.tag = it.predict.toInt()
@@ -76,10 +73,9 @@ fun MapScreen(
 
                 mv.setMapCenterPointAndZoomLevel(
                     MapPoint.mapPointWithGeoCoord(lats / size, lngs / size),
-                    7,
+                    8,
                     true
                 )
-
             }
         )
     }
@@ -99,14 +95,4 @@ private fun CreateListButton(
             }
         }
     }
-}
-
-private fun randomArgbColor() : Int {
-    val random = Random.Default
-    val alpha = random.nextInt(256)
-    val red = random.nextInt(256)
-    val green = random.nextInt(256)
-    val blue = random.nextInt(256)
-
-    return Color.argb(alpha, red, green, blue)
 }
