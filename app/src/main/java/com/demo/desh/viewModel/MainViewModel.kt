@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
 import java.net.URLEncoder
 
-class MainViewModel(private val repository: UserRepository = UserRepository()) : ViewModel() {
+class MainViewModel(private val userRepository: UserRepository = UserRepository()) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
@@ -29,8 +29,8 @@ class MainViewModel(private val repository: UserRepository = UserRepository()) :
     fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {
             val res =
-                if (serviceName == DEFAULT_SERVICE_NAME) repository.getRecommendationAllInfo()
-                else repository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
+                if (serviceName == DEFAULT_SERVICE_NAME) userRepository.getRecommendationAllInfo()
+                else userRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
 
             Log.e("MapScreen : fetchMapView()", "res = ${res.body()?.list}")
 
@@ -47,7 +47,7 @@ class MainViewModel(private val repository: UserRepository = UserRepository()) :
 
     fun fetchServiceList() {
         viewModelScope.launch {
-            val res = repository.getServiceList()
+            val res = userRepository.getServiceList()
             Log.e("MapScreen : fetchServiceList()", "res = $res")
 
             if (res.isSuccessful) {

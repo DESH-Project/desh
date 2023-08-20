@@ -78,7 +78,7 @@ object MapViewManager {
         return circles
     }
 
-    fun randomArgbColor() : Int {
+    private fun randomArgbColor() : Int {
         val random = Random.Default
         val alpha = random.nextInt(256)
         val red = random.nextInt(256)
