@@ -72,11 +72,10 @@ fun MapScreen(
 
         CreateListButton(serviceList) { viewModel.fetchMapView(it) }
 
-
         AndroidView(
             factory = mv ?: MapViewManager.createMapView(recommendInfo),
             modifier = Modifier.fillMaxSize(),
-            update = { mv -> MapViewManager.onMapViewUpdate(mv, recommendInfo)}
+            update = { mv -> MapViewManager.onMapViewUpdate(mv, recommendInfo) }
         )
     }
 }

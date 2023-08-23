@@ -1,11 +1,15 @@
 package com.demo.desh.util
 
 import android.content.Context
+import android.graphics.Color
+import android.util.Log
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.RecommendInfo
+import net.daum.mf.map.api.MapCircle
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
+import kotlin.random.Random
 
 object MapViewManager {
     fun onMapViewUpdate(mv: MapView, recommendInfo: RecommendInfo?) {
@@ -20,7 +24,7 @@ object MapViewManager {
             lats += it.lat
             lngs += it.lng
 
-            /* Circle 추가
+            // Circle 추가
             val circle = MapCircle(
                 MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
                 1500,
@@ -28,12 +32,11 @@ object MapViewManager {
                 randomArgbColor()
             )
 
-            circle.tag = it.predict.toInt()
-
             mv.addCircle(circle)
-            */
 
-            val markerItemName = "(${it.service})\n${it.district} : ${it.predict}"
+            /*
+            Log.e("MapViewManager", "${it.predict}, ${it.predict.formatDecimalSeparator()}")
+            val markerItemName = "${it.district}\n${it.predict.formatDecimalSeparator()}"
 
             val marker = MapPOIItem()
             marker.mapPoint = MapPoint.mapPointWithGeoCoord(it.lat, it.lng)
@@ -42,6 +45,8 @@ object MapViewManager {
             marker.itemName = markerItemName
 
             mv.addPOIItem(marker)
+            */
+
         }
 
         mv.setMapCenterPointAndZoomLevel(
@@ -49,6 +54,16 @@ object MapViewManager {
             8,
             true
         )
+    }
+
+    private fun randomArgbColor(): Int {
+        val random = Random.Default
+        val a = random.nextInt(0, 256)
+        val r = random.nextInt(0, 256)
+        val g = random.nextInt(0, 256)
+        val b = random.nextInt(0, 256)
+
+        return Color.argb(a, r, g, b)
     }
 
     fun createMapView(recommendInfo: RecommendInfo?) : (context: Context) -> MapView {
@@ -70,7 +85,7 @@ object MapViewManager {
 
         if (list.isNotEmpty()) {
             list.forEach {
-                val markerItemName = "(${it.service})\n${it.district} ${it.predict}"
+                val markerItemName = "${it.district}\n${it.predict.formatDecimalSeparator()}"
 
                 val marker = MapPOIItem()
                 marker.mapPoint = MapPoint.mapPointWithGeoCoord(it.lat, it.lng)
@@ -83,5 +98,14 @@ object MapViewManager {
         }
 
         return markers
+    }
+    private fun Long.formatDecimalSeparator(): String {
+        val str = toString()
+
+        return str
+            .reversed()
+            .substring(7)
+            .reversed()
+            .plus("천(만원)")
     }
 }
