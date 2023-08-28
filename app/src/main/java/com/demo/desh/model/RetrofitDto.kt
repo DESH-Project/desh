@@ -24,7 +24,7 @@ data class User(
     var id : Long? = null,
     val nickname : String,
     val email : String,
-    val profileImageUrl : String,
+    val profileImageUrl : String
 ) : Serializable
 
 data class Realty(

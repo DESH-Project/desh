@@ -38,9 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.demo.desh.util.MainNavigation
+import com.demo.desh.viewModel.MainViewModel
 
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(
+    viewModel: MainViewModel,
+    navController: NavHostController
+) {
     Column(
         verticalArrangement = Arrangement.Center, modifier = Modifier.padding(0.dp,130.dp,0.dp,0.dp)
     ) {

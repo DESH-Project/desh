@@ -2,6 +2,7 @@ package com.demo.desh
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material.Scaffold
@@ -27,16 +28,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val user = intent.getSerializableExtra("user") as User
+
+        Log.d("MainActivity", "user = $user")
 
         setContent {
-            val user = intent.getSerializableExtra("user") as User
-
             DeshprojectfeTheme {
                 Surface {
-                    App(
-                        user = user,
-                        viewModel = viewModel
-                    )
+                    App(viewModel, user)
                 }
             }
         }
@@ -45,8 +44,8 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 fun App(
-    user: User,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    user: User
 ) {
     val navController = rememberNavController()
 
@@ -54,7 +53,6 @@ fun App(
         content = { it
             MainNavigationHost(
                 navController = navController,
-                user = user,
                 viewModel = viewModel
             )
         },
@@ -65,12 +63,11 @@ fun App(
 @Composable
 fun MainNavigationHost(
     navController: NavHostController,
-    user: User,
     viewModel: MainViewModel,
 ) {
     NavHost(navController = navController, startDestination = MainNavigation.Home.route) {
         composable(route = MainNavigation.Home.route) {
-            MainScreen(navController)
+            MainScreen(viewModel, navController)
         }
 
         composable(route = MainNavigation.Profile.route) {
