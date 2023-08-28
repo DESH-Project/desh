@@ -5,7 +5,7 @@ import android.content.Intent
 import android.widget.Toast
 import com.demo.desh.MainActivity
 import com.demo.desh.model.User
-import com.demo.desh.repository.UserRepository
+import com.demo.desh.access.repository.UserRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,7 +21,7 @@ abstract class SocialLogin {
         result.enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
                 user.id = response.body()
-                intentMain(context, user)
+                toNext(context, user)
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
@@ -31,7 +31,7 @@ abstract class SocialLogin {
         })
     }
 
-    private fun intentMain(context: Context, user: User) {
+    private fun toNext(context: Context, user: User) {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("user", user)
         context.startActivity(intent)

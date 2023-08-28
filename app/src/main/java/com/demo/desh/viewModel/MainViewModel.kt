@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
-import com.demo.desh.repository.UserRepository
+import com.demo.desh.access.repository.UserRepository
 import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView

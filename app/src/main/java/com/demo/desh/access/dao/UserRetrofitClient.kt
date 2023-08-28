@@ -1,4 +1,4 @@
-package com.demo.desh.api
+package com.demo.desh.access.dao
 
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RecommendInfo
@@ -11,7 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface UserClient {
+interface UserRetrofitClient {
     /* 소셜 로그인 성공시 서버에 유저 정보 전달 */
     @POST("login")
     fun login(@Body user: User): Call<Long>

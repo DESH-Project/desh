@@ -1,6 +1,6 @@
-package com.demo.desh.repository
+package com.demo.desh.access.repository
 
-import com.demo.desh.api.RetrofitClient
+import com.demo.desh.util.RetrofitClient
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
@@ -11,25 +11,25 @@ import retrofit2.http.Body
 import retrofit2.http.Query
 
 class UserRepository {
-    private val userClient = RetrofitClient.userClient
+    private val userRetrofitClient = RetrofitClient.userRetrofitClient
 
     fun login(user: User): Call<Long> {
-        return userClient.login(user)
+        return userRetrofitClient.login(user)
     }
 
     suspend fun sendRealtyInfo(@Body realty: Realty): Response<Long> {
-        return userClient.sendRealtyInfo(realty)
+        return userRetrofitClient.sendRealtyInfo(realty)
     }
 
     suspend fun getServiceList(): Response<ServiceList> {
-        return userClient.getServiceList()
+        return userRetrofitClient.getServiceList()
     }
 
     suspend fun getRecommendationAllInfo(): Response<RecommendInfo> {
-        return userClient.getRecommendationAllInfo()
+        return userRetrofitClient.getRecommendationAllInfo()
     }
 
     suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<RecommendInfo> {
-        return userClient.getRecommendationInfo(encodedServiceName)
+        return userRetrofitClient.getRecommendationInfo(encodedServiceName)
     }
 }
