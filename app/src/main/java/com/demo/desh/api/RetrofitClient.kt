@@ -14,7 +14,7 @@ object RetrofitClient {
             .build()
     }
 
-    val userService: UserService by lazy {
-        retrofit.create(UserService::class.java)
+    val userClient: UserClient by lazy {
+        retrofit.create(UserClient::class.java)
     }
 }

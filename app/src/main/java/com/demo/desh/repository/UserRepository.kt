@@ -11,25 +11,25 @@ import retrofit2.http.Body
 import retrofit2.http.Query
 
 class UserRepository {
-    private val userService = RetrofitClient.userService
+    private val userClient = RetrofitClient.userClient
 
     fun login(user: User): Call<Long> {
-        return userService.login(user)
+        return userClient.login(user)
     }
 
     suspend fun sendRealtyInfo(@Body realty: Realty): Response<Long> {
-        return userService.sendRealtyInfo(realty)
+        return userClient.sendRealtyInfo(realty)
     }
 
     suspend fun getServiceList(): Response<ServiceList> {
-        return userService.getServiceList()
+        return userClient.getServiceList()
     }
 
     suspend fun getRecommendationAllInfo(): Response<RecommendInfo> {
-        return userService.getRecommendationAllInfo()
+        return userClient.getRecommendationAllInfo()
     }
 
     suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<RecommendInfo> {
-        return userService.getRecommendationInfo(encodedServiceName)
+        return userClient.getRecommendationInfo(encodedServiceName)
     }
 }

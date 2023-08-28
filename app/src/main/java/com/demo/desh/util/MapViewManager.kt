@@ -2,7 +2,6 @@ package com.demo.desh.util
 
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.RecommendInfo
 import net.daum.mf.map.api.MapCircle
@@ -100,12 +99,6 @@ object MapViewManager {
         return markers
     }
     private fun Long.formatDecimalSeparator(): String {
-        val str = toString()
-
-        return str
-            .reversed()
-            .substring(7)
-            .reversed()
-            .plus("천(만원)")
+        return toString()
     }
 }
