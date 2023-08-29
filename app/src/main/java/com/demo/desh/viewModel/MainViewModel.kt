@@ -22,8 +22,12 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
 
     private val _mapView = MutableLiveData<(context: Context) -> MapView>()
     val mapView: LiveData<(context: Context) -> MapView> get() = _mapView
+
     private val _recommendInfo = MutableLiveData<RecommendInfo>()
     val recommendInfo: LiveData<RecommendInfo> get() = _recommendInfo
+
+    private val _infoText = MutableLiveData<String>()
+    val infoText: LiveData<String> get() = _infoText
 
     fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {
@@ -37,6 +41,7 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
                 val body = res.body()!!
                 _mapView.value = MapViewManager.createMapView(body)
                 _recommendInfo.value = body
+                _infoText.value = if (serviceName == DEFAULT_SERVICE_NAME) "전체" else serviceName
             }
         }
     }

@@ -5,7 +5,6 @@ import android.graphics.Color
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.RecommendInfo
 import net.daum.mf.map.api.MapCircle
-import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 import kotlin.random.Random
@@ -17,7 +16,7 @@ object MapViewManager {
 
         var lats: Double = 0.0
         var lngs: Double = 0.0
-        val size = recommendInfo?.list?.size ?: 1
+        val size = recommendInfo?.size ?: 1
 
         recommendInfo?.list?.forEach {
             lats += it.lat
@@ -45,8 +44,8 @@ object MapViewManager {
 
             mv.addPOIItem(marker)
             */
-
         }
+
 
         mv.setMapCenterPointAndZoomLevel(
             MapPoint.mapPointWithGeoCoord(lats / size, lngs / size),
@@ -66,37 +65,38 @@ object MapViewManager {
     }
 
     fun createMapView(recommendInfo: RecommendInfo?) : (context: Context) -> MapView {
-        val markers = if (recommendInfo == null) getMapItems() else getMapItems(recommendInfo.list)
-        return makeMapView(markers)
+        val circles = if (recommendInfo == null) getMapItems() else getMapItems(recommendInfo.list)
+        return makeMapView(circles)
     }
 
-    private fun makeMapView(markers: List<MapPOIItem>) : (context: Context) -> MapView {
+    private fun makeMapView(circles: List<MapCircle>) : (context: Context) -> MapView {
         return { context: Context ->
             val mv = MapView(context)
-            markers.forEach { mv.addPOIItem(it) }
+            circles.forEach { mv.addCircle(it) }
             mv
         }
     }
 
     /* recommendInfo -> Circle 생성 */
-    private fun getMapItems(list: List<Recommend> = listOf()) : List<MapPOIItem> {
-        val markers = mutableListOf<MapPOIItem>()
+    private fun getMapItems(list: List<Recommend> = listOf()) : List<MapCircle> {
+        val circles = mutableListOf<MapCircle>()
 
         if (list.isNotEmpty()) {
             list.forEach {
                 val markerItemName = "${it.district}\n${it.predict.formatDecimalSeparator()}"
 
-                val marker = MapPOIItem()
-                marker.mapPoint = MapPoint.mapPointWithGeoCoord(it.lat, it.lng)
-                marker.markerType = MapPOIItem.MarkerType.RedPin
-                marker.selectedMarkerType = MapPOIItem.MarkerType.BluePin
-                marker.itemName = markerItemName
+                val circle = MapCircle(
+                    MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
+                    500,
+                    randomArgbColor(),
+                    randomArgbColor()
+                )
 
-                markers.add(marker)
+                circles.add(circle)
             }
         }
 
-        return markers
+        return circles
     }
     private fun Long.formatDecimalSeparator(): String {
         return toString()

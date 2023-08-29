@@ -24,8 +24,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
@@ -39,6 +41,7 @@ fun MapScreen(
     val serviceList by viewModel.serviceList.observeAsState()
     val mv by viewModel.mapView.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
+    val infoText by viewModel.infoText.observeAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
@@ -46,31 +49,9 @@ fun MapScreen(
     }
 
     Column {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = onBackButtonClick,
-                modifier = Modifier
-                    .background(Color.Transparent)
-                    .width(40.dp)
-                    .padding(15.dp, 0.dp, 0.dp, 0.dp)
-            ) {
-                Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = "뒤로가기")
-            }
-
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 15.dp, 0.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = "조회 가능한 업종의 개수는 ${serviceList?.size ?: 0}개 입니다.")
-                Text(text = "총 ${recommendInfo?.size ?: 0}개의 결과가 검색되었습니다")
-            }
-        }
-
         CreateListButton(serviceList) { viewModel.fetchMapView(it) }
+
+        InfoTextBar(infoText, serviceList, recommendInfo, onBackButtonClick)
 
         AndroidView(
             factory = mv ?: MapViewManager.createMapView(recommendInfo),
@@ -92,6 +73,41 @@ private fun CreateListButton(
                     Text(text = item)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun InfoTextBar(
+    infoText: String?,
+    serviceList: ServiceList?,
+    recommendInfo: RecommendInfo?,
+    onBackButtonClick: () -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = onBackButtonClick,
+            modifier = Modifier
+                .background(Color.Transparent)
+                .width(40.dp)
+                .padding(15.dp, 0.dp, 0.dp, 0.dp)
+        ) {
+            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = "뒤로가기")
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 0.dp, 15.dp, 0.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "조회 가능한 업종의 개수는 ${serviceList?.size ?: 0}개 입니다.", fontWeight = FontWeight.Bold)
+            Text(text = "\"${infoText}\"에 대한 검색 결과입니다.")
+            Text(text = "총 ${recommendInfo?.size ?: 0}개의 결과가 검색되었습니다")
         }
     }
 }
