@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.demo.desh.MainActivity
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.util.MapViewManager
@@ -36,7 +37,8 @@ import com.demo.desh.viewModel.MainViewModel
 @Composable
 fun MapScreen(
     viewModel: MainViewModel,
-    onBackButtonClick: () -> Unit
+    onBackButtonClick: () -> Unit,
+    markerEventListener: MainActivity.MarkerEventListener
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
     val mv by viewModel.mapView.observeAsState()
@@ -56,7 +58,7 @@ fun MapScreen(
         AndroidView(
             factory = mv ?: MapViewManager.createMapView(recommendInfo),
             modifier = Modifier.fillMaxSize(),
-            update = { mv -> MapViewManager.onMapViewUpdate(mv, recommendInfo) }
+            update = { mv -> MapViewManager.onMapViewUpdate(mv, recommendInfo, markerEventListener) }
         )
     }
 }
