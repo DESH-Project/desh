@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
 import java.net.URLEncoder
 
-class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository = UserRetrofitRepository()) : ViewModel() {
+class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
