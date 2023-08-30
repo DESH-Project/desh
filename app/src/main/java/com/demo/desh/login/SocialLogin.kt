@@ -3,26 +3,36 @@ package com.demo.desh.login
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.runtime.rememberCoroutineScope
 import com.demo.desh.MainActivity
-import com.demo.desh.api.RetrofitClient
+import com.demo.desh.access.entity.Member
+import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.model.User
-import kotlinx.coroutines.coroutineScope
+import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.access.room.MemberRoomDatabase
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-interface SocialLogin {
-    fun login(context: Context)
+abstract class SocialLogin {
+    private val userRetrofitRepository = UserRetrofitRepository()
 
-    fun send(context: Context, user: User) {
-        val userService = RetrofitClient.userService
-        val result = userService.login(user)
+    abstract fun login(context: Context)
+
+    protected fun send(context: Context, user: User) {
+        val result = userRetrofitRepository.login(user)
 
         result.enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
                 user.id = response.body()
-                intentMain(context, user)
+
+                val memberDb = MemberRoomDatabase.getInstance(context)
+                val memberDao = memberDb.memberDao()
+                val memberRepository = MemberRepository(memberDao)
+
+                val member = Member(user.nickname, user.email, user.profileImageUrl)
+
+                memberRepository.insertMember(member)
+                toNext(context, user)
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
@@ -32,7 +42,7 @@ interface SocialLogin {
         })
     }
 
-    fun intentMain(context: Context, user: User) {
+    private fun toNext(context: Context, user: User) {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("user", user)
         context.startActivity(intent)

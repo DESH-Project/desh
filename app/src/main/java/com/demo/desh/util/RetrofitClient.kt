@@ -1,5 +1,6 @@
-package com.demo.desh.api
+package com.demo.desh.util
 
+import com.demo.desh.access.dao.UserRetrofitDao
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -14,7 +15,7 @@ object RetrofitClient {
             .build()
     }
 
-    val userService: UserService by lazy {
-        retrofit.create(UserService::class.java)
+    val userRetrofitDao: UserRetrofitDao by lazy {
+        retrofit.create(UserRetrofitDao::class.java)
     }
 }

@@ -1,4 +1,4 @@
-package com.demo.desh.api
+package com.demo.desh.access.dao
 
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RecommendInfo
@@ -11,14 +11,14 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface UserService {
+interface UserRetrofitDao {
     /* 소셜 로그인 성공시 서버에 유저 정보 전달 */
     @POST("login")
     fun login(@Body user: User): Call<Long>
 
     /* 건물 정보 등록 */
     @POST("/realty")
-    fun sendRealtyInfo(@Body realty: Realty): Call<Long>
+    suspend fun sendRealtyInfo(@Body realty: Realty): Response<Long>
 
     /* 내가 본 매물 정보 프리뷰 */
 
@@ -30,7 +30,7 @@ interface UserService {
 
     /* 전체 상권 추천 정보 */
     @GET("recommend-all")
-    suspend fun getRecommendationAllInfo() : Response<RecommendInfo>
+    suspend fun getRecommendationAllInfo(): Response<RecommendInfo>
 
     /* 상권 추천 정보 */
     @GET("recommend")

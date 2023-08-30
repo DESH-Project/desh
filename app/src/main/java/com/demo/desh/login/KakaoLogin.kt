@@ -8,7 +8,7 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 
-object KakaoLogin: SocialLogin {
+object KakaoLogin: SocialLogin() {
     private const val TAG = "KakaoLoginObject"
 
     override fun login(context: Context) {
