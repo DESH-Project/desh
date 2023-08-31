@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.demo.desh.MainActivity
+import com.demo.desh.model.DistrictInfo
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.util.MapViewManager
@@ -56,11 +57,22 @@ fun MapScreen(
 
         InfoTextBar(infoText, serviceList, recommendInfo, onBackButtonClick)
 
+        TestDistrictList(districtInfo)
+
         AndroidView(
             factory = mv ?: MapViewManager.createMapView(recommendInfo),
             modifier = Modifier.fillMaxSize(),
             update = { mv -> MapViewManager.onMapViewUpdate(mv, recommendInfo, markerEventListener) }
         )
+    }
+}
+
+@Composable
+private fun TestDistrictList(districtInfo: DistrictInfo?) {
+    LazyRow {
+        itemsIndexed(districtInfo?.list ?: listOf("Loading...")) { idx, item ->
+            Text(text = "$idx : $item")
+        }
     }
 }
 

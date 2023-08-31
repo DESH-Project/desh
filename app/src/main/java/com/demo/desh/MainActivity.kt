@@ -24,7 +24,7 @@ import net.daum.mf.map.api.MapView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
-    private val markerEventListener = MarkerEventListener(this)
+    private val markerEventListener = MarkerEventListener(this, viewModel)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class MarkerEventListener(val context: Context) : MapView.POIItemEventListener {
+    class MarkerEventListener(val context: Context, private val viewModel: MainViewModel) : MapView.POIItemEventListener {
         // 마커 클릭시
         override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
             /*
@@ -65,6 +65,9 @@ class MainActivity : AppCompatActivity() {
 
             builder.show()
             */
+
+            val itemName = mapPOIItem?.itemName!!
+            viewModel.fetchDistrictInfoList(itemName)
         }
 
         // 말풍선 클릭시 1 (사용 X)

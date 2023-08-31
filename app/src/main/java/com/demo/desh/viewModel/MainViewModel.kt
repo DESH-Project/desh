@@ -70,6 +70,7 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
         viewModelScope.launch {
             val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
             val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
+            Log.e("MapScreen : fetchDistrictInfoList()", "res = $res")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
