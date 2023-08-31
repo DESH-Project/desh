@@ -24,7 +24,6 @@ import net.daum.mf.map.api.MapView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
-    private val markerEventListener = MarkerEventListener(this, viewModel)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "user = $user")
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
+        val markerEventListener = MarkerEventListener(this, viewModel)
 
         setContent {
             DeshprojectfeTheme {
