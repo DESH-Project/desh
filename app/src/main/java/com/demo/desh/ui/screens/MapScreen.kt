@@ -80,6 +80,7 @@ fun MapScreen(
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
 
+    // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
     BottomDrawer(
         gesturesEnabled = gesturesEnabled,
         drawerState = drawerState,
