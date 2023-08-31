@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.model.DistrictInfo
 import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
 import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) : ViewModel() {
     companion object {
@@ -57,6 +59,21 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
             if (res.isSuccessful) {
                 val body = res.body()!!
                 _serviceList.value = body
+            }
+        }
+    }
+
+    private val _districtInfo = MutableLiveData<DistrictInfo>()
+    val districtInfo: LiveData<DistrictInfo> get() = _districtInfo
+
+    fun fetchDistrictInfoList(districtName: String) {
+        viewModelScope.launch {
+            val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
+            val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
+
+            if (res.isSuccessful) {
+                val body = res.body()!!
+                _districtInfo.value = body
             }
         }
     }

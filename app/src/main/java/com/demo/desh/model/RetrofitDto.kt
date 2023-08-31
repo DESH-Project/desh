@@ -35,3 +35,16 @@ data class Realty(
     val squareMeter: Double,
     val userId: Long
 ) : Serializable
+
+data class DistrictInfo(
+    val size: Int,
+    val list: List<District>,
+    val status: Int
+)
+
+data class District(
+    val id: Long,
+    val address: String,
+    val image: String,
+    val price: Double
+)

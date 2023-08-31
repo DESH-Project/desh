@@ -1,5 +1,6 @@
 package com.demo.desh.access.dao
 
+import com.demo.desh.model.DistrictInfo
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
@@ -35,4 +36,8 @@ interface UserRetrofitDao {
     /* 상권 추천 정보 */
     @GET("recommend")
     suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<RecommendInfo>
+
+    /* 상권에 따른 상가 리스트 조회 */
+    @GET("stores")
+    suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<DistrictInfo>
 }

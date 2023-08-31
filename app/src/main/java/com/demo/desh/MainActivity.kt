@@ -47,22 +47,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*
-    class CustomBalloonAdapter() : CalloutBalloonAdapter {
-        override fun getCalloutBalloon(p0: MapPOIItem?): View {
-            // 마커 클릭시 말풍선
-        }
-
-        override fun getPressedCalloutBalloon(p0: MapPOIItem?): View {
-            // 말풍선 클릭시
-
-        }
-    }
-    */
-
     class MarkerEventListener(val context: Context) : MapView.POIItemEventListener {
         // 마커 클릭시
-        override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
+        override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
+            /*
             val builder = AlertDialog.Builder(context)
             val itemList = arrayOf("토스트", "마커 삭제", "취소")
 
@@ -76,24 +64,25 @@ class MainActivity : AppCompatActivity() {
             }
 
             builder.show()
+            */
         }
 
         // 말풍선 클릭시 1 (사용 X)
-        override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
+        override fun onCalloutBalloonOfPOIItemTouched(mapView: MapView?, mapPOIItem: MapPOIItem?) {
             TODO("Not yet implemented")
         }
 
         // 말풍선 클릭시 2 (사용 O)
         override fun onCalloutBalloonOfPOIItemTouched(
-            p0: MapView?,
-            p1: MapPOIItem?,
-            p2: MapPOIItem.CalloutBalloonButtonType?
+            mapView: MapView?,
+            mapPOIItem: MapPOIItem?,
+            callOutButtonType: MapPOIItem.CalloutBalloonButtonType?
         ) {
 
         }
 
         // 마커 이동시 (isDraggable = true) 인 경우
-        override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
+        override fun onDraggablePOIItemMoved(mapView: MapView?, mapPOIItem: MapPOIItem?, mapPoint: MapPoint?) {
             TODO("Not yet implemented")
         }
     }

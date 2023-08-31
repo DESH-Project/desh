@@ -44,6 +44,7 @@ fun MapScreen(
     val mv by viewModel.mapView.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
     val infoText by viewModel.infoText.observeAsState()
+    val districtInfo by viewModel.districtInfo.observeAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
