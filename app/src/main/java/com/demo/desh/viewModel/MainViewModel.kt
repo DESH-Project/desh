@@ -9,12 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.model.District
 import com.demo.desh.model.DistrictInfo
 import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) : ViewModel() {
     companion object {
@@ -70,10 +70,23 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
         viewModelScope.launch {
             val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
             val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
+
             Log.e("MapScreen : fetchDistrictInfoList()", "res = ${res.body()}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
+
+                if (body.list.isEmpty()) {
+                    val sample = District(
+                        id = 1L,
+                        address = "서울시 노원구 상계 1동",
+                        image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
+                        price = 12.7
+                    )
+
+                    body.list.add(sample)
+                }
+
                 _districtInfo.value = body
             }
         }
