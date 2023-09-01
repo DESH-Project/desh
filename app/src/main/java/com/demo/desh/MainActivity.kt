@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
@@ -18,6 +19,7 @@ import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.util.MainNavigationHost
 import com.demo.desh.viewModel.MainViewModel
 import com.demo.desh.viewModel.MainViewModelFactory
+import net.daum.mf.map.api.CalloutBalloonAdapter
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
@@ -89,6 +91,17 @@ class MainActivity : AppCompatActivity() {
             TODO("Not yet implemented")
         }
     }
+
+    /* 커스텀 말풍선 구현을 위한 클래스 */
+    class CustomCallOutBalloonAdapter : CalloutBalloonAdapter {
+        override fun getCalloutBalloon(mapPOIItem: MapPOIItem?): View {
+            TODO("Not yet implemented")
+        }
+
+        override fun getPressedCalloutBalloon(p0: MapPOIItem?): View {
+            TODO("Not yet implemented")
+        }
+    }
 }
 
 @Composable
@@ -104,7 +117,8 @@ fun App(
             MainNavigationHost(
                 navController = navController,
                 viewModel = viewModel,
-                markerEventListener = markerEventListener
+                markerEventListener = markerEventListener,
+                user = user
             )
         },
 

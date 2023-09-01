@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.demo.desh.MainActivity
+import com.demo.desh.model.User
 import com.demo.desh.ui.screens.MainScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
@@ -71,11 +72,12 @@ fun BottomNavigationBar(navController: NavHostController) {
 fun MainNavigationHost(
     navController: NavHostController,
     viewModel: MainViewModel,
-    markerEventListener: MainActivity.MarkerEventListener
+    markerEventListener: MainActivity.MarkerEventListener,
+    user: User
 ) {
     NavHost(navController = navController, startDestination = MainNavigation.Home.route) {
         composable(route = MainNavigation.Home.route) {
-            MainScreen(viewModel, navController)
+            MainScreen(viewModel, navController, user)
         }
 
         composable(route = MainNavigation.Profile.route) {
