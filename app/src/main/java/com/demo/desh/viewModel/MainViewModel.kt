@@ -15,6 +15,8 @@ import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
 import java.net.URLEncoder
+import java.util.UUID
+import kotlin.random.Random
 
 class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) : ViewModel() {
     companion object {
@@ -73,6 +75,9 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
 
             Log.e("MapScreen : fetchDistrictInfoList()", "res = ${res.body()}")
 
+            _districtInfo.value = randomDistrictSampleList()
+
+            /*
             if (res.isSuccessful) {
                 val body = res.body()!!
 
@@ -89,6 +94,26 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
 
                 _districtInfo.value = body
             }
+            */
         }
+    }
+
+    private fun randomDistrictSampleList() : DistrictInfo {
+        val random = Random.Default
+        val size = random.nextInt(5, 10)
+        val list = mutableListOf<District>()
+
+        for (i in 0 until size) {
+            val district = District(
+                id = (i + 1).toLong(),
+                address = UUID.randomUUID().toString(),
+                image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
+                price = random.nextDouble(1.0, 1000.0)
+            )
+
+            list.add(district)
+        }
+
+        return DistrictInfo(size, list)
     }
 }

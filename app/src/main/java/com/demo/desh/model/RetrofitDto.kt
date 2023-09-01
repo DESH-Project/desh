@@ -38,8 +38,8 @@ data class Realty(
 
 data class DistrictInfo(
     val size: Int,
-    val list: MutableList<District>,
-    val status: Int
+    val list: List<District>,
+    val status: Int = 200
 )
 
 data class District(

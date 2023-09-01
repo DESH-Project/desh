@@ -1,52 +1,43 @@
 package com.demo.desh.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.BottomDrawer
-import androidx.compose.material.BottomDrawerState
-import androidx.compose.material.BottomDrawerValue
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.rememberBottomDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.demo.desh.MainActivity
 import com.demo.desh.model.District
 import com.demo.desh.model.DistrictInfo
@@ -54,8 +45,7 @@ import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import de.charlex.compose.BottomDrawerScaffold
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -63,6 +53,7 @@ import kotlinx.coroutines.launch
 fun MapScreen(
     viewModel: MainViewModel,
     onBackButtonClick: () -> Unit,
+    goToRealtyDetail: (Long) -> Unit,
     markerEventListener: MainActivity.MarkerEventListener
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
@@ -71,40 +62,45 @@ fun MapScreen(
     val infoText by viewModel.infoText.observeAsState()
     val districtInfo by viewModel.districtInfo.observeAsState()
 
+    val onDrawerItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
+
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
         viewModel.fetchServiceList()
     }
 
-    val (gesturesEnabled, toggleGesturesEnabled) = remember { mutableStateOf(true) }
-    val coroutineScope = rememberCoroutineScope()
-    val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
-
+    // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
-    BottomDrawer(
-        gesturesEnabled = gesturesEnabled,
-        drawerState = drawerState,
-        drawerContent = { DistrictDrawerContent(districtInfo) },
+    BottomDrawerScaffold(
+        drawerContent = { DistrictDrawerContent(districtInfo, onDrawerItemClick) },
+        drawerGesturesEnabled = true,
+        drawerPeekHeight = 150.dp,
+        drawerBackgroundColor = Color.Transparent,  //Transparent drawer for custom Drawer shape
+        drawerElevation = 0.dp,
+
         content = {
             Scaffold(
                 topBar = {
                     Column {
                         CreateListButton(serviceList) { viewModel.fetchMapView(it) }
                         InfoTextBar(infoText, serviceList, recommendInfo, onBackButtonClick)
-                        BottomBarContent(coroutineScope = coroutineScope, drawerState = drawerState)
                     }
                 },
 
                 content = { innerPadding ->
-                    val modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxHeight()
-
-                    AndroidView(
-                        factory = mv ?: MapViewManager.createMapView(recommendInfo),
-                        modifier = Modifier.fillMaxSize(),
-                        update = { mv -> MapViewManager.onMapViewUpdate(mv, recommendInfo, markerEventListener) }
-                    )
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        AndroidView(
+                            factory = mv ?: MapViewManager.createMapView(recommendInfo),
+                            modifier = Modifier.fillMaxSize(),
+                            update = { mv ->
+                                MapViewManager.onMapViewUpdate(
+                                    mv,
+                                    recommendInfo,
+                                    markerEventListener
+                                )
+                            }
+                        )
+                    }
                 }
             )
         }
@@ -113,43 +109,40 @@ fun MapScreen(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomBarContent(coroutineScope: CoroutineScope, drawerState: BottomDrawerState) {
-    BottomAppBar {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Localized Description")
-            }
-        }
+private fun DistrictDrawerContent(districtInfo: DistrictInfo?, onItemClick: (Long) -> Unit) {
+    val placeHolderColor = Color(0x33000000)
 
-        Spacer(modifier = Modifier.weight(1f, true))
-
-        IconButton(onClick = { }) {
-            Icon(imageVector = Icons.Filled.Favorite, contentDescription = "Localized Description")
-        }
-    }
-}
-
-@Composable
-private fun TestDistrictList(districtInfo: DistrictInfo?) {
-
-
-    /*
-    LazyRow {
-        itemsIndexed(districtInfo?.list ?: listOf("Loading...")) { idx, item ->
-            Text(text = "$idx : $item")
-        }
-    }
-    */
-}
-
-@Composable
-private fun DistrictDrawerContent(districtInfo: DistrictInfo?) {
-    LazyColumn {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         itemsIndexed(districtInfo?.list ?: listOf<District>()) { _, item ->
-            Card {
-                Image(painter = rememberAsyncImagePainter(model = item.image), contentDescription = null)
-                Text(text = item.address)
-                Text(text = item.price.toString())
+            Card(
+                elevation = 8.dp,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth(),
+                onClick = { onItemClick(item.id) }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    AsyncImage(
+                        model = item.image,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        placeholder = ColorPainter(placeHolderColor),
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                    )
+
+                    Spacer(modifier = Modifier.size(8.dp))
+
+                    Column {
+                        Text(text = "주소: ${item.address}")
+                        Text(text = "시세: ${item.price}")
+                        Spacer(modifier = Modifier.size(4.dp))
+                    }
+                }
             }
         }
     }

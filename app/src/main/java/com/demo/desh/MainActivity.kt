@@ -14,6 +14,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
@@ -25,14 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.demo.desh.model.User
 import com.demo.desh.ui.screens.MainScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
+import com.demo.desh.ui.screens.RealtyDetailScreen
 import com.demo.desh.ui.screens.SettingsScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.MainViewModel
@@ -67,7 +71,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class MarkerEventListener(val context: Context, private val viewModel: MainViewModel) : MapView.POIItemEventListener {
+    class MarkerEventListener(
+        private val context: Context,
+        private val viewModel: MainViewModel,
+    ) : MapView.POIItemEventListener {
         // 마커 클릭시
         override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
             /*
@@ -85,14 +92,11 @@ class MainActivity : AppCompatActivity() {
 
             builder.show()
             */
-
-            val itemName = mapPOIItem?.itemName!!
-            viewModel.fetchDistrictInfoList(itemName)
         }
 
         // 말풍선 클릭시 1 (사용 X)
         override fun onCalloutBalloonOfPOIItemTouched(mapView: MapView?, mapPOIItem: MapPOIItem?) {
-            TODO("Not yet implemented")
+            onCalloutBalloonOfPOIItemTouched(mapView, mapPOIItem, null)
         }
 
         // 말풍선 클릭시 2 (사용 O)
@@ -101,7 +105,7 @@ class MainActivity : AppCompatActivity() {
             mapPOIItem: MapPOIItem?,
             callOutButtonType: MapPOIItem.CalloutBalloonButtonType?
         ) {
-
+            viewModel.fetchDistrictInfoList(mapPOIItem?.itemName!!)
         }
 
         // 마커 이동시 (isDraggable = true) 인 경우
@@ -131,6 +135,7 @@ sealed class MainNavigation(
     object Map : MainNavigation("map", "Map", Icons.Outlined.Phone)
     object Profile : MainNavigation("profile", "Profile", Icons.Outlined.AccountCircle)
     object Settings : MainNavigation("settings", "Settings", Icons.Outlined.Settings)
+    object RealtyDetail : MainNavigation("realtyDetail", "RealtyDetail", Icons.Outlined.Info)
 
     companion object {
         val items = listOf(Home, Profile, Settings)
@@ -182,6 +187,8 @@ fun App(
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController = navController, startDestination = MainNavigation.Home.route) {
+                val REALTY_ID = "realtyId"
+
                 composable(route = MainNavigation.Home.route) {
                     MainScreen(viewModel, navController, user)
                 }
@@ -196,7 +203,14 @@ fun App(
 
                 composable(route = MainNavigation.Map.route) {
                     val onBackButtonClick = { navController.navigate(MainNavigation.Home.route) }
-                    MapScreen(viewModel, onBackButtonClick, markerEventListener)
+                    val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
+
+                    MapScreen(viewModel, onBackButtonClick, goToRealtyDetail, markerEventListener)
+                }
+
+                composable(route = "${MainNavigation.RealtyDetail.route}/{${REALTY_ID}}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getLong(REALTY_ID)
+                    id?.let { realtyId -> RealtyDetailScreen(realtyId) }
                 }
             }
         }
