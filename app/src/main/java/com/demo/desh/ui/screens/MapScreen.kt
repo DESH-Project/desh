@@ -95,8 +95,6 @@ fun MapScreen(
                     }
                 },
 
-                bottomBar = { BottomBarContent(coroutineScope = coroutineScope, drawerState = drawerState) },
-
                 content = { innerPadding ->
                     val modifier = Modifier
                         .padding(innerPadding)

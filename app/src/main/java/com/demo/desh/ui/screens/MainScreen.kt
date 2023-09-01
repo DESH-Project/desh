@@ -43,8 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.demo.desh.MainNavigation
 import com.demo.desh.model.User
-import com.demo.desh.util.MainNavigation
 import com.demo.desh.viewModel.MainViewModel
 
 
@@ -178,7 +178,7 @@ fun Bottom(navController: NavController){
             ) {
             }
         },
-    ) { }
+    ) { it }
 }
 
 
