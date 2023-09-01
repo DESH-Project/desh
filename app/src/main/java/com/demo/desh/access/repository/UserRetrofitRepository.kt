@@ -2,7 +2,8 @@ package com.demo.desh.access.repository
 
 import com.demo.desh.model.DistrictInfo
 import com.demo.desh.util.RetrofitClient
-import com.demo.desh.model.Realty
+import com.demo.desh.model.RealtyCreationReq
+import com.demo.desh.model.RealtyDetail
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.model.User
@@ -16,7 +17,7 @@ class UserRetrofitRepository {
         return userRetrofitDao.login(user)
     }
 
-    suspend fun sendRealtyInfo(realty: Realty): Response<Long> {
+    suspend fun sendRealtyInfo(realty: RealtyCreationReq): Response<Long> {
         return userRetrofitDao.sendRealtyInfo(realty)
     }
 
@@ -34,5 +35,9 @@ class UserRetrofitRepository {
 
     suspend fun getDistrictInfo(encodedDistrictName: String): Response<DistrictInfo> {
         return userRetrofitDao.getStoreList(encodedDistrictName)
+    }
+
+    suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<RealtyDetail> {
+        return userRetrofitDao.getRealtyDetail(realtyId, userId)
     }
 }

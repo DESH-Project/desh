@@ -1,7 +1,8 @@
 package com.demo.desh.access.dao
 
 import com.demo.desh.model.DistrictInfo
-import com.demo.desh.model.Realty
+import com.demo.desh.model.RealtyCreationReq
+import com.demo.desh.model.RealtyDetail
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.model.User
@@ -19,7 +20,7 @@ interface UserRetrofitDao {
 
     /* 건물 정보 등록 */
     @POST("/realty")
-    suspend fun sendRealtyInfo(@Body realty: Realty): Response<Long>
+    suspend fun sendRealtyInfo(@Body realty: RealtyCreationReq): Response<Long>
 
     /* 내가 본 매물 정보 프리뷰 */
 
@@ -40,4 +41,7 @@ interface UserRetrofitDao {
     /* 상권에 따른 상가 리스트 조회 */
     @GET("stores")
     suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<DistrictInfo>
+
+    @GET("store")
+    suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<RealtyDetail>
 }

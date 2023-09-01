@@ -209,8 +209,8 @@ fun App(
                 }
 
                 composable(route = "${MainNavigation.RealtyDetail.route}/{${REALTY_ID}}") { backStackEntry ->
-                    val id = backStackEntry.arguments?.getLong(REALTY_ID)
-                    id?.let { realtyId -> RealtyDetailScreen(realtyId) }
+                    val id = backStackEntry.arguments?.getString(REALTY_ID)
+                    id?.let { realtyId -> RealtyDetailScreen(realtyId.toLong(), user, viewModel) }
                 }
             }
         }

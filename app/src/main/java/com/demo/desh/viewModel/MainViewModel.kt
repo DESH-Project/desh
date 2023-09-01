@@ -11,6 +11,8 @@ import com.demo.desh.model.ServiceList
 import com.demo.desh.access.repository.UserRetrofitRepository
 import com.demo.desh.model.District
 import com.demo.desh.model.DistrictInfo
+import com.demo.desh.model.RealtyDetail
+import com.demo.desh.model.RealtyInfo
 import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
@@ -95,6 +97,39 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
                 _districtInfo.value = body
             }
             */
+        }
+    }
+
+    private val _realtyDetail = MutableLiveData<RealtyDetail>()
+    val realtyDetail: LiveData<RealtyDetail> get() = _realtyDetail
+
+    fun fetchRealtyDetail(realtyId: Long, userId: Long) {
+        viewModelScope.launch {
+            val res = userRetrofitRepository.getRealtyDetail(realtyId, userId)
+            Log.e("MainViewModel.fetchRealtyDetail()", "res = ${res.body()}")
+
+            if (res.isSuccessful) {
+                val body = res.body()!!
+                _realtyDetail.value = body
+            }
+
+            else {
+                val sampleRealtyInfo = RealtyInfo(
+                    id = realtyId,
+                    name = "건물 이름입니다.",
+                    price = 12.7,
+                    address = "서울시 노원구 상계 1동",
+                    pyung = 1234,
+                    squareMeter = 33.3,
+                    image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
+                    nearby = "근처 상권입니다.",
+                    userId = userId
+                )
+
+                val sample = RealtyDetail(1, listOf(sampleRealtyInfo))
+
+                _realtyDetail.value = sample
+            }
         }
     }
 
