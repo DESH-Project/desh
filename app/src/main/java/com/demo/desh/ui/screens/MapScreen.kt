@@ -1,5 +1,6 @@
 package com.demo.desh.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -74,7 +75,7 @@ fun MapScreen(
     BottomDrawerScaffold(
         drawerContent = { DistrictDrawerContent(districtInfo, onDrawerItemClick) },
         drawerGesturesEnabled = true,
-        drawerPeekHeight = 150.dp,
+        drawerPeekHeight = 200.dp,
         drawerBackgroundColor = Color.Transparent,  //Transparent drawer for custom Drawer shape
         drawerElevation = 0.dp,
 
@@ -110,10 +111,12 @@ fun MapScreen(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DistrictDrawerContent(districtInfo: DistrictInfo?, onItemClick: (Long) -> Unit) {
+    if (districtInfo == null) return
+
     val placeHolderColor = Color(0x33000000)
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        itemsIndexed(districtInfo?.list ?: listOf<District>()) { _, item ->
+        itemsIndexed(districtInfo.list) { _, item ->
             Card(
                 elevation = 8.dp,
                 modifier = Modifier
@@ -153,10 +156,15 @@ private fun CreateListButton(
     serviceList: ServiceList?,
     onSelectedServiceNameChange: (String) -> Unit
 ) {
+    if (serviceList == null) return
+
     LazyRow {
-        itemsIndexed(serviceList?.list ?: listOf("Loading...")) { _, item ->
+        itemsIndexed(serviceList.list) { _, item ->
             Card {
-                TextButton(onClick = { onSelectedServiceNameChange(item) }) {
+                TextButton(onClick = {
+                    Log.e("MapScreen.CreateListButton", "Click item = $item")
+                    onSelectedServiceNameChange(item)
+                }) {
                     Text(text = item)
                 }
             }

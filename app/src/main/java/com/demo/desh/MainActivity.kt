@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "user = $user")
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
-        val markerEventListener = MarkerEventListener(this, viewModel)
+        val markerEventListener = MarkerEventListener(viewModel)
 
         setContent {
             DeshprojectfeTheme {
@@ -71,10 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class MarkerEventListener(
-        private val context: Context,
-        private val viewModel: MainViewModel,
-    ) : MapView.POIItemEventListener {
+    class MarkerEventListener(private val viewModel: MainViewModel) : MapView.POIItemEventListener {
         // 마커 클릭시
         override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
             /*
@@ -96,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
         // 말풍선 클릭시 1 (사용 X)
         override fun onCalloutBalloonOfPOIItemTouched(mapView: MapView?, mapPOIItem: MapPOIItem?) {
-            onCalloutBalloonOfPOIItemTouched(mapView, mapPOIItem, null)
+            this.onCalloutBalloonOfPOIItemTouched(mapView, mapPOIItem, null)
         }
 
         // 말풍선 클릭시 2 (사용 O)

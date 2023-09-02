@@ -135,7 +135,7 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
 
     private fun randomDistrictSampleList() : DistrictInfo {
         val random = Random.Default
-        val size = random.nextInt(5, 10)
+        val size = random.nextInt(20, 30)
         val list = mutableListOf<District>()
 
         for (i in 0 until size) {
