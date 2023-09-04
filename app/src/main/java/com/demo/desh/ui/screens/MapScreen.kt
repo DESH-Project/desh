@@ -75,7 +75,7 @@ fun MapScreen(
         drawerContent = { DistrictDrawerContent(districtInfo, onDrawerItemClick) },
         drawerGesturesEnabled = true,
         drawerPeekHeight = 200.dp,
-        drawerBackgroundColor = Color.Transparent,  //Transparent drawer for custom Drawer shape
+        drawerBackgroundColor = Color.White,  //Transparent drawer for custom Drawer shape
         drawerElevation = 0.dp,
 
         content = {
@@ -113,7 +113,7 @@ private fun DistrictDrawerContent(districtInfo: DistrictInfo?, onItemClick: (Lon
     val placeHolderColor = Color(0x33000000)
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        itemsIndexed(districtInfo?.list ?: listOf()) { _, item ->
+        itemsIndexed(districtInfo?.data ?: listOf()) { _, item ->
             Card(
                 elevation = 8.dp,
                 modifier = Modifier
@@ -154,7 +154,7 @@ private fun CreateListButton(
     onSelectedServiceNameChange: (String) -> Unit
 ) {
     LazyRow {
-        itemsIndexed(serviceList?.list ?: listOf()) { _, item ->
+        itemsIndexed(serviceList?.data?: listOf()) { _, item ->
             Card {
                 TextButton(onClick = {
                     Log.e("MapScreen.CreateListButton", "Click item = $item")

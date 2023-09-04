@@ -17,7 +17,6 @@ import com.demo.desh.model.RealtyInfo
 import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
-import okhttp3.internal.wait
 import java.net.URLEncoder
 import java.util.UUID
 import kotlin.random.Random
@@ -43,7 +42,7 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
                 if (serviceName == DEFAULT_SERVICE_NAME) userRetrofitRepository.getRecommendationAllInfo()
                 else userRetrofitRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
 
-            Log.e("MapScreen : fetchMapView()", "res = $res, res body = ${res.body()?.list}")
+            Log.e("MapScreen : fetchMapView()", "res = $res, res body = ${res.body()?.data}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
@@ -60,7 +59,7 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
     fun fetchServiceList() {
         viewModelScope.launch {
             val res = userRetrofitRepository.getServiceList()
-            Log.e("MapScreen : fetchServiceList()", "res = $res")
+            Log.e("MapScreen : fetchServiceList()", "res = $res, res body = ${res.body()}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!

@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
@@ -26,12 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.demo.desh.model.User
 import com.demo.desh.ui.screens.MainScreen
 import com.demo.desh.ui.screens.MapScreen
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "user = $user")
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
-        val markerEventListener = MarkerEventListener(viewModel)
+        val markerEventListener = MarkerEventListener(this, viewModel)
 
         setContent {
             DeshprojectfeTheme {
@@ -71,24 +71,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class MarkerEventListener(private val viewModel: MainViewModel) : MapView.POIItemEventListener {
+    class MarkerEventListener(private val context: Context, private val viewModel: MainViewModel) : MapView.POIItemEventListener {
         // 마커 클릭시
         override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
-            /*
             val builder = AlertDialog.Builder(context)
             val itemList = arrayOf("토스트", "마커 삭제", "취소")
 
-            builder.setTitle("${p1?.itemName}")
+            builder.setTitle("${mapPOIItem?.itemName}")
             builder.setItems(itemList) { dialog, which ->
                 when (which) {
                     0 -> Toast.makeText(context, "토스트", Toast.LENGTH_SHORT).show()
-                    1 -> p0?.removePOIItem(p1)
+                    1 -> mapView?.removePOIItem(mapPOIItem)
                     2 -> dialog.dismiss()
                 }
             }
 
             builder.show()
-            */
+
+            onCalloutBalloonOfPOIItemTouched(mapView, mapPOIItem)
         }
 
         // 말풍선 클릭시 1 (사용 X)

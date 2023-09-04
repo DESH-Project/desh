@@ -4,7 +4,7 @@ import java.io.Serializable
 
 data class RecommendInfo(
     val size: Int,
-    val list: List<Recommend>
+    val data: List<Recommend>
 ): Serializable
 
 data class Recommend(
@@ -17,7 +17,7 @@ data class Recommend(
 
 data class ServiceList(
     val size: Int,
-    val list: List<String>
+    val data: List<String>
 ): Serializable
 
 data class User(
@@ -38,7 +38,7 @@ data class RealtyCreationReq(
 
 data class DistrictInfo(
     val size: Int,
-    val list: List<District>,
+    val data: List<District>,
     val status: Int = 200
 )
 
@@ -51,7 +51,7 @@ data class District(
 
 data class RealtyDetail(
     val size: Int,
-    val list: List<RealtyInfo>,
+    val data: List<RealtyInfo>,
     val status: Int = 200
 )
 

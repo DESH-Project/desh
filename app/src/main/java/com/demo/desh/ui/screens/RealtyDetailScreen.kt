@@ -29,7 +29,7 @@ fun RealtyDetailScreen(
 
     Scaffold { paddingValue ->
         Box(modifier = Modifier.padding(paddingValue)) {
-            val info = realtyDetail?.list?.first()
+            val info = realtyDetail?.data?.first()
 
             info?.apply {
                 Column {

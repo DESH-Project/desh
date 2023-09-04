@@ -3,7 +3,6 @@ package com.demo.desh.util
 import android.content.Context
 import android.util.Log
 import com.demo.desh.MainActivity
-import com.demo.desh.model.Recommend
 import com.demo.desh.model.RecommendInfo
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
@@ -17,7 +16,7 @@ object MapViewManager {
         // mv.setCalloutBalloonAdapter(CustomBalloonAdapter())
         mv.setPOIItemEventListener(markerEventListener)
 
-        recommendInfo?.list?.forEach {
+        recommendInfo?.data?.forEach {
             Log.e("MapViewManager", "${it.predict}, ${it.predict.formatDecimalSeparator()}")
 
             val marker = MapPOIItem()
@@ -50,8 +49,8 @@ object MapViewManager {
     private fun getMapItems(recommendInfo: RecommendInfo?) : List<MapPOIItem> {
         val markers = mutableListOf<MapPOIItem>()
 
-        if (recommendInfo?.list?.isNotEmpty() == true) {
-            val list = recommendInfo.list
+        if (recommendInfo?.data?.isNotEmpty() == true) {
+            val list = recommendInfo.data
 
             list.forEach {
                 val markerItemName = "${it.district}\n${it.predict.formatDecimalSeparator()}"
