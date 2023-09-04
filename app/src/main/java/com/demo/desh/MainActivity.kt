@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity() {
     class MarkerEventListener(private val context: Context, private val viewModel: MainViewModel) : MapView.POIItemEventListener {
         // 마커 클릭시
         override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
+            Log.e("MarkerEventListener", "POI Item Selected : $mapPOIItem")
+
             val builder = AlertDialog.Builder(context)
             val itemList = arrayOf("토스트", "마커 삭제", "취소")
 
@@ -112,6 +114,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /* 커스텀 말풍선 구현을 위한 클래스 */
+    /*
     class CustomCallOutBalloonAdapter : CalloutBalloonAdapter {
         override fun getCalloutBalloon(mapPOIItem: MapPOIItem?): View {
             TODO("Not yet implemented")
@@ -121,6 +124,7 @@ class MainActivity : AppCompatActivity() {
             TODO("Not yet implemented")
         }
     }
+     */
 }
 
 sealed class MainNavigation(

@@ -16,7 +16,7 @@ object MapViewManager {
         // mv.setCalloutBalloonAdapter(CustomBalloonAdapter())
         mv.setPOIItemEventListener(markerEventListener)
 
-        recommendInfo?.data?.forEach {
+        recommendInfo?.data?.forEachIndexed { idx, it ->
             Log.e("MapViewManager", "${it.predict}, ${it.predict.formatDecimalSeparator()}")
 
             val marker = MapPOIItem()
@@ -25,6 +25,8 @@ object MapViewManager {
                     mapPoint = MapPoint.mapPointWithGeoCoord(it.lat, it.lng)
                     markerType = MapPOIItem.MarkerType.RedPin
                     selectedMarkerType = MapPOIItem.MarkerType.BluePin
+                    tag = idx
+                    isDraggable = false
                 }
 
             mv.addPOIItem(marker)
@@ -53,13 +55,11 @@ object MapViewManager {
             val list = recommendInfo.data
 
             list.forEach {
-                val markerItemName = "${it.district}\n${it.predict.formatDecimalSeparator()}"
-
                 val marker = MapPOIItem()
                 marker.mapPoint = MapPoint.mapPointWithGeoCoord(it.lat, it.lng)
                 marker.markerType = MapPOIItem.MarkerType.RedPin
                 marker.selectedMarkerType = MapPOIItem.MarkerType.BluePin
-                marker.itemName = markerItemName
+                marker.itemName = it.district
 
                 markers.add(marker)
             }

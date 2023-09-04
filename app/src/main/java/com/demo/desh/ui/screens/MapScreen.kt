@@ -71,10 +71,11 @@ fun MapScreen(
 
     // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
+    // https://developersbreach.com/modal-bottom-sheet-jetpack-compose-android/
     BottomDrawerScaffold(
         drawerContent = { DistrictDrawerContent(districtInfo, onDrawerItemClick) },
         drawerGesturesEnabled = true,
-        drawerPeekHeight = 200.dp,
+        drawerPeekHeight = 150.dp,
         drawerBackgroundColor = Color.White,  //Transparent drawer for custom Drawer shape
         drawerElevation = 0.dp,
 
