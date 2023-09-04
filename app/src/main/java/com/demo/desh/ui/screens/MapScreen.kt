@@ -40,11 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.demo.desh.MainActivity
-import com.demo.desh.model.District
 import com.demo.desh.model.DistrictInfo
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
-import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
 import de.charlex.compose.BottomDrawerScaffold
 
@@ -64,6 +62,7 @@ fun MapScreen(
     val districtInfo by viewModel.districtInfo.observeAsState()
 
     val onDrawerItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
+    val onListButtonClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
@@ -83,7 +82,7 @@ fun MapScreen(
             Scaffold(
                 topBar = {
                     Column {
-                        CreateListButton(serviceList) { viewModel.fetchMapView(it) }
+                        CreateListButton(serviceList, onListButtonClick)
                         InfoTextBar(infoText, serviceList, recommendInfo, onBackButtonClick)
                     }
                 },
@@ -91,10 +90,10 @@ fun MapScreen(
                 content = { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
                         AndroidView(
-                            factory = mv ?: MapViewManager.createMapView(recommendInfo),
+                            factory = mv ?: viewModel.createMapView(recommendInfo),
                             modifier = Modifier.fillMaxSize(),
                             update = { mv ->
-                                MapViewManager.onMapViewUpdate(
+                                viewModel.fetchMapViewUpdate(
                                     mv,
                                     recommendInfo,
                                     markerEventListener
@@ -111,12 +110,10 @@ fun MapScreen(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DistrictDrawerContent(districtInfo: DistrictInfo?, onItemClick: (Long) -> Unit) {
-    if (districtInfo == null) return
-
     val placeHolderColor = Color(0x33000000)
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        itemsIndexed(districtInfo.list) { _, item ->
+        itemsIndexed(districtInfo?.list ?: listOf()) { _, item ->
             Card(
                 elevation = 8.dp,
                 modifier = Modifier
@@ -156,10 +153,8 @@ private fun CreateListButton(
     serviceList: ServiceList?,
     onSelectedServiceNameChange: (String) -> Unit
 ) {
-    if (serviceList == null) return
-
     LazyRow {
-        itemsIndexed(serviceList.list) { _, item ->
+        itemsIndexed(serviceList?.list ?: listOf()) { _, item ->
             Card {
                 TextButton(onClick = {
                     Log.e("MapScreen.CreateListButton", "Click item = $item")

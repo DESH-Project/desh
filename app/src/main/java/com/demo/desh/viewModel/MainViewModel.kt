@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demo.desh.MainActivity
 import com.demo.desh.model.RecommendInfo
 import com.demo.desh.model.ServiceList
 import com.demo.desh.access.repository.UserRetrofitRepository
@@ -16,6 +17,7 @@ import com.demo.desh.model.RealtyInfo
 import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
+import okhttp3.internal.wait
 import java.net.URLEncoder
 import java.util.UUID
 import kotlin.random.Random
@@ -41,7 +43,7 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
                 if (serviceName == DEFAULT_SERVICE_NAME) userRetrofitRepository.getRecommendationAllInfo()
                 else userRetrofitRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
 
-            Log.e("MapScreen : fetchMapView()", "res = ${res.body()?.list}")
+            Log.e("MapScreen : fetchMapView()", "res = $res, res body = ${res.body()?.list}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
@@ -131,6 +133,18 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
                 _realtyDetail.value = sample
             }
         }
+    }
+
+    fun fetchMapViewUpdate(mv: MapView, recommendInfo: RecommendInfo?, markerEventListener: MainActivity.MarkerEventListener) {
+        viewModelScope.launch {
+            MapViewManager.onMapViewUpdate(mv, recommendInfo, markerEventListener)
+        }
+    }
+
+    fun createMapView(recommendInfo: RecommendInfo?) : (context: Context) -> MapView {
+        var mv: ((context: Context) -> MapView)? = null
+        viewModelScope.launch { mv = MapViewManager.createMapView(recommendInfo) }
+        return mv!!
     }
 
     private fun randomDistrictSampleList() : DistrictInfo {
