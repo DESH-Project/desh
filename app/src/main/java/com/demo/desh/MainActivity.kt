@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
@@ -14,7 +13,6 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Phone
@@ -41,7 +39,6 @@ import com.demo.desh.ui.screens.SettingsScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.MainViewModel
 import com.demo.desh.viewModel.MainViewModelFactory
-import net.daum.mf.map.api.CalloutBalloonAdapter
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
@@ -130,16 +127,16 @@ class MainActivity : AppCompatActivity() {
 sealed class MainNavigation(
     val route: String,
     val title: String,
-    val icon: ImageVector
+    val icon: ImageVector? = null
 ) {
     object Home : MainNavigation("home", "Home", Icons.Outlined.Home)
-    object Map : MainNavigation("map", "Map", Icons.Outlined.Phone)
-    object Profile : MainNavigation("profile", "Profile", Icons.Outlined.AccountCircle)
+    object Profile : MainNavigation("profile", "Profile", Icons.Outlined.Info)
     object Settings : MainNavigation("settings", "Settings", Icons.Outlined.Settings)
-    object RealtyDetail : MainNavigation("realtyDetail", "RealtyDetail", Icons.Outlined.Info)
+    object Map : MainNavigation("map", "Map")
+    object RealtyDetail : MainNavigation("realtyDetail", "RealtyDetail")
 
     companion object {
-        val items = listOf(Home, Profile, Settings)
+        val bottomItems = listOf(Home, Profile, Settings)
     }
 }
 
@@ -160,7 +157,7 @@ fun App(
                     val backStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = backStackEntry?.destination?.route
 
-                    MainNavigation.items.forEach { navItem ->
+                    MainNavigation.bottomItems.forEach { navItem ->
                         BottomNavigationItem(
                             selected = currentRoute == navItem.route,
                             onClick = {
@@ -175,7 +172,7 @@ fun App(
 
                             icon = {
                                 Icon(
-                                    imageVector = navItem.icon,
+                                    imageVector = navItem.icon!!,
                                     contentDescription = navItem.title
                                 )
                             },

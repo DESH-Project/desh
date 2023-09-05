@@ -6,14 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demo.desh.MainActivity
-import com.demo.desh.model.RecommendInfo
-import com.demo.desh.model.ServiceList
 import com.demo.desh.access.repository.UserRetrofitRepository
 import com.demo.desh.model.District
-import com.demo.desh.model.DistrictInfo
-import com.demo.desh.model.RealtyDetail
-import com.demo.desh.model.RealtyInfo
+import com.demo.desh.model.Realty
+import com.demo.desh.model.Recommend
+import com.demo.desh.model.ServerResponse
 import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
 import net.daum.mf.map.api.MapView
@@ -30,8 +27,8 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
     private val _mapView = MutableLiveData<(context: Context) -> MapView>()
     val mapView: LiveData<(context: Context) -> MapView> get() = _mapView
 
-    private val _recommendInfo = MutableLiveData<RecommendInfo>()
-    val recommendInfo: LiveData<RecommendInfo> get() = _recommendInfo
+    private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
+    val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
 
     private val _infoText = MutableLiveData<String>()
     val infoText: LiveData<String> get() = _infoText
@@ -53,8 +50,8 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
         }
     }
 
-    private val _serviceList = MutableLiveData<ServiceList>()
-    val serviceList: LiveData<ServiceList> get() = _serviceList
+    private val _serviceList = MutableLiveData<ServerResponse<String>>()
+    val serviceList: LiveData<ServerResponse<String>> get() = _serviceList
 
     fun fetchServiceList() {
         viewModelScope.launch {
@@ -68,8 +65,8 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
         }
     }
 
-    private val _districtInfo = MutableLiveData<DistrictInfo>()
-    val districtInfo: LiveData<DistrictInfo> get() = _districtInfo
+    private val _districtInfo = MutableLiveData<ServerResponse<District>>()
+    val districtInfo: LiveData<ServerResponse<District>> get() = _districtInfo
 
     fun fetchDistrictInfoList(districtName: String) {
         viewModelScope.launch {
@@ -101,8 +98,8 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
         }
     }
 
-    private val _realtyDetail = MutableLiveData<RealtyDetail>()
-    val realtyDetail: LiveData<RealtyDetail> get() = _realtyDetail
+    private val _realtyDetail = MutableLiveData<ServerResponse<Realty>>()
+    val realtyDetail: LiveData<ServerResponse<Realty>> get() = _realtyDetail
 
     fun fetchRealtyDetail(realtyId: Long, userId: Long) {
         viewModelScope.launch {
@@ -115,7 +112,7 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
             }
 
             else {
-                val sampleRealtyInfo = RealtyInfo(
+                val sampleRealtyInfo = Realty(
                     id = realtyId,
                     name = "건물 이름입니다.",
                     price = 12.7,
@@ -127,26 +124,14 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
                     userId = userId
                 )
 
-                val sample = RealtyDetail(1, listOf(sampleRealtyInfo))
+                val sample = ServerResponse(1, listOf(sampleRealtyInfo))
 
                 _realtyDetail.value = sample
             }
         }
     }
 
-    fun fetchMapViewUpdate(mv: MapView, recommendInfo: RecommendInfo?, markerEventListener: MainActivity.MarkerEventListener) {
-        viewModelScope.launch {
-            MapViewManager.onMapViewUpdate(mv, recommendInfo, markerEventListener)
-        }
-    }
-
-    fun createMapView(recommendInfo: RecommendInfo?) : (context: Context) -> MapView {
-        var mv: ((context: Context) -> MapView)? = null
-        viewModelScope.launch { mv = MapViewManager.createMapView(recommendInfo) }
-        return mv!!
-    }
-
-    private fun randomDistrictSampleList() : DistrictInfo {
+    private fun randomDistrictSampleList() : ServerResponse<District> {
         val random = Random.Default
         val size = random.nextInt(20, 30)
         val list = mutableListOf<District>()
@@ -162,6 +147,6 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
             list.add(district)
         }
 
-        return DistrictInfo(size, list)
+        return ServerResponse(size, list)
     }
 }

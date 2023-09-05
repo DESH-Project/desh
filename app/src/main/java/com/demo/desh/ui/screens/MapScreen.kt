@@ -40,9 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.demo.desh.MainActivity
-import com.demo.desh.model.DistrictInfo
-import com.demo.desh.model.RecommendInfo
-import com.demo.desh.model.ServiceList
+import com.demo.desh.model.District
+import com.demo.desh.model.Recommend
+import com.demo.desh.model.ServerResponse
+import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
 import de.charlex.compose.BottomDrawerScaffold
 
@@ -91,10 +92,10 @@ fun MapScreen(
                 content = { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
                         AndroidView(
-                            factory = mv ?: viewModel.createMapView(recommendInfo),
+                            factory = mv ?: MapViewManager.createMapView(recommendInfo),
                             modifier = Modifier.fillMaxSize(),
                             update = { mv ->
-                                viewModel.fetchMapViewUpdate(
+                                MapViewManager.onMapViewUpdate(
                                     mv,
                                     recommendInfo,
                                     markerEventListener
@@ -110,7 +111,7 @@ fun MapScreen(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun DistrictDrawerContent(districtInfo: DistrictInfo?, onItemClick: (Long) -> Unit) {
+private fun DistrictDrawerContent(districtInfo: ServerResponse<District>?, onItemClick: (Long) -> Unit) {
     val placeHolderColor = Color(0x33000000)
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -151,7 +152,7 @@ private fun DistrictDrawerContent(districtInfo: DistrictInfo?, onItemClick: (Lon
 
 @Composable
 private fun CreateListButton(
-    serviceList: ServiceList?,
+    serviceList: ServerResponse<String>?,
     onSelectedServiceNameChange: (String) -> Unit
 ) {
     LazyRow {
@@ -171,8 +172,8 @@ private fun CreateListButton(
 @Composable
 private fun InfoTextBar(
     infoText: String?,
-    serviceList: ServiceList?,
-    recommendInfo: RecommendInfo?,
+    serviceList: ServerResponse<String>?,
+    recommendInfo: ServerResponse<Recommend>?,
     onBackButtonClick: () -> Unit
 ) {
     Row(

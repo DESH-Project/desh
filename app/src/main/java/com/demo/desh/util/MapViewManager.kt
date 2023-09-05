@@ -3,13 +3,14 @@ package com.demo.desh.util
 import android.content.Context
 import android.util.Log
 import com.demo.desh.MainActivity
-import com.demo.desh.model.RecommendInfo
+import com.demo.desh.model.Recommend
+import com.demo.desh.model.ServerResponse
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 
 object MapViewManager {
-    fun onMapViewUpdate(mv: MapView, recommendInfo: RecommendInfo?, markerEventListener: MainActivity.MarkerEventListener) {
+    fun onMapViewUpdate(mv: MapView, recommendInfo: ServerResponse<Recommend>?, markerEventListener: MainActivity.MarkerEventListener) {
         mv.removeAllCircles()
         mv.removeAllPOIItems()
 
@@ -35,7 +36,7 @@ object MapViewManager {
         mv.fitMapViewAreaToShowAllPOIItems()
     }
 
-    fun createMapView(recommendInfo: RecommendInfo?) : (context: Context) -> MapView {
+    fun createMapView(recommendInfo: ServerResponse<Recommend>?) : (context: Context) -> MapView {
         val markers = if (recommendInfo == null) getMapItems(null) else getMapItems(recommendInfo)
         return makeMapView(markers)
     }
@@ -48,7 +49,7 @@ object MapViewManager {
         }
     }
 
-    private fun getMapItems(recommendInfo: RecommendInfo?) : List<MapPOIItem> {
+    private fun getMapItems(recommendInfo: ServerResponse<Recommend>?) : List<MapPOIItem> {
         val markers = mutableListOf<MapPOIItem>()
 
         if (recommendInfo?.data?.isNotEmpty() == true) {

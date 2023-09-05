@@ -1,11 +1,11 @@
 package com.demo.desh.access.repository
 
-import com.demo.desh.model.DistrictInfo
+import com.demo.desh.model.District
+import com.demo.desh.model.Realty
 import com.demo.desh.util.RetrofitClient
 import com.demo.desh.model.RealtyCreationReq
-import com.demo.desh.model.RealtyDetail
-import com.demo.desh.model.RecommendInfo
-import com.demo.desh.model.ServiceList
+import com.demo.desh.model.Recommend
+import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.User
 import retrofit2.Call
 import retrofit2.Response
@@ -21,23 +21,23 @@ class UserRetrofitRepository {
         return userRetrofitDao.sendRealtyInfo(realty)
     }
 
-    suspend fun getServiceList(): Response<ServiceList> {
+    suspend fun getServiceList(): Response<ServerResponse<String>> {
         return userRetrofitDao.getServiceList()
     }
 
-    suspend fun getRecommendationAllInfo(): Response<RecommendInfo> {
+    suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>> {
         return userRetrofitDao.getRecommendationAllInfo()
     }
 
-    suspend fun getRecommendationInfo(encodedServiceName: String): Response<RecommendInfo> {
+    suspend fun getRecommendationInfo(encodedServiceName: String): Response<ServerResponse<Recommend>> {
         return userRetrofitDao.getRecommendationInfo(encodedServiceName)
     }
 
-    suspend fun getDistrictInfo(encodedDistrictName: String): Response<DistrictInfo> {
+    suspend fun getDistrictInfo(encodedDistrictName: String): Response<ServerResponse<District>> {
         return userRetrofitDao.getStoreList(encodedDistrictName)
     }
 
-    suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<RealtyDetail> {
+    suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<ServerResponse<Realty>> {
         return userRetrofitDao.getRealtyDetail(realtyId, userId)
     }
 }

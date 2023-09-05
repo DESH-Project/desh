@@ -1,10 +1,10 @@
 package com.demo.desh.access.dao
 
-import com.demo.desh.model.DistrictInfo
+import com.demo.desh.model.District
+import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
-import com.demo.desh.model.RealtyDetail
-import com.demo.desh.model.RecommendInfo
-import com.demo.desh.model.ServiceList
+import com.demo.desh.model.Recommend
+import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.User
 import retrofit2.Call
 import retrofit2.Response
@@ -28,20 +28,20 @@ interface UserRetrofitDao {
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
     @GET("/service")
-    suspend fun getServiceList(): Response<ServiceList>
+    suspend fun getServiceList(): Response<ServerResponse<String>>
 
     /* 전체 상권 추천 정보 */
     @GET("recommend-all")
-    suspend fun getRecommendationAllInfo(): Response<RecommendInfo>
+    suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>>
 
     /* 상권 추천 정보 */
     @GET("recommend")
-    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<RecommendInfo>
+    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<ServerResponse<Recommend>>
 
     /* 상권에 따른 상가 리스트 조회 */
     @GET("stores")
-    suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<DistrictInfo>
+    suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<ServerResponse<District>>
 
     @GET("store")
-    suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<RealtyDetail>
+    suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<ServerResponse<Realty>>
 }

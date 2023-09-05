@@ -2,10 +2,11 @@ package com.demo.desh.model
 
 import java.io.Serializable
 
-data class RecommendInfo(
+data class ServerResponse<out T>(
     val size: Int,
-    val data: List<Recommend>
-): Serializable
+    val data: List<T>,
+    val status: Int = 200
+)
 
 data class Recommend(
     val lat: Double,
@@ -13,11 +14,6 @@ data class Recommend(
     val service: String,
     val district: String,
     val predict: Long
-): Serializable
-
-data class ServiceList(
-    val size: Int,
-    val data: List<String>
 ): Serializable
 
 data class User(
@@ -36,12 +32,6 @@ data class RealtyCreationReq(
     val userId: Long
 ) : Serializable
 
-data class DistrictInfo(
-    val size: Int,
-    val data: List<District>,
-    val status: Int = 200
-)
-
 data class District(
     val id: Long,
     val address: String,
@@ -49,13 +39,7 @@ data class District(
     val price: Double
 )
 
-data class RealtyDetail(
-    val size: Int,
-    val data: List<RealtyInfo>,
-    val status: Int = 200
-)
-
-data class RealtyInfo(
+data class Realty(
     val id: Long,
     val name: String,
     val price: Double,
