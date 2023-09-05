@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
@@ -30,17 +32,30 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.demo.desh.util.MainNavigation
+import coil.compose.AsyncImage
+import com.demo.desh.MainNavigation
+import com.demo.desh.model.User
+import com.demo.desh.viewModel.MainViewModel
+
 
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(
+    viewModel: MainViewModel,
+    navController: NavHostController,
+    user: User
+) {
+    UserCardProfile(user = user)
+
     Column(
         verticalArrangement = Arrangement.Center, modifier = Modifier.padding(0.dp,130.dp,0.dp,0.dp)
     ) {
@@ -52,6 +67,40 @@ fun MainScreen(navController: NavHostController) {
         Bottom(navController)
     }
 }
+
+@Composable
+private fun UserCardProfile(user: User) {
+    val placeHolderColor = Color(0x33000000)
+
+    Card(
+        elevation = 8.dp,
+        modifier = Modifier.padding(4.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            AsyncImage(
+                model = user.profileImageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                placeholder = ColorPainter(placeHolderColor),
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+            )
+            
+            Spacer(modifier = Modifier.size(8.dp))
+            
+            Column {
+                Text(text = user.nickname)
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(text = user.email)
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolbarWithMenu2() {
@@ -129,7 +178,7 @@ fun Bottom(navController: NavController){
             ) {
             }
         },
-    ) { }
+    ) { it }
 }
 
 
@@ -188,7 +237,10 @@ fun HorizontalListView() {
 }
 @Composable
 fun TopHeader(navController: NavController){
-    Surface( color = Color.DarkGray,modifier = Modifier.fillMaxWidth().height(170.dp).clip(shape = CircleShape.copy(all = CornerSize(12.dp)))) {
+    Surface( color = Color.DarkGray,modifier = Modifier
+        .fillMaxWidth()
+        .height(170.dp)
+        .clip(shape = CircleShape.copy(all = CornerSize(12.dp)))) {
         Surface(color = Color.White,modifier = Modifier
             .fillMaxWidth()
             .height(150.dp)

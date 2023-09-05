@@ -1,12 +1,12 @@
 package com.demo.desh.model
 
-import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-data class RecommendInfo(
+data class ServerResponse<out T>(
     val size: Int,
-    val list: List<Recommend>
-): Serializable
+    val data: List<T>,
+    val status: Int = 200
+)
 
 data class Recommend(
     val lat: Double,
@@ -16,23 +16,37 @@ data class Recommend(
     val predict: Long
 ): Serializable
 
-data class ServiceList(
-    val size: Int,
-    val list: List<String>
-): Serializable
-
 data class User(
     var id : Long? = null,
-    @SerializedName("nickname") val nickname : String,
-    @SerializedName("email") val email : String,
-    @SerializedName("profileImageUrl") val profileImageUrl : String,
+    val nickname : String,
+    val email : String,
+    val profileImageUrl : String
 ) : Serializable
 
-data class Realty(
-    @SerializedName("name") val name: String,
-    @SerializedName("price") val price: Double,
-    @SerializedName("address") val address: String,
-    @SerializedName("pyung") val pyung: Long,
-    @SerializedName("squareMeter") val squareMeter: Double,
-    @SerializedName("userId") val userId: Long
+data class RealtyCreationReq(
+    val name: String,
+    val price: Double,
+    val address: String,
+    val pyung: Long,
+    val squareMeter: Double,
+    val userId: Long
 ) : Serializable
+
+data class District(
+    val id: Long,
+    val address: String,
+    val image: String,
+    val price: Double
+)
+
+data class Realty(
+    val id: Long,
+    val name: String,
+    val price: Double,
+    val address: String,
+    val pyung: Long,
+    val squareMeter: Double,
+    val image: String,
+    val nearby: String,
+    val userId: Long
+)
