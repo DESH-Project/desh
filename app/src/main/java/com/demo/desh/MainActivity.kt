@@ -9,29 +9,15 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Phone
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.model.User
-import com.demo.desh.ui.screens.MainScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
 import com.demo.desh.ui.screens.RealtyDetailScreen
@@ -127,17 +113,11 @@ class MainActivity : AppCompatActivity() {
 sealed class MainNavigation(
     val route: String,
     val title: String,
-    val icon: ImageVector? = null
 ) {
-    object Home : MainNavigation("home", "Home", Icons.Outlined.Home)
-    object Profile : MainNavigation("profile", "Profile", Icons.Outlined.Info)
-    object Settings : MainNavigation("settings", "Settings", Icons.Outlined.Settings)
+    object Profile : MainNavigation("profile", "Profile")
+    object Settings : MainNavigation("settings", "Settings")
     object Map : MainNavigation("map", "Map")
     object RealtyDetail : MainNavigation("realtyDetail", "RealtyDetail")
-
-    companion object {
-        val bottomItems = listOf(Home, Profile, Settings)
-    }
 }
 
 @Composable
@@ -147,49 +127,11 @@ fun App(
     user: User
 ) {
     val navController = rememberNavController()
-    val showBottomBar = navController
-        .currentBackStackEntryAsState().value?.destination?.route != MainNavigation.Map.route
 
-    Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                BottomNavigation {
-                    val backStackEntry by navController.currentBackStackEntryAsState()
-                    val currentRoute = backStackEntry?.destination?.route
-
-                    MainNavigation.bottomItems.forEach { navItem ->
-                        BottomNavigationItem(
-                            selected = currentRoute == navItem.route,
-                            onClick = {
-                                navController.navigate(navItem.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-
-                            icon = {
-                                Icon(
-                                    imageVector = navItem.icon!!,
-                                    contentDescription = navItem.title
-                                )
-                            },
-                            label = { Text(text = navItem.title) }
-                        )
-                    }
-                }
-            }
-        }
-    ) { innerPadding ->
+    Scaffold() { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            NavHost(navController = navController, startDestination = MainNavigation.Home.route) {
+            NavHost(navController = navController, startDestination = MainNavigation.Map.route) {
                 val REALTY_ID = "realtyId"
-
-                composable(route = MainNavigation.Home.route) {
-                    MainScreen(viewModel, navController, user)
-                }
 
                 composable(route = MainNavigation.Profile.route) {
                     ProfileScreen()
@@ -200,10 +142,9 @@ fun App(
                 }
 
                 composable(route = MainNavigation.Map.route) {
-                    val onBackButtonClick = { navController.navigate(MainNavigation.Home.route) }
                     val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
 
-                    MapScreen(viewModel, onBackButtonClick, goToRealtyDetail, markerEventListener)
+                    MapScreen(viewModel, goToRealtyDetail, markerEventListener)
                 }
 
                 composable(route = "${MainNavigation.RealtyDetail.route}/{${REALTY_ID}}") { backStackEntry ->
