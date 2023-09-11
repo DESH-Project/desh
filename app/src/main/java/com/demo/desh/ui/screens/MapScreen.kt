@@ -1,7 +1,7 @@
 package com.demo.desh.ui.screens
 
+import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -43,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
-import com.demo.desh.MainActivity
 import com.demo.desh.model.District
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
@@ -57,7 +55,6 @@ import de.charlex.compose.BottomDrawerScaffold
 fun MapScreen(
     viewModel: MainViewModel,
     goToRealtyDetail: (Long) -> Unit,
-    markerEventListener: MainActivity.MarkerEventListener
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
     val mv by viewModel.mapView.observeAsState()
@@ -80,30 +77,23 @@ fun MapScreen(
     // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
     // https://developersbreach.com/modal-bottom-sheet-jetpack-compose-android/
+
     BottomDrawerScaffold(
         drawerContent = {
-            if (showBottomDrawer == true) {
-                DrawerContent(serviceList, districtInfo, onListButtonClick, onDrawerItemClick)
-            }
+            DrawerContent(serviceList, districtInfo, onListButtonClick, onDrawerItemClick)
         },
         drawerGesturesEnabled = true,
-        drawerPeekHeight = if (showBottomDrawer == true) 150.dp else 24.dp,
+        drawerPeekHeight = if (showBottomDrawer == true) 128.dp else 32.dp,
         drawerBackgroundColor = Color.LightGray,  //Transparent drawer for custom Drawer shape
-        drawerElevation = 3.dp,
+        drawerElevation = 0.dp,
 
         content = {
             Scaffold { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
                     AndroidView(
-                        factory = mv ?: MapViewManager.createMapView(recommendInfo),
+                        factory = { _context: Context -> MapViewManager.createMapView(_context, recommendInfo) },
                         modifier = Modifier.fillMaxSize(),
-                        update = { mv ->
-                            MapViewManager.onMapViewUpdate(
-                                mv,
-                                recommendInfo,
-                                markerEventListener
-                            )
-                        }
+                        update = { }
                     )
                 }
             }

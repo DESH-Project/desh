@@ -13,6 +13,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,9 +26,7 @@ import com.demo.desh.ui.screens.SettingsScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.MainViewModel
 import com.demo.desh.viewModel.MainViewModelFactory
-import net.daum.mf.map.api.MapPOIItem
-import net.daum.mf.map.api.MapPoint
-import net.daum.mf.map.api.MapView
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
@@ -38,15 +37,13 @@ class MainActivity : AppCompatActivity() {
         val user = intent.getSerializableExtra("user") as User
         Log.d("MainActivity", "user = $user")
 
-        viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
-        val markerEventListener = MarkerEventListener(viewModel)
+        viewModel = ViewModelProvider(this, MainViewModelFactory(context = this))[MainViewModel::class.java]
 
         setContent {
             DeshprojectfeTheme {
                 Surface {
                     App(
                         viewModel = viewModel,
-                        markerEventListener = markerEventListener,
                         user = user
                     )
                 }
@@ -54,10 +51,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /*
     class MarkerEventListener(private val viewModel: MainViewModel) : MapView.POIItemEventListener {
         // 마커 클릭시
         override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
-            /*
             Log.e("MarkerEventListener", "POI Item Selected : $mapPOIItem")
 
             val builder = AlertDialog.Builder(context)
@@ -75,7 +72,6 @@ class MainActivity : AppCompatActivity() {
             builder.show()
 
             onCalloutBalloonOfPOIItemTouched(mapView, mapPOIItem)
-             */
 
             mapView?.setMapCenterPointAndZoomLevel(
                 mapPOIItem?.mapPoint,
@@ -106,8 +102,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* 커스텀 말풍선 구현을 위한 클래스 */
-    /*
     class CustomCallOutBalloonAdapter : CalloutBalloonAdapter {
         override fun getCalloutBalloon(mapPOIItem: MapPOIItem?): View {
             TODO("Not yet implemented")
@@ -133,7 +127,6 @@ sealed class MainNavigation(
 @Composable
 fun App(
     viewModel: MainViewModel,
-    markerEventListener: MainActivity.MarkerEventListener,
     user: User
 ) {
     val navController = rememberNavController()
@@ -153,8 +146,7 @@ fun App(
 
                 composable(route = MainNavigation.Map.route) {
                     val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
-
-                    MapScreen(viewModel, goToRealtyDetail, markerEventListener)
+                    MapScreen(viewModel, goToRealtyDetail)
                 }
 
                 composable(route = "${MainNavigation.RealtyDetail.route}/{${REALTY_ID}}") { backStackEntry ->
