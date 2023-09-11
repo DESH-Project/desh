@@ -35,8 +35,6 @@ class MainViewModel(
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
 
-    private val _infoText = MutableLiveData<String>()
-    val infoText: LiveData<String> get() = _infoText
 
     fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {
@@ -50,7 +48,17 @@ class MainViewModel(
                 val body = res.body()!!
                 _mapView.value = MapViewManager.createMapView(context, body)
                 _recommendInfo.value = body
-                _infoText.value = if (serviceName == DEFAULT_SERVICE_NAME) "전체" else serviceName
+            }
+        }
+    }
+
+    fun initRecommendInfo() {
+        viewModelScope.launch {
+            val res = userRetrofitRepository.getRecommendationAllInfo()
+            Log.e("MapScreen : initRecommendInfo()", "res = $res, res body = ${res.body()}")
+
+            if (res.isSuccessful) {
+                _recommendInfo.value = res.body()!!
             }
         }
     }

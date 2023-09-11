@@ -2,9 +2,7 @@ package com.demo.desh.util
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import com.demo.desh.MainActivity
+import com.demo.desh.R
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.kakao.vectormap.KakaoMap
@@ -13,47 +11,12 @@ import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapView
 import com.kakao.vectormap.MapViewInfo
+import com.kakao.vectormap.label.LabelOptions
+import com.kakao.vectormap.label.LabelStyle
+import com.kakao.vectormap.label.LabelStyles
 import java.lang.Exception
 
 object MapViewManager {
-    /*
-    fun onMapViewUpdate(mv: MapView, recommendInfo: ServerResponse<Recommend>?, markerEventListener: MainActivity.MarkerEventListener) {
-        mv.removeAllCircles()
-        mv.removeAllPOIItems()
-
-        // mv.setCalloutBalloonAdapter(CustomBalloonAdapter())
-        mv.setPOIItemEventListener(markerEventListener)
-
-        recommendInfo?.data?.forEachIndexed { idx, it ->
-            Log.e("MapViewManager", "${it.predict}, ${it.predict.formatDecimalSeparator()}")
-
-            val marker = MapPOIItem()
-                .apply {
-                    itemName = it.district
-                    mapPoint = MapPoint.mapPointWithGeoCoord(it.lat, it.lng)
-                    markerType = MapPOIItem.MarkerType.RedPin
-                    selectedMarkerType = MapPOIItem.MarkerType.BluePin
-                    tag = idx
-                    isDraggable = false
-                }
-
-            mv.addPOIItem(marker)
-
-            val circle = MapCircle(
-                MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
-                500,
-                Color(196, 128, 128, 128).toArgb(),
-                Color(196, 128, 128, 128).toArgb()
-            )
-
-            mv.addCircle(circle)
-        }
-
-        mv.fitMapViewAreaToShowAllPOIItems()
-        mv.isSelected = true
-    }
-
-     */
     fun createMapView(context: Context, recommendInfo: ServerResponse<Recommend>?) : MapView {
         val mv = MapView(context)
 
@@ -73,7 +36,26 @@ object MapViewManager {
             object : KakaoMapReadyCallback() {
                 // 인증 후 API가 정상적으로 실행될 때 호출
                 override fun onMapReady(kakaoMap: KakaoMap) {
-                    Log.e("Map", "지도 시작")
+                    val labelManager = kakaoMap.labelManager
+                    val layer = labelManager?.layer
+                    val styles = labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.chamomile)))
+
+                    Log.e("KakaoMapReadyCallback onMapReady", "recommendInfo : $recommendInfo")
+
+                    recommendInfo?.data?.forEachIndexed { _, item ->
+                        Log.e("KakaoMap", "item : $item")
+                        val options = LabelOptions.from(LatLng.from(item.lat, item.lng))
+                            .setStyles(styles)
+                            .setClickable(true)
+
+                        layer?.addLabel(options)
+                    }
+
+                    val options = LabelOptions.from(LatLng.from(37.394660, 127.111182))
+                        .setStyles(styles)
+                        .setClickable(true)
+
+                    layer?.addLabel(options)
                 }
 
                 // 지도 시작 시 확대/축소 줌 레벨 설정

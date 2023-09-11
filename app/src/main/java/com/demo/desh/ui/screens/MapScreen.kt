@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -45,33 +46,36 @@ import coil.compose.AsyncImage
 import com.demo.desh.model.District
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.User
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
+import com.kakao.vectormap.MapView
 import de.charlex.compose.BottomDrawerScaffold
+import kotlinx.coroutines.runBlocking
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
+    user: User,
     viewModel: MainViewModel,
     goToRealtyDetail: (Long) -> Unit,
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
     val mv by viewModel.mapView.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
-    val infoText by viewModel.infoText.observeAsState()
     val districtInfo by viewModel.districtInfo.observeAsState()
     val showBottomDrawer by viewModel.showBottomDrawer.observeAsState()
 
     val onDrawerItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
     val onListButtonClick = { serviceName: String ->
-        viewModel.fetchMapView(serviceName)
         viewModel.noShowBottomDrawer()
+        viewModel.fetchMapView(serviceName)
     }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchMapView()
         viewModel.fetchServiceList()
+        viewModel.initRecommendInfo()
     }
 
     // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
@@ -80,7 +84,7 @@ fun MapScreen(
 
     BottomDrawerScaffold(
         drawerContent = {
-            DrawerContent(serviceList, districtInfo, onListButtonClick, onDrawerItemClick)
+            DrawerContent(user, serviceList, districtInfo, onListButtonClick, onDrawerItemClick)
         },
         drawerGesturesEnabled = true,
         drawerPeekHeight = if (showBottomDrawer == true) 128.dp else 32.dp,
@@ -93,7 +97,6 @@ fun MapScreen(
                     AndroidView(
                         factory = { _context: Context -> MapViewManager.createMapView(_context, recommendInfo) },
                         modifier = Modifier.fillMaxSize(),
-                        update = { }
                     )
                 }
             }
@@ -104,6 +107,7 @@ fun MapScreen(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DrawerContent(
+    user: User,
     serviceList: ServerResponse<String>?,
     districtInfo: ServerResponse<District>?,
     onListButtonClick: (String) -> Unit,
@@ -118,9 +122,10 @@ private fun DrawerContent(
         Spacer(modifier = Modifier.padding(0.dp, 8.dp, 0.dp, 0.dp))
 
         Divider(modifier = Modifier
-            .background(color = Color.Gray)
+            .background(color = Color.White)
             .height(4.dp)
-            .width(24.dp)
+            .width(36.dp)
+            .alpha(5.0f)
         )
 
         Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
@@ -145,40 +150,46 @@ private fun DrawerContent(
 
         Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
 
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            itemsIndexed(districtInfo?.data ?: listOf()) { _, item ->
-                Card(
-                    elevation = 8.dp,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .fillMaxWidth(),
-                    onClick = { onItemClick(item.id) }
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(8.dp)
+        Column {
+            Text(text = "${user.nickname}님을 위한 추천 상가목록")
+
+            LazyRow(modifier = Modifier.fillMaxWidth()) {
+                itemsIndexed(districtInfo?.data ?: listOf()) { _, item ->
+                    Card(
+                        elevation = 8.dp,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .fillMaxWidth(),
+                        onClick = { onItemClick(item.id) }
                     ) {
-                        AsyncImage(
-                            model = item.image,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            placeholder = ColorPainter(placeHolderColor),
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            AsyncImage(
+                                model = item.image,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                placeholder = ColorPainter(placeHolderColor),
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                            )
 
-                        Spacer(modifier = Modifier.size(8.dp))
+                            Spacer(modifier = Modifier.size(8.dp))
 
-                        Column {
-                            Text(text = "주소: ${item.address}")
-                            Text(text = "시세: ${item.price}")
-                            Spacer(modifier = Modifier.size(4.dp))
+                            Column {
+                                Text(text = "주소: ${item.address}")
+                                Text(text = "시세: ${item.price}")
+                                Spacer(modifier = Modifier.size(4.dp))
+                            }
                         }
                     }
                 }
             }
         }
+
+
     }
 
 }

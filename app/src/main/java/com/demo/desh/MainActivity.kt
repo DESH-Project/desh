@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val user = intent.getSerializableExtra("user") as User
         Log.d("MainActivity", "user = $user")
 
-        viewModel = ViewModelProvider(this, MainViewModelFactory(context = this))[MainViewModel::class.java]
+        viewModel = ViewModelProvider(this, MainViewModelFactory(this))[MainViewModel::class.java]
 
         setContent {
             DeshprojectfeTheme {
@@ -146,7 +146,7 @@ fun App(
 
                 composable(route = MainNavigation.Map.route) {
                     val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
-                    MapScreen(viewModel, goToRealtyDetail)
+                    MapScreen(user, viewModel, goToRealtyDetail)
                 }
 
                 composable(route = "${MainNavigation.RealtyDetail.route}/{${REALTY_ID}}") { backStackEntry ->
