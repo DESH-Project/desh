@@ -1,6 +1,7 @@
 package com.demo.desh.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -62,9 +64,13 @@ fun MapScreen(
     val recommendInfo by viewModel.recommendInfo.observeAsState()
     val infoText by viewModel.infoText.observeAsState()
     val districtInfo by viewModel.districtInfo.observeAsState()
+    val showBottomDrawer by viewModel.showBottomDrawer.observeAsState()
 
     val onDrawerItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
-    val onListButtonClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
+    val onListButtonClick = { serviceName: String ->
+        viewModel.fetchMapView(serviceName)
+        viewModel.noShowBottomDrawer()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
@@ -75,14 +81,18 @@ fun MapScreen(
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
     // https://developersbreach.com/modal-bottom-sheet-jetpack-compose-android/
     BottomDrawerScaffold(
-        drawerContent = { DrawerContent(serviceList, districtInfo, onListButtonClick, onDrawerItemClick) },
+        drawerContent = {
+            if (showBottomDrawer == true) {
+                DrawerContent(serviceList, districtInfo, onListButtonClick, onDrawerItemClick)
+            }
+        },
         drawerGesturesEnabled = true,
-        drawerPeekHeight = 150.dp,
-        drawerBackgroundColor = Color.White,  //Transparent drawer for custom Drawer shape
-        drawerElevation = 0.dp,
+        drawerPeekHeight = if (showBottomDrawer == true) 150.dp else 24.dp,
+        drawerBackgroundColor = Color.LightGray,  //Transparent drawer for custom Drawer shape
+        drawerElevation = 3.dp,
 
         content = {
-            Scaffold() { innerPadding ->
+            Scaffold { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
                     AndroidView(
                         factory = mv ?: MapViewManager.createMapView(recommendInfo),
@@ -115,24 +125,35 @@ private fun DrawerContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.padding(0.dp, 8.dp, 0.dp, 0.dp))
 
-        LazyRow() {
+        Divider(modifier = Modifier
+            .background(color = Color.Gray)
+            .height(4.dp)
+            .width(24.dp)
+        )
+
+        Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
+        
+        LazyRow {
             itemsIndexed(serviceList?.data ?: listOf()) { _, item ->
                 Card(
                     elevation = 8.dp,
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .padding(4.dp),
+                    backgroundColor = Color.Gray
                 ) {
                     TextButton(onClick = {
                         Log.e("MapScreen.CreateListButton", "Click item = $item")
                         onListButtonClick(item)
                     }) {
-                        Text(text = item)
+                        Text(text = item, color = Color.White)
                     }
                 }
             }
         }
 
-        Divider(modifier = Modifier.size(5.dp))
+        Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             itemsIndexed(districtInfo?.data ?: listOf()) { _, item ->

@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "user = $user")
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
-        val markerEventListener = MarkerEventListener(this, viewModel)
+        val markerEventListener = MarkerEventListener(viewModel)
 
         setContent {
             DeshprojectfeTheme {
@@ -54,9 +54,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class MarkerEventListener(private val context: Context, private val viewModel: MainViewModel) : MapView.POIItemEventListener {
+    class MarkerEventListener(private val viewModel: MainViewModel) : MapView.POIItemEventListener {
         // 마커 클릭시
         override fun onPOIItemSelected(mapView: MapView?, mapPOIItem: MapPOIItem?) {
+            /*
             Log.e("MarkerEventListener", "POI Item Selected : $mapPOIItem")
 
             val builder = AlertDialog.Builder(context)
@@ -74,6 +75,13 @@ class MainActivity : AppCompatActivity() {
             builder.show()
 
             onCalloutBalloonOfPOIItemTouched(mapView, mapPOIItem)
+             */
+
+            mapView?.setMapCenterPointAndZoomLevel(
+                mapPOIItem?.mapPoint,
+                3,
+                true
+            )
         }
 
         // 말풍선 클릭시 1 (사용 X)
@@ -87,7 +95,9 @@ class MainActivity : AppCompatActivity() {
             mapPOIItem: MapPOIItem?,
             callOutButtonType: MapPOIItem.CalloutBalloonButtonType?
         ) {
+            viewModel.showBottomDrawer()
             viewModel.fetchDistrictInfoList(mapPOIItem?.itemName!!)
+            mapPOIItem.selectedMarkerType = MapPOIItem.MarkerType.BluePin
         }
 
         // 마커 이동시 (isDraggable = true) 인 경우

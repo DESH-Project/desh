@@ -2,9 +2,12 @@ package com.demo.desh.util
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.demo.desh.MainActivity
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import net.daum.mf.map.api.MapCircle
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
@@ -31,9 +34,19 @@ object MapViewManager {
                 }
 
             mv.addPOIItem(marker)
+
+            val circle = MapCircle(
+                MapPoint.mapPointWithGeoCoord(it.lat, it.lng),
+                500,
+                Color(196, 128, 128, 128).toArgb(),
+                Color(196, 128, 128, 128).toArgb()
+            )
+
+            mv.addCircle(circle)
         }
 
         mv.fitMapViewAreaToShowAllPOIItems()
+        mv.isSelected = true
     }
 
     fun createMapView(recommendInfo: ServerResponse<Recommend>?) : (context: Context) -> MapView {

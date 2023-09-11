@@ -27,11 +27,14 @@ class SplashActivity : AppCompatActivity() {
 
         Log.d(TAG, "keyHash : $keyHash")
 
+        /*
         val naverClientId = getString(R.string.NAVER_OAUTH_CLIENT_ID)
         val naverClientSecret = getString(R.string.NAVER_OAUTH_CLIENT_SECRET)
         val naverClientName = getString(R.string.APP_NAME)
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret, naverClientName)
 
+
+         */
         val room = MemberRoomDatabase.getInstance(this)
         val memberDao = room.memberDao()
         val memberRepository = MemberRepository(memberDao)
