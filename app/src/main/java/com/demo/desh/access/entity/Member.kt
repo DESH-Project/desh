@@ -3,6 +3,7 @@ package com.demo.desh.access.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.demo.desh.model.User
 
 @Entity(tableName = "member")
 class Member {
@@ -25,5 +26,11 @@ class Member {
         this.nickname = nickname
         this.email = email
         this.profileImageUrl = imageUrl
+    }
+
+    constructor(user: User) {
+        this.nickname = user.nickname
+        this.email = user.email
+        this.profileImageUrl = user.profileImageUrl
     }
 }

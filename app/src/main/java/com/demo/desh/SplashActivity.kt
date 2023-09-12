@@ -39,6 +39,7 @@ class SplashActivity : AppCompatActivity() {
         val memberRepository = MemberRepository(memberDao)
 
         val members = memberRepository.findAllMember()
+        Log.e(TAG, "member = $members")
 
         if (members.isEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))

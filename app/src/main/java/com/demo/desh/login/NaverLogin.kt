@@ -38,6 +38,7 @@ object NaverLogin : SocialLogin() {
                         profileImageUrl = profileImage!!
                     )
 
+                    saveMemberIntoRoomDB(context, user)
                     send(context, user)
                 }
             })

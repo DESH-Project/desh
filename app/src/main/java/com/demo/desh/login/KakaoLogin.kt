@@ -56,6 +56,8 @@ object KakaoLogin: SocialLogin() {
                 )
 
                 Log.d(TAG, "서버에 전송합니다")
+
+                saveMemberIntoRoomDB(context, kakaoUser!!)
                 send(context, kakaoUser!!)
             }
         }

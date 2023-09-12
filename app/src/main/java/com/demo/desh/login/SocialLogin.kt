@@ -42,6 +42,15 @@ abstract class SocialLogin {
         })
     }
 
+    protected fun saveMemberIntoRoomDB(context: Context, user: User) {
+        val member = Member(user)
+        val roomDatabase = MemberRoomDatabase.getInstance(context)
+        val memberDao = roomDatabase.memberDao()
+        val memberRepository = MemberRepository(memberDao)
+
+        memberRepository.insertMember(member)
+    }
+
     private fun toNext(context: Context, user: User) {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("user", user)
