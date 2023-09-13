@@ -1,7 +1,6 @@
 package com.demo.desh.ui.screens
 
 import android.util.Log
-import android.widget.ImageButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,15 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -40,7 +32,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -58,7 +49,6 @@ import com.demo.desh.viewModel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import de.charlex.compose.BottomDrawerScaffold
-import okhttp3.internal.wait
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -67,6 +57,7 @@ fun MapScreen(
     user: User,
     viewModel: MainViewModel,
     goToRealtyDetail: (Long) -> Unit,
+    goToRemainServiceListScreen: (Int) -> Unit
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
@@ -75,6 +66,7 @@ fun MapScreen(
     val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
     val onServiceItemClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
     val onDistrictButtonClick = { districtName: String -> viewModel.fetchDistrictInfoList(districtName)}
+    val onListMoreButtonClick = { index: Int -> goToRemainServiceListScreen(index)  }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
@@ -84,7 +76,6 @@ fun MapScreen(
     // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
     // https://developersbreach.com/modal-bottom-sheet-jetpack-compose-android/
-
     BottomDrawerScaffold(
         drawerContent = {
             DrawerContent(
@@ -93,6 +84,7 @@ fun MapScreen(
                 districtInfo = districtInfo,
                 recommendInfo = recommendInfo,
                 onServiceItemClick = onServiceItemClick,
+                onListMoreButtonClick = onListMoreButtonClick,
                 onDistrictButtonClick = onDistrictButtonClick,
                 onDistrictItemClick = onDistrictItemClick
             )
@@ -114,7 +106,6 @@ fun MapScreen(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DrawerContent(
     user: User,
@@ -122,6 +113,7 @@ private fun DrawerContent(
     districtInfo: ServerResponse<District>?,
     recommendInfo: ServerResponse<Recommend>?,
     onServiceItemClick: (String) -> Unit,
+    onListMoreButtonClick: (Int) -> Unit,
     onDistrictButtonClick: (String) -> Unit,
     onDistrictItemClick: (Long) -> Unit
 ) {
@@ -142,7 +134,7 @@ private fun DrawerContent(
 
         Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
 
-        CreateListButton(serviceList, onServiceItemClick)
+        CreateListButton(serviceList, onServiceItemClick, onListMoreButtonClick)
 
         Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
 
@@ -284,10 +276,11 @@ private fun CreateDistrictPager(
 @Composable
 private fun CreateListButton(
     serviceList: ServerResponse<String>?,
-    onListButtonClick: (String) -> Unit
+    onListButtonClick: (String) -> Unit,
+    onListMoreButtonClick: (Int) -> Unit
 ) {
-    val lastIndex = 2
-    val previewServiceList = serviceList?.data?.slice(0..lastIndex)?.toMutableList()
+    val index = 3
+    val previewServiceList = serviceList?.data?.slice(0 until index)?.toMutableList()
 
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
@@ -321,7 +314,7 @@ private fun CreateListButton(
                 .padding(4.dp),
             backgroundColor = Color(0xFF444548)
         ) {
-            IconButton(onClick = { } ) {
+            IconButton(onClick = { onListMoreButtonClick(index) } ) {
                 Icon(Icons.Filled.KeyboardArrowRight, null)
             }
         }
