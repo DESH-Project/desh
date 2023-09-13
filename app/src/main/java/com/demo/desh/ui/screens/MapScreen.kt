@@ -1,8 +1,9 @@
 package com.demo.desh.ui.screens
 
-import android.content.Context
 import android.util.Log
+import android.widget.ImageButton
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -28,6 +31,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +46,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.demo.desh.model.District
@@ -50,9 +55,10 @@ import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.User
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
-import com.kakao.vectormap.MapView
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import de.charlex.compose.BottomDrawerScaffold
-import kotlinx.coroutines.runBlocking
+import okhttp3.internal.wait
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -65,13 +71,10 @@ fun MapScreen(
     val serviceList by viewModel.serviceList.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
     val districtInfo by viewModel.districtInfo.observeAsState()
-    val showBottomDrawer by viewModel.showBottomDrawer.observeAsState()
 
-    val onDrawerItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
-    val onListButtonClick = { serviceName: String ->
-        viewModel.fetchDistrictInfoList(serviceName)
-        viewModel.fetchMapView(serviceName)
-    }
+    val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
+    val onServiceItemClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
+    val onDistrictButtonClick = { districtName: String -> viewModel.fetchDistrictInfoList(districtName)}
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
@@ -84,7 +87,15 @@ fun MapScreen(
 
     BottomDrawerScaffold(
         drawerContent = {
-            DrawerContent(user, serviceList, districtInfo, onListButtonClick, onDrawerItemClick)
+            DrawerContent(
+                user = user,
+                serviceList = serviceList,
+                districtInfo = districtInfo,
+                recommendInfo = recommendInfo,
+                onServiceItemClick = onServiceItemClick,
+                onDistrictButtonClick = onDistrictButtonClick,
+                onDistrictItemClick = onDistrictItemClick
+            )
         },
         drawerGesturesEnabled = true,
         drawerBackgroundColor = Color(0xAA000000),  //Transparent drawer for custom Drawer shape
@@ -109,10 +120,12 @@ private fun DrawerContent(
     user: User,
     serviceList: ServerResponse<String>?,
     districtInfo: ServerResponse<District>?,
-    onListButtonClick: (String) -> Unit,
-    onItemClick: (Long) -> Unit
+    recommendInfo: ServerResponse<Recommend>?,
+    onServiceItemClick: (String) -> Unit,
+    onDistrictButtonClick: (String) -> Unit,
+    onDistrictItemClick: (Long) -> Unit
 ) {
-    val placeHolderColor = Color(0x33000000)
+    val placeHolderColor = Color(0xAA000000)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -124,96 +137,197 @@ private fun DrawerContent(
             .background(color = Color.White)
             .height(4.dp)
             .width(36.dp)
-            .alpha(5.0f)
+            .alpha(0.6f)
         )
 
         Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
-        
-        LazyRow {
-            itemsIndexed(serviceList?.data ?: listOf()) { _, item ->
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = 8.dp,
-                    modifier = Modifier
-                        .padding(4.dp),
-                    backgroundColor = Color(0xFF444548)
-                ) {
-                    TextButton(onClick = {
-                        Log.e("MapScreen.CreateListButton", "Click item = $item")
-                        onListButtonClick(item)
-                    }) {
-                        Text(text = item, color = Color.White)
-                    }
-                }
-            }
-        }
+
+        CreateListButton(serviceList, onServiceItemClick)
 
         Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
 
-        Column {
-            Text(text = "${user.nickname}님을 위한 추천 상가목록")
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = user.nickname,
+                    color = Color(0xFFFF6A68),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
 
-            LazyRow(modifier = Modifier.fillMaxWidth()) {
-                itemsIndexed(districtInfo?.data ?: listOf()) { _, item ->
-                    Card(
-                        shape = RoundedCornerShape(20.dp),
-                        elevation = 8.dp,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .height(256.dp)
-                            .fillMaxWidth(),
-                        onClick = { onItemClick(item.id) }
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(8.dp)
-                        ) {
-                            AsyncImage(
-                                model = item.image,
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                placeholder = ColorPainter(placeHolderColor),
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                            )
-
-                            Spacer(modifier = Modifier.size(8.dp))
-
-                            Column {
-                                Text(text = "주소: ${item.address}")
-                                Text(text = "시세: ${item.price}")
-                                Spacer(modifier = Modifier.size(4.dp))
-                            }
-                        }
-                    }
-                }
+                Text(
+                    text = "님을 위한 추천 상권목록",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
             }
+
+            CreateRecommendPager(recommendInfo, onDistrictButtonClick)
         }
 
+        Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
 
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = user.nickname,
+                    color = Color(0xFFFF6A68),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
+
+                Text(
+                    text = "님을 위한 추천 상가목록",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            CreateDistrictPager(districtInfo, onDistrictItemClick, placeHolderColor)
+        }
     }
-
 }
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun CreateRecommendPager(
+    recommendInfo: ServerResponse<Recommend>?,
+    onDistrictButtonClick: (String) -> Unit
+) {
+    val count = recommendInfo?.size ?: 0
+    val list = recommendInfo?.data ?: listOf()
+
+    HorizontalPager(
+        count = count,
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .height(48.dp)
+    ) { page ->
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier
+                .clickable { onDistrictButtonClick(list[page].district) }
+        ) {
+            val item = list[page]
+
+            Text(
+                text = item.service,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = item.district,
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = item.predict.toString(),
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun CreateDistrictPager(
+    districtInfo: ServerResponse<District>?,
+    onDistrictItemClick: (Long) -> Unit,
+    placeHolderColor : Color
+) {
+    val count = districtInfo?.size ?: 0
+    val list = districtInfo?.data ?: listOf()
+
+    HorizontalPager(
+        count = count,
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) { page ->
+        val item = list[page]
+
+        Column(
+            modifier = Modifier.clickable { onDistrictItemClick(item.id) }
+        ) {
+            AsyncImage(
+                model = item.image,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                placeholder = ColorPainter(placeHolderColor),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Column {
+                Text(text = "주소: ${item.address}")
+                Text(text = "시세: ${item.price}")
+            }
+        }
+    }
+}
+
+
 
 @Composable
 private fun CreateListButton(
     serviceList: ServerResponse<String>?,
-    onSelectedServiceNameChange: (String) -> Unit
+    onListButtonClick: (String) -> Unit
 ) {
-    LazyRow {
-        itemsIndexed(serviceList?.data?: listOf()) { _, item ->
-            Card {
+    val lastIndex = 2
+    val previewServiceList = serviceList?.data?.slice(0..lastIndex)?.toMutableList()
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        previewServiceList?.forEach { item ->
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                elevation = 8.dp,
+                modifier = Modifier
+                    .width(84.dp)
+                    .height(48.dp)
+                    .padding(4.dp),
+                backgroundColor = Color(0xFF444548)
+            ) {
                 TextButton(onClick = {
                     Log.e("MapScreen.CreateListButton", "Click item = $item")
-                    onSelectedServiceNameChange(item)
+                    onListButtonClick(item)
                 }) {
-                    Text(text = item)
+                    Text(text = item, color = Color.White)
                 }
+            }
+        }
+
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 8.dp,
+            modifier = Modifier
+                .width(84.dp)
+                .height(48.dp)
+                .padding(4.dp),
+            backgroundColor = Color(0xFF444548)
+        ) {
+            IconButton(onClick = { } ) {
+                Icon(Icons.Filled.KeyboardArrowRight, null)
             }
         }
     }
 }
+
 
 @Composable
 private fun InfoTextBar(

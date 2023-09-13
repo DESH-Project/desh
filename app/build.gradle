@@ -62,6 +62,9 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
 
+    // ViewPager
+    implementation("com.google.accompanist:accompanist-pager:0.20.1")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.20.1")
 
     // navigation
     def nav_version = "2.7.0"
