@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -62,20 +63,19 @@ fun MapScreen(
     goToRealtyDetail: (Long) -> Unit,
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
-    val mv by viewModel.mapView.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
     val districtInfo by viewModel.districtInfo.observeAsState()
     val showBottomDrawer by viewModel.showBottomDrawer.observeAsState()
 
     val onDrawerItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
     val onListButtonClick = { serviceName: String ->
-        viewModel.noShowBottomDrawer()
+        viewModel.fetchDistrictInfoList(serviceName)
         viewModel.fetchMapView(serviceName)
     }
 
     LaunchedEffect(Unit) {
+        viewModel.fetchMapView()
         viewModel.fetchServiceList()
-        viewModel.initRecommendInfo()
     }
 
     // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
@@ -87,15 +87,14 @@ fun MapScreen(
             DrawerContent(user, serviceList, districtInfo, onListButtonClick, onDrawerItemClick)
         },
         drawerGesturesEnabled = true,
-        drawerPeekHeight = if (showBottomDrawer == true) 128.dp else 32.dp,
-        drawerBackgroundColor = Color.LightGray,  //Transparent drawer for custom Drawer shape
+        drawerBackgroundColor = Color(0xAA000000),  //Transparent drawer for custom Drawer shape
         drawerElevation = 0.dp,
 
         content = {
             Scaffold { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
                     AndroidView(
-                        factory = { _context: Context -> MapViewManager.createMapView(_context, recommendInfo) },
+                        factory = { context -> MapViewManager.createMapView(context, recommendInfo) },
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -133,10 +132,11 @@ private fun DrawerContent(
         LazyRow {
             itemsIndexed(serviceList?.data ?: listOf()) { _, item ->
                 Card(
+                    shape = RoundedCornerShape(20.dp),
                     elevation = 8.dp,
                     modifier = Modifier
                         .padding(4.dp),
-                    backgroundColor = Color.Gray
+                    backgroundColor = Color(0xFF444548)
                 ) {
                     TextButton(onClick = {
                         Log.e("MapScreen.CreateListButton", "Click item = $item")
@@ -156,9 +156,11 @@ private fun DrawerContent(
             LazyRow(modifier = Modifier.fillMaxWidth()) {
                 itemsIndexed(districtInfo?.data ?: listOf()) { _, item ->
                     Card(
+                        shape = RoundedCornerShape(20.dp),
                         elevation = 8.dp,
                         modifier = Modifier
                             .padding(4.dp)
+                            .height(256.dp)
                             .fillMaxWidth(),
                         onClick = { onItemClick(item.id) }
                     ) {

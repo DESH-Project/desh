@@ -1,19 +1,15 @@
 package com.demo.desh
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         val user = intent.getSerializableExtra("user") as User
         Log.d("MainActivity", "user = $user")
 
-        viewModel = ViewModelProvider(this, MainViewModelFactory(this))[MainViewModel::class.java]
+        viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
 
         setContent {
             DeshprojectfeTheme {

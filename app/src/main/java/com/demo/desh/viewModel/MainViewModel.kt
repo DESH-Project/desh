@@ -2,8 +2,6 @@ package com.demo.desh.viewModel
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.currentCompositionLocalContext
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,7 +19,6 @@ import java.util.UUID
 import kotlin.random.Random
 
 class MainViewModel(
-    private val context: Context,
     private val userRetrofitRepository: UserRetrofitRepository
 ) : ViewModel() {
     companion object {
@@ -29,8 +26,6 @@ class MainViewModel(
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
-    private val _mapView = MutableLiveData<MapView>()
-    val mapView: LiveData<MapView> get() = _mapView
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
@@ -46,19 +41,7 @@ class MainViewModel(
 
             if (res.isSuccessful) {
                 val body = res.body()!!
-                _mapView.value = MapViewManager.createMapView(context, body)
                 _recommendInfo.value = body
-            }
-        }
-    }
-
-    fun initRecommendInfo() {
-        viewModelScope.launch {
-            val res = userRetrofitRepository.getRecommendationAllInfo()
-            Log.e("MapScreen : initRecommendInfo()", "res = $res, res body = ${res.body()}")
-
-            if (res.isSuccessful) {
-                _recommendInfo.value = res.body()!!
             }
         }
     }

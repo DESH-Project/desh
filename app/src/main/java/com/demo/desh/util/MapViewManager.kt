@@ -50,22 +50,11 @@ object MapViewManager {
 
                         layer?.addLabel(options)
                     }
-
-                    val options = LabelOptions.from(LatLng.from(37.394660, 127.111182))
-                        .setStyles(styles)
-                        .setClickable(true)
-
-                    layer?.addLabel(options)
                 }
 
                 // 지도 시작 시 확대/축소 줌 레벨 설정
                 override fun getZoomLevel(): Int {
                     return super.getZoomLevel()
-                }
-
-                // 지도 시작 시 위치 좌표 설정
-                override fun getPosition(): LatLng {
-                    return LatLng.from(37.486960, 127.115587)
                 }
 
                 // 지도 시작 시 App 및 MapType 설정
@@ -96,6 +85,9 @@ object MapViewManager {
         */
 
         return mv
+    }
+
+    fun reCreateMapView(mapView: MapView, recommendInfo: ServerResponse<Recommend>?) {
     }
 
     /*
