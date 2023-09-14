@@ -114,7 +114,7 @@ fun profile(){
     Row(modifier = Modifier.padding(20.dp,1.dp)) {
 
         Image(
-            painter = painterResource(id = R.drawable.profile),
+            painter = painterResource(id = R.drawable.chamomile),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -132,7 +132,7 @@ fun profile(){
 }
 @Composable
 fun color(){
-    Image(painter = painterResource(R.drawable.start_screen5), contentDescription = null, contentScale = ContentScale.FillWidth, modifier = Modifier.height(500.dp))
+    Image(painter = painterResource(R.drawable.chamomile), contentDescription = null, contentScale = ContentScale.FillWidth, modifier = Modifier.height(500.dp))
 }
 
 @Composable

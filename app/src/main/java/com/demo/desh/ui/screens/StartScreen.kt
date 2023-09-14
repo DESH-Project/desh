@@ -36,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.demo.desh.R
 import com.demo.desh.model.User
 import com.demo.desh.viewModel.MainViewModel
@@ -50,11 +51,11 @@ fun StartScreen(
     goToMapScreen: () -> Unit
 ) {
     val startImages = listOf(
-        R.drawable.start_screen1,
-        R.drawable.start_screen2,
-        R.drawable.start_screen3,
-        R.drawable.start_screen4,
-        R.drawable.start_screen5
+        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen1.jpg",
+        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen2.jpg",
+        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen3.jpg",
+        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen4.jpg",
+        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen5.jpg",
     )
 
     Scaffold { innerPadding ->
@@ -73,14 +74,15 @@ fun StartScreen(
                         .height(512.dp)
                 ) { pageIndex ->
                     Box(modifier = Modifier.fillMaxSize()) {
-                        Image(
-                            painter = painterResource(startImages[pageIndex]),
+                        AsyncImage(
+                            model = startImages[pageIndex],
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .clickable { goToMapScreen() }
                         )
+
 
                         /*
                         Icon(
