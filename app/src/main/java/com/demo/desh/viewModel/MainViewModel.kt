@@ -1,6 +1,5 @@
 package com.demo.desh.viewModel
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,27 +10,22 @@ import com.demo.desh.model.District
 import com.demo.desh.model.Realty
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
-import com.demo.desh.util.MapViewManager
 import kotlinx.coroutines.launch
-import net.daum.mf.map.api.MapView
 import java.net.URLEncoder
 import java.util.UUID
 import kotlin.random.Random
 
-class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) : ViewModel() {
+class MainViewModel(
+    private val userRetrofitRepository: UserRetrofitRepository
+) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
-    private val _mapView = MutableLiveData<(context: Context) -> MapView>()
-    val mapView: LiveData<(context: Context) -> MapView> get() = _mapView
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
-
-    private val _infoText = MutableLiveData<String>()
-    val infoText: LiveData<String> get() = _infoText
 
     fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {
@@ -43,11 +37,20 @@ class MainViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
 
             if (res.isSuccessful) {
                 val body = res.body()!!
-                _mapView.value = MapViewManager.createMapView(body)
                 _recommendInfo.value = body
-                _infoText.value = if (serviceName == DEFAULT_SERVICE_NAME) "전체" else serviceName
             }
         }
+    }
+
+    private val _showBottomDrawer = MutableLiveData<Boolean>()
+    val showBottomDrawer : LiveData<Boolean> get() = _showBottomDrawer
+
+    fun showBottomDrawer() {
+        _showBottomDrawer.value = true
+    }
+
+    fun noShowBottomDrawer() {
+        _showBottomDrawer.value = false
     }
 
     private val _serviceList = MutableLiveData<ServerResponse<String>>()

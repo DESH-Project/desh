@@ -2,6 +2,7 @@ package com.demo.desh.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,14 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -24,6 +23,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,39 +31,42 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
-import com.demo.desh.MainActivity
 import com.demo.desh.model.District
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.User
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import de.charlex.compose.BottomDrawerScaffold
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
+    user: User,
     viewModel: MainViewModel,
-    onBackButtonClick: () -> Unit,
     goToRealtyDetail: (Long) -> Unit,
-    markerEventListener: MainActivity.MarkerEventListener
+    goToRemainServiceListScreen: (Int) -> Unit,
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
-    val mv by viewModel.mapView.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
-    val infoText by viewModel.infoText.observeAsState()
     val districtInfo by viewModel.districtInfo.observeAsState()
 
-    val onDrawerItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
-    val onListButtonClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
+    val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
+    val onServiceItemClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
+    val onDistrictButtonClick = { districtName: String -> viewModel.fetchDistrictInfoList(districtName)}
+    val onListMoreButtonClick = { index: Int -> goToRemainServiceListScreen(index)  }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
@@ -74,100 +77,250 @@ fun MapScreen(
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
     // https://developersbreach.com/modal-bottom-sheet-jetpack-compose-android/
     BottomDrawerScaffold(
-        drawerContent = { DistrictDrawerContent(districtInfo, onDrawerItemClick) },
+        drawerContent = {
+            DrawerContent(
+                user = user,
+                serviceList = serviceList,
+                districtInfo = districtInfo,
+                recommendInfo = recommendInfo,
+                onServiceItemClick = onServiceItemClick,
+                onListMoreButtonClick = onListMoreButtonClick,
+                onDistrictButtonClick = onDistrictButtonClick,
+                onDistrictItemClick = onDistrictItemClick
+            )
+        },
         drawerGesturesEnabled = true,
-        drawerPeekHeight = 150.dp,
-        drawerBackgroundColor = Color.White,  //Transparent drawer for custom Drawer shape
+        drawerBackgroundColor = Color(0xAA000000),  //Transparent drawer for custom Drawer shape
         drawerElevation = 0.dp,
 
         content = {
-            Scaffold(
-                topBar = {
-                    Column {
-                        CreateListButton(serviceList, onListButtonClick)
-                        InfoTextBar(infoText, serviceList, recommendInfo, onBackButtonClick)
-                    }
-                },
-
-                content = { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        AndroidView(
-                            factory = mv ?: MapViewManager.createMapView(recommendInfo),
-                            modifier = Modifier.fillMaxSize(),
-                            update = { mv ->
-                                MapViewManager.onMapViewUpdate(
-                                    mv,
-                                    recommendInfo,
-                                    markerEventListener
-                                )
-                            }
-                        )
-                    }
+            Scaffold { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    AndroidView(
+                        factory = { context -> MapViewManager.createMapView(context, recommendInfo) },
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
-            )
+            }
         }
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun DistrictDrawerContent(districtInfo: ServerResponse<District>?, onItemClick: (Long) -> Unit) {
-    val placeHolderColor = Color(0x33000000)
+private fun DrawerContent(
+    user: User,
+    serviceList: ServerResponse<String>?,
+    districtInfo: ServerResponse<District>?,
+    recommendInfo: ServerResponse<Recommend>?,
+    onServiceItemClick: (String) -> Unit,
+    onListMoreButtonClick: (Int) -> Unit,
+    onDistrictButtonClick: (String) -> Unit,
+    onDistrictItemClick: (Long) -> Unit
+) {
+    val placeHolderColor = Color(0xAA000000)
 
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        itemsIndexed(districtInfo?.data ?: listOf()) { _, item ->
-            Card(
-                elevation = 8.dp,
-                modifier = Modifier
-                    .padding(4.dp)
-                    .fillMaxWidth(),
-                onClick = { onItemClick(item.id) }
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    AsyncImage(
-                        model = item.image,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        placeholder = ColorPainter(placeHolderColor),
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                    )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier.padding(0.dp, 8.dp, 0.dp, 0.dp))
 
-                    Spacer(modifier = Modifier.size(8.dp))
+        Divider(modifier = Modifier
+            .background(color = Color.White)
+            .height(4.dp)
+            .width(36.dp)
+            .alpha(0.6f)
+        )
 
-                    Column {
-                        Text(text = "주소: ${item.address}")
-                        Text(text = "시세: ${item.price}")
-                        Spacer(modifier = Modifier.size(4.dp))
-                    }
-                }
+        Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
+
+        CreateListButton(serviceList, onServiceItemClick, onListMoreButtonClick)
+
+        Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
+
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = user.nickname,
+                    color = Color(0xFFFF6A68),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
+
+                Text(
+                    text = "님을 위한 추천 상권목록",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            CreateRecommendPager(recommendInfo, onDistrictButtonClick)
+        }
+
+        Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
+
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = user.nickname,
+                    color = Color(0xFFFF6A68),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
+
+                Text(
+                    text = "님을 위한 추천 상가목록",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            CreateDistrictPager(districtInfo, onDistrictItemClick, placeHolderColor)
+        }
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun CreateRecommendPager(
+    recommendInfo: ServerResponse<Recommend>?,
+    onDistrictButtonClick: (String) -> Unit
+) {
+    val count = recommendInfo?.size ?: 0
+    val list = recommendInfo?.data ?: listOf()
+
+    HorizontalPager(
+        count = count,
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .height(48.dp)
+    ) { page ->
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier
+                .clickable { onDistrictButtonClick(list[page].district) }
+        ) {
+            val item = list[page]
+
+            Text(
+                text = item.service,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = item.district,
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = item.predict.toString(),
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun CreateDistrictPager(
+    districtInfo: ServerResponse<District>?,
+    onDistrictItemClick: (Long) -> Unit,
+    placeHolderColor : Color
+) {
+    val count = districtInfo?.size ?: 0
+    val list = districtInfo?.data ?: listOf()
+
+    HorizontalPager(
+        count = count,
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) { page ->
+        val item = list[page]
+
+        Column(
+            modifier = Modifier.clickable { onDistrictItemClick(item.id) }
+        ) {
+            AsyncImage(
+                model = item.image,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                placeholder = ColorPainter(placeHolderColor),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Column {
+                Text(text = "주소: ${item.address}")
+                Text(text = "시세: ${item.price}")
             }
         }
     }
 }
+
+
 
 @Composable
 private fun CreateListButton(
     serviceList: ServerResponse<String>?,
-    onSelectedServiceNameChange: (String) -> Unit
+    onListButtonClick: (String) -> Unit,
+    onListMoreButtonClick: (Int) -> Unit
 ) {
-    LazyRow {
-        itemsIndexed(serviceList?.data?: listOf()) { _, item ->
-            Card {
+    val index = 3
+    val previewServiceList = serviceList?.data?.slice(0 until index)?.toMutableList()
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        previewServiceList?.forEach { item ->
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                elevation = 8.dp,
+                modifier = Modifier
+                    .width(84.dp)
+                    .height(48.dp)
+                    .padding(4.dp),
+                backgroundColor = Color(0xFF444548)
+            ) {
                 TextButton(onClick = {
                     Log.e("MapScreen.CreateListButton", "Click item = $item")
-                    onSelectedServiceNameChange(item)
+                    onListButtonClick(item)
                 }) {
-                    Text(text = item)
+                    Text(text = item, color = Color.White)
                 }
+            }
+        }
+
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 8.dp,
+            modifier = Modifier
+                .width(84.dp)
+                .height(48.dp)
+                .padding(4.dp),
+            backgroundColor = Color(0xFF444548)
+        ) {
+            IconButton(onClick = { onListMoreButtonClick(index) } ) {
+                Icon(Icons.Filled.KeyboardArrowRight, null)
             }
         }
     }
 }
+
 
 @Composable
 private fun InfoTextBar(
