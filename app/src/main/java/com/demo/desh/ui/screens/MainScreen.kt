@@ -132,7 +132,7 @@ fun profile(){
 }
 @Composable
 fun color(){
-    Image(painter = painterResource(R.drawable.place), contentDescription = null, contentScale = ContentScale.FillWidth, modifier = Modifier.height(500.dp))
+    Image(painter = painterResource(R.drawable.start_screen5), contentDescription = null, contentScale = ContentScale.FillWidth, modifier = Modifier.height(500.dp))
 }
 
 @Composable

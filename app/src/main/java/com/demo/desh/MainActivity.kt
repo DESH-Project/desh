@@ -5,12 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,6 +18,7 @@ import com.demo.desh.model.User
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
 import com.demo.desh.ui.screens.RemainServiceListScreen
+import com.demo.desh.ui.screens.StartScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.MainViewModel
 import com.demo.desh.viewModel.MainViewModelFactory
@@ -37,73 +37,67 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             DeshprojectfeTheme {
-                Surface {
-                    App(
-                        viewModel = viewModel,
-                        user = user
-                    )
-                }
+                Root(
+                    viewModel = viewModel,
+                    user = user
+                )
             }
         }
     }
 }
 
-sealed class MainNavigation(
-    val route: String,
-    val title: String,
-) {
-    object Main : MainNavigation("main", "Main")
-    object Profile : MainNavigation("profile", "Profile")
-    object Settings : MainNavigation("settings", "Settings")
-    object Map : MainNavigation("map", "Map")
-    object RealtyDetail : MainNavigation("realtyDetail", "RealtyDetail")
-    object RemainServiceList : MainNavigation("remainServiceList", "RemainServiceList")
+sealed class MainNavigation(val route: String) {
+    object Start : MainNavigation("start")
+    object Profile : MainNavigation("profile")
+    object Settings : MainNavigation("settings")
+    object Map : MainNavigation("map")
+    object RealtyDetail : MainNavigation("realtyDetail")
+    object RemainServiceList : MainNavigation("remainServiceList")
 }
 
 @Composable
-fun App(
+fun Root(
     viewModel: MainViewModel,
     user: User
 ) {
     val navController = rememberNavController()
 
-    Scaffold() { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            NavHost(navController = navController, startDestination = MainNavigation.Map.route) {
-                val realtyId = "realtyId"
-                val serviceListIndex = "index"
+    NavHost(
+        modifier = Modifier.padding(0.dp),
+        navController = navController,
+        startDestination = MainNavigation.Start.route
+    ) {
+        val realtyId = "realtyId"
+        val serviceListIndex = "index"
 
-                composable(route = MainNavigation.Profile.route) {
-                    ProfileScreen()
-                }
+        composable(route = MainNavigation.Start.route) {
+            val goToMapScreen = { navController.navigate(MainNavigation.Map.route) }
+            StartScreen(user, viewModel, goToMapScreen)
+        }
 
-                /*
-                composable(route = MainNavigation.Main.route) {
-                    MainScreen()
-                }
-                 */
+        composable(route = MainNavigation.Profile.route) {
+            ProfileScreen()
+        }
 
-                composable(route = MainNavigation.Map.route) {
-                    val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
-                    val goToRemainServiceListScreen = { index: Int -> navController.navigate(MainNavigation.RemainServiceList.route + "/$index") }
-                    MapScreen(user, viewModel, goToRealtyDetail, goToRemainServiceListScreen)
-                }
+        composable(route = MainNavigation.Map.route) {
+            val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
+            val goToRemainServiceListScreen = { index: Int -> navController.navigate(MainNavigation.RemainServiceList.route + "/$index") }
+            MapScreen(user, viewModel, goToRealtyDetail, goToRemainServiceListScreen)
+        }
 
-                composable(route = "${MainNavigation.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
-                    backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
-                        realtyId = it.toLong(),
-                        user = user,
-                        viewModel = viewModel
-                    ) }
-                }
+        composable(route = "${MainNavigation.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
+            backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
+                realtyId = it.toLong(),
+                user = user,
+                viewModel = viewModel
+            ) }
+        }
 
-                composable(route = "${MainNavigation.RemainServiceList.route}/{${serviceListIndex}}") { backStackEntry ->
-                    backStackEntry.arguments?.getString(serviceListIndex)?.let { RemainServiceListScreen(
-                        index = it.toInt(),
-                        viewModel = viewModel
-                    ) }
-                }
-            }
+        composable(route = "${MainNavigation.RemainServiceList.route}/{${serviceListIndex}}") { backStackEntry ->
+            backStackEntry.arguments?.getString(serviceListIndex)?.let { RemainServiceListScreen(
+                index = it.toInt(),
+                viewModel = viewModel
+            ) }
         }
     }
 }

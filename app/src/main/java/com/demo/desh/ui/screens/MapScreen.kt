@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -20,6 +22,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -121,8 +124,17 @@ private fun DrawerContent(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
+        Row(
+            modifier = Modifier.background(Color.Transparent),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Switch(checked = false, onCheckedChange = { })
+        }
+
+        Spacer(modifier = Modifier.padding(0.dp, 24.dp, 0.dp, 0.dp))
+
         Spacer(modifier = Modifier.padding(0.dp, 8.dp, 0.dp, 0.dp))
 
         Divider(modifier = Modifier
@@ -282,41 +294,31 @@ private fun CreateListButton(
     val index = 3
     val previewServiceList = serviceList?.data?.slice(0 until index)?.toMutableList()
 
-    Row(
+    LazyRow(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        previewServiceList?.forEach { item ->
+        itemsIndexed(previewServiceList ?: listOf()) { _, item ->
+            val size = if (item[0] in 'a'..'z') 12 else 24
+
             Card(
                 shape = RoundedCornerShape(20.dp),
                 elevation = 8.dp,
                 modifier = Modifier
-                    .width(84.dp)
                     .height(48.dp)
                     .padding(4.dp),
                 backgroundColor = Color(0xFF444548)
             ) {
-                TextButton(onClick = {
-                    Log.e("MapScreen.CreateListButton", "Click item = $item")
-                    onListButtonClick(item)
-                }) {
+                TextButton(
+                    modifier = Modifier.width(size.dp * item.length),
+                    onClick = {
+                        Log.e("MapScreen.CreateListButton", "Click item = $item")
+                        onListButtonClick(item)
+                    }) {
                     Text(text = item, color = Color.White)
                 }
             }
-        }
 
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            elevation = 8.dp,
-            modifier = Modifier
-                .width(84.dp)
-                .height(48.dp)
-                .padding(4.dp),
-            backgroundColor = Color(0xFF444548)
-        ) {
-            IconButton(onClick = { onListMoreButtonClick(index) } ) {
-                Icon(Icons.Filled.KeyboardArrowRight, null)
-            }
         }
     }
 }

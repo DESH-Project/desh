@@ -23,7 +23,6 @@ class MainViewModel(
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
-
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
 
@@ -138,6 +137,23 @@ class MainViewModel(
         val random = Random.Default
         val size = random.nextInt(20, 30)
         val list = mutableListOf<District>()
+
+        val district = District(
+            id = -1,
+            address = UUID.randomUUID().toString(),
+            image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%E1%84%80%E1%85%A9%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8B%E1%85%B5.png",
+            price = 123456.0
+        )
+
+        val district2 = District(
+            id = -1,
+            address = UUID.randomUUID().toString(),
+            image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/191675017-%EC%96%BC%EC%96%B4%EB%B6%99%EC%9D%80-%ED%8C%8C%EB%8F%84-%EB%B2%BD%EC%A7%80-3d-%EA%B7%B8%EB%A6%BC.jpg",
+            price = 123456.0
+        )
+
+        list.add(district)
+        list.add(district2)
 
         for (i in 0 until size) {
             val district = District(
