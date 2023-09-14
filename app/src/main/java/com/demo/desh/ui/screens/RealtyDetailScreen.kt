@@ -16,7 +16,7 @@ import com.demo.desh.viewModel.MainViewModel
 
 
 @Composable
-fun RealtyDetailScreen(
+fun RealtyDetailScreen22(
     realtyId: Long,
     user: User,
     viewModel: MainViewModel

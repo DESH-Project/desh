@@ -1,6 +1,5 @@
 package com.demo.desh.viewModel
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,8 +10,6 @@ import com.demo.desh.model.District
 import com.demo.desh.model.Realty
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
-import com.demo.desh.util.MapViewManager
-import com.kakao.vectormap.MapView
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.util.UUID
@@ -29,7 +26,6 @@ class MainViewModel(
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
-
 
     fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {

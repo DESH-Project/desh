@@ -57,7 +57,7 @@ fun MapScreen(
     user: User,
     viewModel: MainViewModel,
     goToRealtyDetail: (Long) -> Unit,
-    goToRemainServiceListScreen: (Int) -> Unit
+    goToRemainServiceListScreen: (Int) -> Unit,
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()

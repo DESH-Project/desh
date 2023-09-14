@@ -1,260 +1,186 @@
-package com.demo.desh.ui.screens
-
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.Card
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconToggleButton
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import com.demo.desh.MainNavigation
+import androidx.compose.ui.unit.sp
+import com.demo.desh.R
 import com.demo.desh.model.User
 import com.demo.desh.viewModel.MainViewModel
 
-
 @Composable
-fun MainScreen(
-    viewModel: MainViewModel,
-    navController: NavHostController,
-    user: User
+fun RealtyDetailScreen(
+    realtyId: Long,
+    user: User,
+    viewModel: MainViewModel
 ) {
-    UserCardProfile(user = user)
+    val scrollState = rememberScrollState();
 
-    Column(
-        verticalArrangement = Arrangement.Center, modifier = Modifier.padding(0.dp,130.dp,0.dp,0.dp)
-    ) {
-        TopHeader(navController =navController)
+    Column(Modifier.verticalScroll(scrollState)) {
+
+        // A surface container using the 'background' color from the theme
+        color()
+        Top()
+        Spacer(modifier = Modifier.padding(10.dp))
+        profile()
+        Spacer(modifier = Modifier.padding(0.dp,10.dp))
+        Divider(color = Color.White , thickness = 1.dp, modifier = Modifier.padding(end = 20.dp, start = 20.dp))
+        buildingdetail()
         Spacer(modifier = Modifier.padding(0.dp,7.dp))
-        MyUI("내가 본 매물")
-        Spacer(modifier = Modifier.padding(0.dp,5.dp))
-        HorizontalListView()
-        Bottom(navController)
+        Divider(color = Color.White , thickness = 1.dp, modifier = Modifier.padding(end = 20.dp, start = 20.dp))
+        aroundbuilding()
+
     }
+
 }
 
 @Composable
-private fun UserCardProfile(user: User) {
-    val placeHolderColor = Color(0x33000000)
+fun Top() {
+    Column(modifier = Modifier.padding(20.dp,10.dp)) {
+        var checked by remember { mutableStateOf(true) }
 
-    Card(
-        elevation = 8.dp,
-        modifier = Modifier.padding(4.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            AsyncImage(
-                model = user.profileImageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                placeholder = ColorPainter(placeHolderColor),
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-            )
-            
-            Spacer(modifier = Modifier.size(8.dp))
-            
-            Column {
-                Text(text = user.nickname)
-                Spacer(modifier = Modifier.size(4.dp))
-                Text(text = user.email)
-            }
-        }
-    }
-}
+        Row() {
+            Text("오도르 카페")
+            Spacer(modifier = Modifier.padding(100.dp, 0.dp))
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ToolbarWithMenu2() {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Good place") },
-                navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Menu"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Filled.MoreVert,
-                            contentDescription = "MoreVert",
-                        )
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription ="매물 내놓기" )
-                    }
-
-                }
-            )
-        }
-    ) {
-        it.calculateTopPadding()
-    }
-}
-
-@Composable
-fun MyUI(name:String) {
-    Row() {
-        Divider(
-            modifier = Modifier
-                .padding(16.dp)
-                .width(130.dp), color = Color.Black, thickness = 2.dp
-        )
-        Text(text = name)
-        Divider(
-            modifier = Modifier
-                .padding(16.dp)
-                .width(130.dp), color = Color.Black, thickness = 2.dp
-        )
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Bottom(navController: NavController){
-    Scaffold(
-        floatingActionButton = {
-            Box(
+            IconToggleButton(
+                checked = checked,
+                onCheckedChange = { ischecked -> checked = ischecked },
+                modifier = Modifier.size(80.dp)
             ) {
-                FloatingActionButton(
-                    onClick = { navController.navigate(MainNavigation.Map.route)
-                    }) {
-                    Text(text = "AI 추천받기")
-                }
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = if (checked) Color.White else Color.Black
+
+                )
+
             }
-        },
-        floatingActionButtonPosition = FabPosition.Center,
+        }
 
+        Spacer(modifier = Modifier.padding(1.dp))
 
-        bottomBar = {
-            BottomAppBar(modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-
-            ) {
-            }
-        },
-    ) { it }
-}
-
-
-@Composable
-fun HorizontalListView() {
-    LazyRow(contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp)) {
-        item{
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-                Text(text = "1")
-            }
-
-        }
-        item{
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-                Text(text = "2")
-            }
-
-        }
-        item{
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-                Text(text = "3")
-            }
-
-        }
-        item{
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-                Text(text = "4")
-            }
-
-        }
-        item { Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-            Text(text = "5")
-        }
-        }
-        item { Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-            Text(text = "6")
-        }
-        }
-        item { Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-            Text(text = "7")
-        }
-        }
-        item { Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-            Text(text = "8")
-        }
-        }
-        item { Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-            Text(text = "9")
-        }
-        }
-        item { Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp), shape = RectangleShape) {
-            Text(text = "10")
-        }
-        }
-    }
-}
-@Composable
-fun TopHeader(navController: NavController){
-    Surface( color = Color.DarkGray,modifier = Modifier
-        .fillMaxWidth()
-        .height(170.dp)
-        .clip(shape = CircleShape.copy(all = CornerSize(12.dp)))) {
-        Surface(color = Color.White,modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp)
-            .clip(shape = CircleShape.copy(all = CornerSize(12.dp)))) {
+        Row() {
             Button(
-                onClick = { },
-                shape = RectangleShape
+                onClick = { /*TODO*/ },
+                colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.buttoncolor))
             ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "매몰내놓기")
-                Spacer(modifier = Modifier.padding(10.dp))
-                Text(text = "건물주 되기")
+                Text("베이커리", fontSize = 18.sp)
+            }
+            Spacer(modifier = Modifier.padding(5.dp, 0.dp))
+            Button(
+                onClick = { /*TODO*/ },
+                colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.buttoncolor))
+            ) {
+                Text("카페", fontSize = 18.sp)
             }
         }
     }
 }
 
+@Composable
+fun profile(){
+    Row(modifier = Modifier.padding(20.dp,1.dp)) {
 
+        Image(
+            painter = painterResource(id = R.drawable.profile),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(64.dp)
+
+        )
+        Column(modifier = Modifier.padding(5.dp,0.dp)){
+
+            Text("중개법인 김두식")
+
+        }
+
+    }
+}
+@Composable
+fun color(){
+    Image(painter = painterResource(R.drawable.place), contentDescription = null, contentScale = ContentScale.FillWidth, modifier = Modifier.height(500.dp))
+}
+
+@Composable
+fun buildingdetail(){
+    Column(modifier = Modifier.padding(15.dp,10.dp)) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+            Icon(imageVector = Icons.Default.Place, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(30.dp))
+            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Text("경기 남양주시 진접음 경복대로")
+        }
+
+        Row(modifier = Modifier.padding(horizontal = 10.dp)){
+            Icon(imageVector = Icons.Default.AddCircle, contentDescription = null,tint = Color.Gray, modifier = Modifier.size(30.dp))
+            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Text("3000/200")
+        }
+        Row(modifier = Modifier.padding(horizontal = 10.dp)){
+            Icon(imageVector = Icons.Default.ExitToApp, contentDescription = null,tint = Color.Gray, modifier = Modifier.size(30.dp))
+            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Text("78.15m")
+        }
+        Row(modifier = Modifier.padding(horizontal = 10.dp)){
+            Icon(imageVector = Icons.Default.LocationOn, contentDescription = null,tint = Color.Gray, modifier = Modifier.size(30.dp))
+            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Text("12.7")
+        }
+
+        Text("애뜨왈커피 로스팅 공장에서 운영하는 베이커리 카페로 젊은 감성있는 인테리어와 많은 주차 공간을 확보하고 있습니다.")
+    }
+}
+@Composable
+fun aroundbuilding() {
+    Column {
+        Text("주변상가", fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
+
+        val items = (1..50).toList()
+        LazyRow() {
+            items(items) { item ->
+                Button(
+                    onClick = { /*TODO*/ },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+                    modifier = Modifier
+                        .padding(vertical = 5.dp, horizontal = 19.dp)
+                        .size(130.dp)
+                ) {
+                    Text("")
+                }
+            }
+        }
+    }
+}

@@ -1,5 +1,6 @@
 package com.demo.desh
 
+import RealtyDetailScreen
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -17,9 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.demo.desh.model.User
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
-import com.demo.desh.ui.screens.RealtyDetailScreen
 import com.demo.desh.ui.screens.RemainServiceListScreen
-import com.demo.desh.ui.screens.SettingsScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.MainViewModel
 import com.demo.desh.viewModel.MainViewModelFactory
@@ -53,6 +52,7 @@ sealed class MainNavigation(
     val route: String,
     val title: String,
 ) {
+    object Main : MainNavigation("main", "Main")
     object Profile : MainNavigation("profile", "Profile")
     object Settings : MainNavigation("settings", "Settings")
     object Map : MainNavigation("map", "Map")
@@ -70,16 +70,18 @@ fun App(
     Scaffold() { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController = navController, startDestination = MainNavigation.Map.route) {
-                val REALTY_ID = "realtyId"
-                val INDEX = "index"
+                val realtyId = "realtyId"
+                val serviceListIndex = "index"
 
                 composable(route = MainNavigation.Profile.route) {
                     ProfileScreen()
                 }
 
-                composable(route = MainNavigation.Settings.route) {
-                    SettingsScreen()
+                /*
+                composable(route = MainNavigation.Main.route) {
+                    MainScreen()
                 }
+                 */
 
                 composable(route = MainNavigation.Map.route) {
                     val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
@@ -87,16 +89,16 @@ fun App(
                     MapScreen(user, viewModel, goToRealtyDetail, goToRemainServiceListScreen)
                 }
 
-                composable(route = "${MainNavigation.RealtyDetail.route}/{${REALTY_ID}}") { backStackEntry ->
-                    backStackEntry.arguments?.getString(REALTY_ID)?.let { RealtyDetailScreen(
+                composable(route = "${MainNavigation.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
+                    backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
                         realtyId = it.toLong(),
                         user = user,
                         viewModel = viewModel
                     ) }
                 }
 
-                composable(route = "${MainNavigation.RemainServiceList.route}/{${INDEX}}") { backStackEntry ->
-                    backStackEntry.arguments?.getString(INDEX)?.let { RemainServiceListScreen(
+                composable(route = "${MainNavigation.RemainServiceList.route}/{${serviceListIndex}}") { backStackEntry ->
+                    backStackEntry.arguments?.getString(serviceListIndex)?.let { RemainServiceListScreen(
                         index = it.toInt(),
                         viewModel = viewModel
                     ) }
