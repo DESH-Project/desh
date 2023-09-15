@@ -41,6 +41,17 @@ class SplashActivity : AppCompatActivity() {
         val members = memberRepository.findAllMember()
         Log.e(TAG, "member = $members")
 
+        val user = User(
+            id = 1L,
+            email = "test@gmail.com",
+            nickname = "박은향",
+            profileImageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%E1%84%80%E1%85%A9%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8B%E1%85%B5.png"
+        )
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("user", user)
+        startActivity(intent)
+        /*
         if (members.isEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))
         }
@@ -58,6 +69,7 @@ class SplashActivity : AppCompatActivity() {
             intent.putExtra("user", user)
             startActivity(intent)
         }
+        */
     }
 
     companion object {
