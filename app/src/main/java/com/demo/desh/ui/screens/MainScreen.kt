@@ -1,3 +1,4 @@
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -5,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconToggleButton
@@ -32,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -115,19 +117,21 @@ fun Top() {
 
         Spacer(modifier = Modifier.padding(1.dp))
 
+
         Row() {
-            Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.buttoncolor))
-            ) {
-                Text("베이커리", fontSize = 18.sp)
+            Card( backgroundColor = Color(0), modifier = Modifier
+                .height(32.dp)
+                .width(100.dp), border = BorderStroke(1.dp,
+                Color(0)
+            )) {
+                Text("#베이커리", fontSize = 18.sp, textAlign = TextAlign.Center)
             }
             Spacer(modifier = Modifier.padding(5.dp, 0.dp))
-            Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.buttoncolor))
-            ) {
-                Text("카페", fontSize = 18.sp)
+            Card(backgroundColor = Color(0), modifier = Modifier
+                .height(32.dp)
+                .width(80.dp), border = BorderStroke(1.dp,
+                Color(0))) {
+                Text("#카페", fontSize = 18.sp, textAlign = TextAlign.Center)
             }
         }
     }
