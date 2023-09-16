@@ -1,5 +1,7 @@
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,6 +50,7 @@ import com.demo.desh.R
 import com.demo.desh.model.User
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.viewModel.MainViewModel
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun RealtyDetailScreen(
@@ -78,6 +82,20 @@ fun RealtyDetailScreen(
                 modifier = Modifier.padding(end = 20.dp, start = 20.dp)
             )
             aroundbuilding()
+            Spacer(modifier = Modifier.padding(0.dp, 10.dp))
+            Divider(
+                color = Color.White,
+                thickness = 1.dp,
+                modifier = Modifier.padding(end = 20.dp, start = 20.dp)
+            )
+            Spacer(modifier = Modifier.padding(0.dp, 3.dp))
+            Text("주변상가", style = Typography2.bodyMedium, fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
+            aroundstore("올리브영")
+            aroundstore("편의점")
+            aroundstore("롯데리아")
+            aroundstore("아마스빈")
+            aroundstore("메가커피")
+
 
         }
 
@@ -194,7 +212,7 @@ fun buildingdetail(){
 @Composable
 fun aroundbuilding() {
     Column {
-        Text("주변상가", style = Typography2.bodyMedium, fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
+        Text("주변상권", style = Typography2.bodyMedium, fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
 
         val items = (1..50).toList()
         LazyRow() {
@@ -211,4 +229,21 @@ fun aroundbuilding() {
             }
         }
     }
+}
+@Composable
+fun aroundstore(pharse: String){
+    Column() {
+        Card(
+            backgroundColor = Color(0),
+            modifier = Modifier.padding(horizontal = 50.dp)
+            .height(40.dp)
+            .width(350.dp)
+            .background(Color.Gray)
+
+        ) {
+        Text(text = pharse,style = Typography2.bodySmall,fontSize = 15.sp, textAlign = TextAlign.Center)
+    }
+        Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+  }
 }
