@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -58,7 +59,7 @@ fun RealtyDetailScreen(
     user: User,
     viewModel: MainViewModel
 ) {
-    Surface(color = Color(0XFF474748), contentColor = Color.White) {
+    Surface(color = Color(0xFF343434), contentColor = Color.White) {
         val scrollState = rememberScrollState();
 
         Column(Modifier.verticalScroll(scrollState)) {
@@ -111,7 +112,7 @@ val customFontFamily = FontFamily(
 
 @Composable
 fun Top() {
-    Column(modifier = Modifier.padding(20.dp,10.dp)) {
+    Column(modifier = Modifier.padding(20.dp, 10.dp)) {
         var checked by remember { mutableStateOf(true) }
 
         Row() {
@@ -137,23 +138,41 @@ fun Top() {
 
 
         Row() {
-            Card( backgroundColor = Color(0), modifier = Modifier
-                .height(32.dp)
-                .width(100.dp), border = BorderStroke(1.dp,
-                Color(0)
-            )) {
-                Text("#베이커리", fontSize = 18.sp, textAlign = TextAlign.Center)
+            Card(
+
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(85.dp), shape = RoundedCornerShape(10.dp), backgroundColor = Color(
+                    0x33000000
+                )
+
+            ) {
+                Text(
+                    "# 베이커리",
+                    style = Typography2.bodySmall,
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
             }
             Spacer(modifier = Modifier.padding(5.dp, 0.dp))
-            Card(backgroundColor = Color(0), modifier = Modifier
-                .height(32.dp)
-                .width(80.dp), border = BorderStroke(1.dp,
-                Color(0))) {
-                Text("#카페", fontSize = 18.sp, textAlign = TextAlign.Center)
+            Card(
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(85.dp), shape = RoundedCornerShape(10.dp), backgroundColor = Color(0x33000000)
+            ) {
+
+
+                Text(
+                    "# 카페",
+                    style = Typography2.bodySmall,
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
 }
+
 
 @Composable
 fun profile(){
@@ -234,11 +253,10 @@ fun aroundbuilding() {
 fun aroundstore(pharse: String){
     Column() {
         Card(
-            backgroundColor = Color(0),
-            modifier = Modifier.padding(horizontal = 50.dp)
+            backgroundColor = Color.Gray,
+            modifier = Modifier.padding(horizontal = 19.dp)
             .height(40.dp)
-            .width(350.dp)
-            .background(Color.Gray)
+            .width(380.dp), shape = RoundedCornerShape(5.dp)
 
         ) {
         Text(text = pharse,style = Typography2.bodySmall,fontSize = 15.sp, textAlign = TextAlign.Center)
