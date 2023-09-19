@@ -1,81 +1,142 @@
 package com.demo.desh.ui.screens
 
 import android.content.Context
+import android.widget.ImageButton
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material.Text
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.demo.desh.R
 import com.demo.desh.login.KakaoLogin
 import com.demo.desh.login.NaverLogin
+import com.demo.desh.model.LoginPreviewInfo
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun LoginScreen(
     goToMapScreen: () -> Unit
 ) {
     val context = LocalContext.current
+    val testData = LoginPreviewInfo.testData
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        LogoText()
+    Scaffold { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(Color.DarkGray)
+        ) {
+            Column {
+                HorizontalPager(
+                    count = testData.size,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) { pageIndex ->
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        AsyncImage(
+                            model = testData[pageIndex].imageUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .fillMaxHeight()
+                        )
 
-        Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 120.dp))
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowForward,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(12.dp)
+                                .size(36.dp)
+                                .alpha(if (pageIndex == testData.size - 1) 0.1f else 0.45f)
+                        )
 
-        SocialLoginButtons(context = context, goToMapScreen)
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(24.dp)
+                        ) {
+                            Text(
+                                text = testData[pageIndex].introduceText,
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+
+                            Text(
+                                text = testData[pageIndex].impactText,
+                                fontSize = 48.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White
+                            )
+
+                            Text(
+                                text = testData[pageIndex].explainText,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+            ) {
+
+                Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 120.dp))
+
+                SocialLoginButtons(context = context, goToMapScreen)
+            }
+        }
     }
 }
 
-@Composable
-private fun LogoText() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "DESH",
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 80.sp,
-            fontStyle = FontStyle.Italic,
-            color = Color.LightGray
-        )
-
-        Text(
-            text = "소상공인을 위한 상권 추천 서비스",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            fontStyle = FontStyle.Normal,
-            color = Color.DarkGray
-        )
-    }
-}
 
 @Composable
 private fun SocialLoginButtons(context: Context, goToMapScreen: () -> Unit) {
-    val loginWithKakaoText = "Sign In With Kakao"
-    val loginWithNaverText = "Sign In With Naver"
-    val loginGuideText = "아래 계정으로 서비스 시작하기"
-
     val coroutineScope = rememberCoroutineScope()
 
     Column(
@@ -83,25 +144,17 @@ private fun SocialLoginButtons(context: Context, goToMapScreen: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .height(256.dp)
     ) {
-        Text(
-            text = loginGuideText,
-            color = Color.Black.copy(alpha = 0.5f),
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
-        )
-
         Spacer(modifier = Modifier.padding(4.dp))
 
         SocialLoginIconButton(
-            text = loginWithKakaoText,
-            imageResource = R.drawable.kakao_login_large_narrow,
+            imageResource = R.drawable.kakao_login_large_wide,
             onClick = { coroutineScope.launch { KakaoLogin.login(context, goToMapScreen) } }
         )
 
+        Spacer(modifier = Modifier.padding(8.dp))
+
         SocialLoginIconButton(
-            text = loginWithNaverText,
             imageResource = R.drawable.naver_login,
             onClick = { coroutineScope.launch { NaverLogin.login(context, goToMapScreen) } }
         )
@@ -110,21 +163,16 @@ private fun SocialLoginButtons(context: Context, goToMapScreen: () -> Unit) {
 
 @Composable
 private fun SocialLoginIconButton(
-    text: String,
     imageResource: Int,
     onClick: () -> Unit
 ) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    IconButton(onClick = onClick) {
         Image(
             painter = painterResource(id = imageResource),
-            contentDescription = text,
-            contentScale = ContentScale.FillBounds,
+            contentDescription = null,
             modifier = Modifier
-                .width(256.dp)
-                .height(80.dp)
+                .fillMaxSize()
+                .clickable { onClick() }
         )
     }
 }
