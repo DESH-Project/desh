@@ -3,13 +3,18 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
+
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -20,7 +25,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -28,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
@@ -62,12 +71,13 @@ fun RealtyDetailScreen(
     viewModel: MainViewModel
 ) {
     Surface(color = Color(0xFF343434), contentColor = Color.White) {
+        
         val scrollState = rememberScrollState();
 
         Column(Modifier.verticalScroll(scrollState)) {
 
             // A surface container using the 'background' color from the theme
-            color()
+            BuildingImage()
             Top()
             Spacer(modifier = Modifier.padding(10.dp))
             profile()
@@ -104,6 +114,7 @@ fun RealtyDetailScreen(
 
     }
 }
+
 val customFontFamily = FontFamily(
     Font(R.font.notosanskr_bold, FontWeight.Bold, FontStyle.Normal),
     Font(R.font.notosanskr_extrabold, FontWeight.ExtraBold, FontStyle.Normal),
@@ -205,74 +216,169 @@ fun profile(){
 
     }
 }
-@Composable
-fun color(){
-    Image(painter = painterResource(R.drawable.place), contentDescription = null, contentScale = ContentScale.FillWidth, modifier = Modifier.height(500.dp))
-}
 
 @Composable
-fun buildingdetail(){
-    Column(modifier = Modifier.padding(15.dp,10.dp)) {
-        Row(modifier = Modifier.padding(horizontal = 10.dp)) {
-            Icon(imageVector = Icons.Default.Place, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(30.dp))
-            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-            Text("경기 남양주시 진접음 경복대로", style = Typography2.bodySmall, fontSize = 14.sp, textAlign = TextAlign.Center)
-        }
+fun BuildingImage() {
+    var isDropDownExpanded by remember { mutableStateOf(false) }
+    Surface() {
+        Image(
+            painter = painterResource(R.drawable.place),
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier.height(500.dp)
+        )
+        Box(contentAlignment = Alignment.BottomEnd) {
+            IconButton(
 
-        Row(modifier = Modifier.padding(horizontal = 10.dp)){
-            Icon(imageVector = Icons.Default.AddCircle, contentDescription = null,tint = Color.Gray, modifier = Modifier.size(30.dp))
-            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-            Text("3000/200", style = Typography2.bodySmall, fontSize = 14.sp, textAlign = TextAlign.Center)
-        }
-        Row(modifier = Modifier.padding(horizontal = 10.dp)){
-            Icon(imageVector = Icons.Default.ExitToApp, contentDescription = null,tint = Color.Gray, modifier = Modifier.size(30.dp))
-            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-            Text("78.15m", style = Typography2.bodySmall, fontSize = 14.sp, textAlign = TextAlign.Center)
-        }
-        Row(modifier = Modifier.padding(horizontal = 10.dp)){
-            Icon(imageVector = Icons.Default.LocationOn, contentDescription = null,tint = Color.Gray, modifier = Modifier.size(30.dp))
-            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-            Text("12.7", style = Typography2.bodySmall, fontSize = 14.sp, textAlign = TextAlign.Center)
-        }
+                onClick = { isDropDownExpanded = true },
+                modifier = Modifier.align(Alignment.Center)
 
-        Text("애뜨왈커피 로스팅 공장에서 운영하는 베이커리 카페로 젊은 감성있는 인테리어와 많은 주차 공간을 확보하고 있습니다.", style = Typography2.bodySmall, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 40.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = null,
+                    tint = Color.White, modifier = Modifier.size(30.dp)
+                )
+            }
+            DropdownMenu(
+                expanded = isDropDownExpanded,
+                onDismissRequest = { isDropDownExpanded = false }, modifier = Modifier.background(color = Color.Black)) {
+                DropdownMenuItem(onClick = { isDropDownExpanded = false }) {
+                    Text(text = "공유하기", color = Color.White)
+
+                }
+                DropdownMenuItem(onClick = { isDropDownExpanded = false }) {
+                    Text(text = "신고하기", color = Color.Red)
+
+                }
+
+            }
+
+        }
     }
 }
-@Composable
-fun aroundbuilding() {
-    Column {
-        Text("주변상권", style = Typography2.bodyMedium, fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
 
-        val items = (1..50).toList()
-        LazyRow() {
-            items(items) { item ->
-                Button(
-                    onClick = { /*TODO*/ },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
-                    modifier = Modifier
-                        .padding(vertical = 5.dp, horizontal = 19.dp)
-                        .size(130.dp)
-                ) {
-                    Text("")
+    @Composable
+    fun buildingdetail() {
+        Column(modifier = Modifier.padding(15.dp, 10.dp)) {
+            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                Text(
+                    "경기 남양주시 진접음 경복대로",
+                    style = Typography2.bodySmall,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                Text(
+                    "3000/200",
+                    style = Typography2.bodySmall,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+                Icon(
+                    imageVector = Icons.Default.ExitToApp,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                Text(
+                    "78.15m",
+                    style = Typography2.bodySmall,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                Text(
+                    "12.7",
+                    style = Typography2.bodySmall,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Text(
+                "애뜨왈커피 로스팅 공장에서 운영하는 베이커리 카페로 젊은 감성있는 인테리어와 많은 주차 공간을 확보하고 있습니다.",
+                style = Typography2.bodySmall,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(horizontal = 40.dp)
+            )
+        }
+    }
+
+    @Composable
+    fun aroundbuilding() {
+        Column {
+            Text(
+                "주변상권",
+                style = Typography2.bodyMedium,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp)
+            )
+
+            val items = (1..50).toList()
+            LazyRow() {
+                items(items) { item ->
+                    Button(
+                        onClick = { /*TODO*/ },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+                        modifier = Modifier
+                            .padding(vertical = 5.dp, horizontal = 19.dp)
+                            .size(130.dp)
+                    ) {
+                        Text("")
+                    }
                 }
             }
         }
     }
-}
-@Composable
-fun aroundstore(pharse: String){
-    Column() {
-        Card(
-            backgroundColor = Color.Gray,
-            modifier = Modifier
-                .padding(horizontal = 19.dp)
-                .height(40.dp)
-                .width(380.dp), shape = RoundedCornerShape(5.dp)
 
-        ) {
-        Text(text = pharse,style = Typography2.bodySmall,fontSize = 15.sp, textAlign = TextAlign.Center)
+    @Composable
+    fun aroundstore(pharse: String) {
+        Column() {
+            Card(
+                backgroundColor = Color.Gray,
+                modifier = Modifier
+                    .padding(horizontal = 19.dp)
+                    .height(40.dp)
+                    .width(380.dp), shape = RoundedCornerShape(5.dp)
+
+            ) {
+                Text(
+                    text = pharse,
+                    style = Typography2.bodySmall,
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+        }
     }
-        Spacer(modifier = Modifier.padding(vertical = 10.dp))
 
-  }
-}
