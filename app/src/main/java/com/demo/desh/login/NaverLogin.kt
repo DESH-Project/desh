@@ -10,7 +10,10 @@ import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 
 object NaverLogin : SocialLogin() {
-    override fun login(context: Context) {
+    override fun login(
+        context: Context,
+        goToMapScreen: () -> Unit
+    ) {
         fun getUserInfo() {
             NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
                 override fun onError(errorCode: Int, message: String) {
@@ -39,7 +42,7 @@ object NaverLogin : SocialLogin() {
                     )
 
                     saveMemberIntoRoomDB(context, user)
-                    send(context, user)
+                    send(context, user, goToMapScreen)
                 }
             })
         }

@@ -6,9 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.demo.desh.access.repository.MemberRepository
-import com.demo.desh.access.room.MemberRoomDatabase
-import com.demo.desh.model.User
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
 import com.navercorp.nid.NaverIdLoginSDK
@@ -34,30 +31,8 @@ class SplashActivity : AppCompatActivity() {
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret, naverClientName)
         */
 
-        val room = MemberRoomDatabase.getInstance(this)
-        val memberDao = room.memberDao()
-        val memberRepository = MemberRepository(memberDao)
-
-        val members = memberRepository.findAllMember()
-        Log.e(TAG, "member = $members")
-
-        if (members.isEmpty()) {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
-
-        else {
-            val intent = Intent(this, MainActivity::class.java)
-            val member = members.first()
-            val user = User(
-                id = member.id.toLong(),
-                email = member.email!!,
-                nickname = member.nickname!!,
-                profileImageUrl = member.profileImageUrl!!
-            )
-
-            intent.putExtra("user", user)
-            startActivity(intent)
-        }
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     companion object {

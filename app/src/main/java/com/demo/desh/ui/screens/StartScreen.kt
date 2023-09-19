@@ -1,7 +1,6 @@
 package com.demo.desh.ui.screens
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
@@ -29,19 +26,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.demo.desh.R
+import com.demo.desh.model.PreviewInfo
 import com.demo.desh.model.User
 import com.demo.desh.viewModel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+
+
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -50,13 +47,7 @@ fun StartScreen(
     viewModel: MainViewModel,
     goToMapScreen: () -> Unit
 ) {
-    val startImages = listOf(
-        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen1.jpg",
-        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen2.jpg",
-        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen3.jpg",
-        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen4.jpg",
-        "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen5.jpg",
-    )
+    val testData = PreviewInfo.testData
 
     Scaffold { innerPadding ->
         Box(
@@ -66,23 +57,21 @@ fun StartScreen(
                 .background(Color.DarkGray)
         ) {
             Column {
-
                 HorizontalPager(
-                    count = startImages.size,
+                    count = testData.size,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(512.dp)
                 ) { pageIndex ->
                     Box(modifier = Modifier.fillMaxSize()) {
                         AsyncImage(
-                            model = startImages[pageIndex],
+                            model = testData[pageIndex].imageUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .clickable { goToMapScreen() }
                         )
-
 
                         /*
                         Icon(
@@ -105,8 +94,22 @@ fun StartScreen(
                                 .align(Alignment.CenterEnd)
                                 .padding(12.dp)
                                 .size(36.dp)
-                                .alpha(if (pageIndex == startImages.size - 1) 0.1f else 0.45f)
+                                .alpha(if (pageIndex == testData.size - 1) 0.1f else 0.45f)
                         )
+
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(12.dp)
+                        ) {
+                            val text = "${testData[pageIndex].deposit}/${testData[pageIndex].monthly}"
+                            Text(
+                                text = text,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
                     }
 
                     Log.e("StartScreen", "pageIndex = $pageIndex")

@@ -14,7 +14,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.demo.desh.access.entity.Member
+import com.demo.desh.access.repository.MemberRepository
+import com.demo.desh.access.room.MemberRoomDatabase
 import com.demo.desh.model.User
+import com.demo.desh.ui.screens.LoginScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
 import com.demo.desh.ui.screens.RemainServiceListScreen
@@ -30,8 +34,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val user = intent.getSerializableExtra("user") as User
-        Log.d("MainActivity", "user = $user")
+        val room = MemberRoomDatabase.getInstance(this)
+        val memberDao = room.memberDao()
+        val memberRepository = MemberRepository(memberDao)
+
+        memberRepository.deleteAllMember()
 
         viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
 
@@ -39,7 +46,7 @@ class MainActivity : AppCompatActivity() {
             DeshprojectfeTheme {
                 Root(
                     viewModel = viewModel,
-                    user = user
+                    memberRepository = memberRepository
                 )
             }
         }
@@ -48,6 +55,7 @@ class MainActivity : AppCompatActivity() {
 
 sealed class MainNavigation(val route: String) {
     object Start : MainNavigation("start")
+    object Login : MainNavigation("login")
     object Profile : MainNavigation("profile")
     object Settings : MainNavigation("settings")
     object Map : MainNavigation("map")
@@ -58,17 +66,37 @@ sealed class MainNavigation(val route: String) {
 @Composable
 fun Root(
     viewModel: MainViewModel,
-    user: User
+    memberRepository: MemberRepository
 ) {
+    val members = memberRepository.findAllMember()
+    val isLoginRequired = members.isEmpty()
     val navController = rememberNavController()
+
+    val user = if (isLoginRequired) {
+        User(nickname = "Tempuser", email = "temp@gmail.com", profileImageUrl = "null")
+    } else {
+        val member = members.last()
+
+        User(
+            id = member.id.toLong(),
+            nickname = member.nickname!!,
+            email = member.email!!,
+            profileImageUrl = member.profileImageUrl!!
+        )
+    }
 
     NavHost(
         modifier = Modifier.padding(0.dp),
         navController = navController,
-        startDestination = MainNavigation.Start.route
+        startDestination = if (isLoginRequired) MainNavigation.Login.route else MainNavigation.Start.route
     ) {
         val realtyId = "realtyId"
         val serviceListIndex = "index"
+
+        composable(route = MainNavigation.Login.route) {
+            val goToStartScreen = { navController.navigate(MainNavigation.Start.route) }
+            LoginScreen(goToStartScreen)
+        }
 
         composable(route = MainNavigation.Start.route) {
             val goToMapScreen = { navController.navigate(MainNavigation.Map.route) }

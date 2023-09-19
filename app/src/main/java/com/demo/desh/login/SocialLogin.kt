@@ -16,9 +16,9 @@ import retrofit2.Response
 abstract class SocialLogin {
     private val userRetrofitRepository = UserRetrofitRepository()
 
-    abstract fun login(context: Context)
+    abstract fun login(context: Context, goToMapScreen: () -> Unit)
 
-    protected fun send(context: Context, user: User) {
+    protected fun send(context: Context, user: User, goToMapScreen: () -> Unit) {
         val result = userRetrofitRepository.login(user)
 
         result.enqueue(object : Callback<Long> {
@@ -32,7 +32,7 @@ abstract class SocialLogin {
                 val member = Member(user.nickname, user.email, user.profileImageUrl)
 
                 memberRepository.insertMember(member)
-                toNext(context, user)
+                goToMapScreen()
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
@@ -51,9 +51,5 @@ abstract class SocialLogin {
         memberRepository.insertMember(member)
     }
 
-    private fun toNext(context: Context, user: User) {
-        val intent = Intent(context, MainActivity::class.java)
-        intent.putExtra("user", user)
-        context.startActivity(intent)
-    }
+
 }

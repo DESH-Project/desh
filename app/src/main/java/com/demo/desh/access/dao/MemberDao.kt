@@ -12,4 +12,7 @@ interface MemberDao {
 
     @Query("select * from member")
     fun findAllMember() : List<Member>
+
+    @Query("delete from member")
+    fun deleteAllMember() : Unit
 }

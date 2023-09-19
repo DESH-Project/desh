@@ -29,7 +29,9 @@ import com.demo.desh.login.NaverLogin
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    goToMapScreen: () -> Unit
+) {
     val context = LocalContext.current
 
     Column(
@@ -41,7 +43,7 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 120.dp))
 
-        SocialLoginButtons(context = context)
+        SocialLoginButtons(context = context, goToMapScreen)
     }
 }
 
@@ -69,7 +71,7 @@ private fun LogoText() {
 }
 
 @Composable
-private fun SocialLoginButtons(context: Context) {
+private fun SocialLoginButtons(context: Context, goToMapScreen: () -> Unit) {
     val loginWithKakaoText = "Sign In With Kakao"
     val loginWithNaverText = "Sign In With Naver"
     val loginGuideText = "아래 계정으로 서비스 시작하기"
@@ -95,13 +97,13 @@ private fun SocialLoginButtons(context: Context) {
         SocialLoginIconButton(
             text = loginWithKakaoText,
             imageResource = R.drawable.kakao_login_large_narrow,
-            onClick = { coroutineScope.launch { KakaoLogin.login(context) } }
+            onClick = { coroutineScope.launch { KakaoLogin.login(context, goToMapScreen) } }
         )
 
         SocialLoginIconButton(
             text = loginWithNaverText,
             imageResource = R.drawable.naver_login,
-            onClick = { coroutineScope.launch { NaverLogin.login(context) } }
+            onClick = { coroutineScope.launch { NaverLogin.login(context, goToMapScreen) } }
         )
     }
 }
