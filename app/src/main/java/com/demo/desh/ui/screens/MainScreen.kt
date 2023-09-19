@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -113,24 +115,32 @@ val customFontFamily = FontFamily(
 @Composable
 fun Top() {
     Column(modifier = Modifier.padding(20.dp, 10.dp)) {
-        var checked by remember { mutableStateOf(true) }
+        var checked by remember { mutableStateOf(false) }
+        val context = LocalContext.current
 
         Row() {
             Text("오도르 카페", fontSize = 24.sp, style = Typography2.bodyLarge)
             Spacer(modifier = Modifier.padding(100.dp, 0.dp))
 
             IconToggleButton(
+
                 checked = checked,
                 onCheckedChange = { ischecked -> checked = ischecked },
                 modifier = Modifier.size(80.dp)
+
             ) {
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
                     tint = if (checked) Color.White else Color.Black
 
-                )
 
+                )
+                
+
+            }
+            if(checked){
+                Toast.makeText(context, "찜하기를 선택하셨습니다.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -254,9 +264,10 @@ fun aroundstore(pharse: String){
     Column() {
         Card(
             backgroundColor = Color.Gray,
-            modifier = Modifier.padding(horizontal = 19.dp)
-            .height(40.dp)
-            .width(380.dp), shape = RoundedCornerShape(5.dp)
+            modifier = Modifier
+                .padding(horizontal = 19.dp)
+                .height(40.dp)
+                .width(380.dp), shape = RoundedCornerShape(5.dp)
 
         ) {
         Text(text = pharse,style = Typography2.bodySmall,fontSize = 15.sp, textAlign = TextAlign.Center)
