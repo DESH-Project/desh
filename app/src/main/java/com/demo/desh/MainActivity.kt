@@ -3,10 +3,8 @@ package com.demo.desh
 import RealtyDetailScreen
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.demo.desh.access.entity.Member
 import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.room.MemberRoomDatabase
 import com.demo.desh.model.User
@@ -72,19 +69,6 @@ fun Root(
     val isLoginRequired = members.isEmpty()
     val navController = rememberNavController()
 
-    val user = if (isLoginRequired) {
-        User(nickname = "Tempuser", email = "temp@gmail.com", profileImageUrl = "null")
-    } else {
-        val member = members.last()
-
-        User(
-            id = member.id.toLong(),
-            nickname = member.nickname!!,
-            email = member.email!!,
-            profileImageUrl = member.profileImageUrl!!
-        )
-    }
-
     NavHost(
         modifier = Modifier.padding(0.dp),
         navController = navController,
@@ -100,6 +84,8 @@ fun Root(
 
         composable(route = MainNavigation.Start.route) {
             val goToMapScreen = { navController.navigate(MainNavigation.Map.route) }
+            val member = memberRepository.findAllMember().last()
+            val user = User.toUser(member)
             StartScreen(user, viewModel, goToMapScreen)
         }
 
@@ -110,10 +96,15 @@ fun Root(
         composable(route = MainNavigation.Map.route) {
             val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
             val goToRemainServiceListScreen = { index: Int -> navController.navigate(MainNavigation.RemainServiceList.route + "/$index") }
+            val member = memberRepository.findAllMember().last()
+            val user = User.toUser(member)
             MapScreen(user, viewModel, goToRealtyDetail, goToRemainServiceListScreen)
         }
 
         composable(route = "${MainNavigation.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
+            val member = memberRepository.findAllMember().last()
+            val user = User.toUser(member)
+
             backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
                 realtyId = it.toLong(),
                 user = user,

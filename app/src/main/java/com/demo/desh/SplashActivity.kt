@@ -24,7 +24,8 @@ class SplashActivity : AppCompatActivity() {
 
         Log.d(TAG, "keyHash : $keyHash")
 
-        /* 네아로 SDK 초기화 이슈 : https://github.com/naver/naveridlogin-sdk-android/issues/47
+        /*
+        // 네아로 SDK 초기화 이슈 : https://github.com/naver/naveridlogin-sdk-android/issues/47
         val naverClientId = getString(R.string.NAVER_OAUTH_CLIENT_ID)
         val naverClientSecret = getString(R.string.NAVER_OAUTH_CLIENT_SECRET)
         val naverClientName = getString(R.string.APP_NAME)

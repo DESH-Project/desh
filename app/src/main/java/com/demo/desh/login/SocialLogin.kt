@@ -25,13 +25,7 @@ abstract class SocialLogin {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
                 user.id = response.body()
 
-                val memberDb = MemberRoomDatabase.getInstance(context)
-                val memberDao = memberDb.memberDao()
-                val memberRepository = MemberRepository(memberDao)
-
-                val member = Member(user.nickname, user.email, user.profileImageUrl)
-
-                memberRepository.insertMember(member)
+                saveMemberIntoRoomDB(context, user)
                 goToMapScreen()
             }
 
@@ -50,6 +44,4 @@ abstract class SocialLogin {
 
         memberRepository.insertMember(member)
     }
-
-
 }

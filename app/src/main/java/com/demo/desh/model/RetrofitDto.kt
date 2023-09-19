@@ -1,5 +1,6 @@
 package com.demo.desh.model
 
+import com.demo.desh.access.entity.Member
 import java.io.Serializable
 
 data class ServerResponse<out T>(
@@ -18,10 +19,23 @@ data class Recommend(
 
 data class User(
     var id : Long? = null,
-    val nickname : String,
-    val email : String,
-    val profileImageUrl : String
-) : Serializable
+    var nickname : String,
+    var email : String,
+    var profileImageUrl : String
+) : Serializable {
+    companion object {
+        fun toUser(member: Member): User {
+            return User(
+                id = member.id.toLong(),
+                nickname = member.nickname!!,
+                email = member.email!!,
+                profileImageUrl = member.profileImageUrl!!
+            )
+        }
+    }
+}
+
+
 
 data class RealtyCreationReq(
     val name: String,
