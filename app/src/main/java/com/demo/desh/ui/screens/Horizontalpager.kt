@@ -78,8 +78,7 @@ fun PagerContent(pagerState: PagerState){
                 }
             }
         }
-        HorizontalPagerIndicator(pagerState = pagerState, modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.BottomCenter).padding(vertical = 480.dp)
-            ,Color.White)
+        HorizontalPagerIndicator(pagerState = pagerState, modifier = Modifier.padding(10.dp),Color.White)
     }
 }
 @OptIn(ExperimentalPagerApi::class)
