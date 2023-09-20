@@ -4,18 +4,24 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.demo.desh.R
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 
@@ -36,7 +42,9 @@ fun ViewTwo(){
         painter = painterResource(R.drawable.place1),
         contentDescription = null,
         contentScale = ContentScale.FillWidth,
-        modifier = Modifier.height(500.dp).width(500.dp)
+        modifier = Modifier
+            .height(500.dp)
+            .width(500.dp)
     )
 
 }
@@ -46,7 +54,9 @@ fun ViewThree(){
         painter = painterResource(R.drawable.place2),
         contentDescription = null,
         contentScale = ContentScale.FillWidth,
-        modifier = Modifier.height(500.dp).width(500.dp)
+        modifier = Modifier
+            .height(500.dp)
+            .width(500.dp)
     )
 
 }
@@ -54,7 +64,7 @@ fun ViewThree(){
 @Composable
 fun PagerContent(pagerState: PagerState){
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-        HorizontalPager(count = 3, state = pagerState) {
+        HorizontalPager(count = 3, state = pagerState, ) {
                 page ->
             when(page) {
                 0 -> {
@@ -68,6 +78,8 @@ fun PagerContent(pagerState: PagerState){
                 }
             }
         }
+        HorizontalPagerIndicator(pagerState = pagerState, modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.BottomCenter).padding(vertical = 480.dp)
+            ,Color.White)
     }
 }
 @OptIn(ExperimentalPagerApi::class)
