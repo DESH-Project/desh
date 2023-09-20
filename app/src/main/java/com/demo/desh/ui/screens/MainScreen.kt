@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demo.desh.R
 import com.demo.desh.model.User
+import com.demo.desh.ui.screens.ContentView1
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.viewModel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -224,60 +225,8 @@ fun profile(){
     }
 }
 
-@Composable
-fun ViewOne(){
-    Image(
-        painter = painterResource(R.drawable.place),
-        contentDescription = null,
-        contentScale = ContentScale.FillWidth,
-        modifier = Modifier.height(500.dp)
-    )
 
-}
 
-@Composable
-fun ViewTwo(){
-    Image(
-        painter = painterResource(R.drawable.place1),
-        contentDescription = null,
-        contentScale = ContentScale.FillWidth,
-        modifier = Modifier.height(500.dp).width(500.dp)
-    )
-
-}
-@Composable
-fun ViewThree(){
-    Image(
-        painter = painterResource(R.drawable.place2),
-        contentDescription = null,
-        contentScale = ContentScale.FillWidth,
-        modifier = Modifier.height(500.dp).width(500.dp)
-    )
-
-}
-@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
-@Composable
-fun PagerContent(pagerState: PagerState){
-    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-        HorizontalPager(count = 3, state = pagerState) {
-            page ->
-            when(page) {
-                0 -> {ViewOne()}
-                1 -> {ViewTwo()}
-                2 -> {ViewThree()}
-            }
-        }
-    }
-}
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun ContentView1(){
-    val pagerState = rememberPagerState()
-    Box(modifier = Modifier.fillMaxWidth()) {
-
-        PagerContent(pagerState = pagerState)
-    }
-}
 @Composable
 fun BuildingImage() {
     var isDropDownExpanded by remember { mutableStateOf(false) }
