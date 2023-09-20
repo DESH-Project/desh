@@ -1,10 +1,16 @@
 package com.demo.desh.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demo.desh.access.entity.Member
+import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.repository.UserRetrofitRepository
 import com.demo.desh.model.District
 import com.demo.desh.model.Realty
@@ -16,11 +22,54 @@ import java.util.UUID
 import kotlin.random.Random
 
 class MainViewModel(
-    private val userRetrofitRepository: UserRetrofitRepository
+    private val userRetrofitRepository: UserRetrofitRepository,
+    private val memberRepository: MemberRepository
 ) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
+    }
+
+    private val _searchMode = MutableLiveData<Boolean>(false)
+    val searchMode : LiveData<Boolean> get() = _searchMode
+
+    fun fetchSearchModeTrue() {
+        _searchMode.value = true
+    }
+
+    fun fetchSearchModeFalse() {
+        _searchMode.value = false
+    }
+
+    private val _searchText = MutableLiveData<String>("")
+    val searchText : LiveData<String> get() = _searchText
+
+    fun fetchSearchText(text: String) {
+        _searchText.value = text
+    }
+
+
+    private val _member = MutableLiveData<Member?>()
+    val member: LiveData<Member?> get() = _member
+
+    fun getLastMember() {
+        viewModelScope.launch {
+            val result = memberRepository.findAllMember()
+            if (result.isEmpty()) _member.value = null
+            else _member.value = result.last()
+        }
+    }
+
+    fun deleteAllMember() {
+        viewModelScope.launch {
+            memberRepository.deleteAllMember()
+        }
+    }
+
+    fun insertMember(member: Member) {
+        viewModelScope.launch {
+            memberRepository.insertMember(member)
+        }
     }
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()

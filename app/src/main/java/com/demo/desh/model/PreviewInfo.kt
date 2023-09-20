@@ -32,7 +32,7 @@ data class PreviewInfo(
             ),
 
             PreviewInfo(
-                imageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen5.jpg",
+                imageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen2.jpg",
                 deposit = 550000000,
                 monthly = 900
             ),

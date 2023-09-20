@@ -3,6 +3,7 @@ package com.demo.desh.login
 import android.content.Context
 import android.widget.Toast
 import com.demo.desh.model.User
+import com.demo.desh.viewModel.MainViewModel
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
@@ -12,6 +13,7 @@ import com.navercorp.nid.profile.data.NidProfileResponse
 object NaverLogin : SocialLogin() {
     override fun login(
         context: Context,
+        viewModel: MainViewModel,
         goToMapScreen: () -> Unit
     ) {
         fun getUserInfo() {
@@ -41,8 +43,7 @@ object NaverLogin : SocialLogin() {
                         profileImageUrl = profileImage!!
                     )
 
-                    saveMemberIntoRoomDB(context, user)
-                    send(context, user, goToMapScreen)
+                    send(user, viewModel, goToMapScreen)
                 }
             })
         }
@@ -59,12 +60,6 @@ object NaverLogin : SocialLogin() {
             }
 
             override fun onSuccess() {
-                val accessToken = NaverIdLoginSDK.getAccessToken()
-                val refreshToken = NaverIdLoginSDK.getRefreshToken()
-                val expiresAt = NaverIdLoginSDK.getExpiresAt().toString()
-                val tokenType = NaverIdLoginSDK.getTokenType()
-                val state = NaverIdLoginSDK.getState().toString()
-
                 getUserInfo()
             }
         }

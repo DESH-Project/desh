@@ -6,6 +6,9 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -14,7 +17,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.room.MemberRoomDatabase
-import com.demo.desh.model.User
 import com.demo.desh.ui.screens.LoginScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
@@ -35,15 +37,12 @@ class MainActivity : AppCompatActivity() {
         val memberDao = room.memberDao()
         val memberRepository = MemberRepository(memberDao)
 
-        memberRepository.deleteAllMember()
-
-        viewModel = ViewModelProvider(this, MainViewModelFactory())[MainViewModel::class.java]
+        viewModel = ViewModelProvider(this, MainViewModelFactory(memberRepository = memberRepository))[MainViewModel::class.java]
 
         setContent {
             DeshprojectfeTheme {
                 Root(
-                    viewModel = viewModel,
-                    memberRepository = memberRepository
+                    viewModel = viewModel
                 )
             }
         }
@@ -61,32 +60,31 @@ sealed class MainNavigation(val route: String) {
 }
 
 @Composable
-fun Root(
-    viewModel: MainViewModel,
-    memberRepository: MemberRepository
-) {
-    val members = memberRepository.findAllMember()
-    val isLoginRequired = members.isEmpty()
+fun Root(viewModel: MainViewModel) {
     val navController = rememberNavController()
+    val member by viewModel.member.observeAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.deleteAllMember()
+    }
 
     NavHost(
         modifier = Modifier.padding(0.dp),
         navController = navController,
-        startDestination = if (isLoginRequired) MainNavigation.Login.route else MainNavigation.Start.route
+        startDestination = if (member == null) MainNavigation.Login.route else MainNavigation.Start.route
     ) {
+
         val realtyId = "realtyId"
         val serviceListIndex = "index"
 
         composable(route = MainNavigation.Login.route) {
             val goToStartScreen = { navController.navigate(MainNavigation.Start.route) }
-            LoginScreen(goToStartScreen)
+            LoginScreen(viewModel, goToStartScreen)
         }
 
         composable(route = MainNavigation.Start.route) {
             val goToMapScreen = { navController.navigate(MainNavigation.Map.route) }
-            val member = memberRepository.findAllMember().last()
-            val user = User.toUser(member)
-            StartScreen(user, viewModel, goToMapScreen)
+            StartScreen(viewModel, goToMapScreen)
         }
 
         composable(route = MainNavigation.Profile.route) {
@@ -96,19 +94,14 @@ fun Root(
         composable(route = MainNavigation.Map.route) {
             val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
             val goToRemainServiceListScreen = { index: Int -> navController.navigate(MainNavigation.RemainServiceList.route + "/$index") }
-            val member = memberRepository.findAllMember().last()
-            val user = User.toUser(member)
-            MapScreen(user, viewModel, goToRealtyDetail, goToRemainServiceListScreen)
+
+            MapScreen(viewModel, goToRealtyDetail, goToRemainServiceListScreen)
         }
 
         composable(route = "${MainNavigation.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
-            val member = memberRepository.findAllMember().last()
-            val user = User.toUser(member)
-
             backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
-                realtyId = it.toLong(),
-                user = user,
-                viewModel = viewModel
+                viewModel = viewModel,
+                realtyId = it.toLong()
             ) }
         }
 

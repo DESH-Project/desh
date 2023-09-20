@@ -36,14 +36,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demo.desh.R
-import com.demo.desh.model.User
 import com.demo.desh.viewModel.MainViewModel
 
 @Composable
 fun RealtyDetailScreen(
-    realtyId: Long,
-    user: User,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    realtyId: Long
 ) {
     val scrollState = rememberScrollState();
 

@@ -1,11 +1,18 @@
 package com.demo.desh.ui.screens
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,17 +23,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -57,7 +70,6 @@ import de.charlex.compose.BottomDrawerScaffold
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
-    user: User,
     viewModel: MainViewModel,
     goToRealtyDetail: (Long) -> Unit,
     goToRemainServiceListScreen: (Int) -> Unit,
@@ -74,7 +86,16 @@ fun MapScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchMapView()
         viewModel.fetchServiceList()
+        viewModel.getLastMember()
     }
+
+    val member by viewModel.member.observeAsState()
+    val user = member?.let { User.toUser(it) }
+
+    val searchMode by viewModel.searchMode.observeAsState()
+    val searchText by viewModel.searchText.observeAsState()
+
+    BackHandler { viewModel.fetchSearchModeFalse() }
 
     // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
@@ -92,6 +113,7 @@ fun MapScreen(
                 onDistrictItemClick = onDistrictItemClick
             )
         },
+
         drawerGesturesEnabled = true,
         drawerBackgroundColor = Color(0xAA000000),  //Transparent drawer for custom Drawer shape
         drawerElevation = 0.dp,
@@ -99,9 +121,22 @@ fun MapScreen(
         content = {
             Scaffold { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
+                    SearchableTopBar(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .background(Color.Transparent),
+
+                        searchMode = searchMode ?: false,
+                        searchText = searchText ?: "",
+                        onSearchTextChanged = { viewModel.fetchSearchText(it) },
+                        onSearchButtonClicked = { viewModel.fetchSearchModeTrue() }
+                    )
+
                     AndroidView(
                         factory = { context -> MapViewManager.createMapView(context, recommendInfo) },
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxSize(),
                     )
                 }
             }
@@ -111,7 +146,7 @@ fun MapScreen(
 
 @Composable
 private fun DrawerContent(
-    user: User,
+    user: User?,
     serviceList: ServerResponse<String>?,
     districtInfo: ServerResponse<District>?,
     recommendInfo: ServerResponse<Recommend>?,
@@ -156,7 +191,7 @@ private fun DrawerContent(
         ) {
             Row(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = user.nickname,
+                    text = user?.nickname ?: "null",
                     color = Color(0xFFFF6A68),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
@@ -181,7 +216,7 @@ private fun DrawerContent(
         ) {
             Row(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = user.nickname,
+                    text = user?.nickname ?: "null",
                     color = Color(0xFFFF6A68),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
@@ -323,6 +358,97 @@ private fun CreateListButton(
     }
 }
 
+@Composable
+fun SearchableTopBar(
+    modifier: Modifier = Modifier,
+    searchMode: Boolean,
+    searchText: String,
+    onSearchTextChanged: (String) -> Unit,
+    onSearchButtonClicked: () -> Unit
+){
+    TopAppBar(
+        modifier = modifier,
+        contentPadding = PaddingValues(8.dp),
+        backgroundColor = Color.White
+    ) {
+        AnimatedVisibility(
+            modifier = Modifier
+                .weight(1f)
+                .padding(4.dp),
+            visible = searchMode,
+            enter = scaleIn() + expandHorizontally(),
+            exit = scaleOut() + shrinkHorizontally()
+        ) {
+            BasicTextField(
+                modifier = Modifier
+                    .background(
+                        Color(0xDDDDDDDD),
+                        RoundedCornerShape(10.dp)
+                    )
+                    .padding(4.dp)
+                    .height(36.dp),
+                value = searchText,
+                onValueChange = onSearchTextChanged,
+                singleLine = true,
+                cursorBrush = SolidColor(MaterialTheme.colors.primary),
+                textStyle = LocalTextStyle.current.copy(
+                    color = MaterialTheme.colors.onSurface,
+                    fontSize = MaterialTheme.typography.body2.fontSize
+                ),
+                decorationBox = { innerTextField ->
+                    Row(
+                        modifier,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(Modifier.weight(1f)) {
+                            if (searchText.isEmpty()) Text(
+                                text = "검색어를 입력하세요.",
+                                style = LocalTextStyle.current.copy(
+                                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
+                                    fontSize = MaterialTheme.typography.body2.fontSize
+                                )
+                            )
+                            innerTextField()
+                        }
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search Icon",
+                                tint = LocalContentColor.current.copy(alpha = 0.5f)
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    if(!searchMode) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            TextButton(
+                onClick = onSearchButtonClicked
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "",
+                    tint = Color.Black
+                )
+
+                Text(
+                    text = "검색하기",
+                    color = Color.Black,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
 
 @Composable
 private fun InfoTextBar(
