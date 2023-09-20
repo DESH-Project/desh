@@ -1,19 +1,23 @@
 package com.demo.desh.ui.screens
-
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -62,31 +66,52 @@ fun ViewThree(){
 }
 @OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun PagerContent(pagerState: PagerState){
+fun PagerContent(pagerState: PagerState) {
+
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-        HorizontalPager(count = 3, state = pagerState, ) {
-                page ->
-            when(page) {
-                0 -> {
-                    ViewOne()
+
+
+            HorizontalPager(count = 3, state = pagerState) { page ->
+                when (page) {
+                    0 -> {
+                        ViewOne()
+                    }
+
+                    1 -> {
+                        ViewTwo()
+                    }
+
+                    2 -> {
+                        ViewThree()
+                    }
+
                 }
-                1 -> {
-                    ViewTwo()
-                }
-                2 -> {
-                    ViewThree()
-                }
+
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentSize(align = Alignment.BottomCenter),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                HorizontalPagerIndicator(
+                    pagerState = pagerState
+                    , modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.BottomCenter).padding(top = 485.dp), activeColor = Color.Gray, inactiveColor = Color.White
+
+                )
             }
         }
-        HorizontalPagerIndicator(pagerState = pagerState, modifier = Modifier.padding(10.dp),Color.White)
     }
-}
+
+
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ContentView1(){
     val pagerState = rememberPagerState()
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box() {
 
         PagerContent(pagerState = pagerState)
+
+
     }
 }
