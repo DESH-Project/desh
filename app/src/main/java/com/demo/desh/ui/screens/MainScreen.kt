@@ -1,15 +1,12 @@
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-
 import androidx.compose.foundation.layout.Column
-
 import androidx.compose.foundation.layout.Row
-
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +29,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ExitToApp
@@ -227,22 +225,28 @@ fun BuildingImage() {
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.height(500.dp)
         )
-        Box(contentAlignment = Alignment.BottomEnd) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.TopEnd)
+
+        ) {
             IconButton(
-
                 onClick = { isDropDownExpanded = true },
-                modifier = Modifier.align(Alignment.Center)
-
+//                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp).border(width = 7.dp, color =Color(0x20C7C1C1), shape = CircleShape)
             ) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = null,
-                    tint = Color.White, modifier = Modifier.size(30.dp)
-                )
+                    tint = Color.White,
+                    modifier = Modifier.size(35.dp).background(color = Color(0x20C7C1C1), shape = CircleShape))
             }
             DropdownMenu(
                 expanded = isDropDownExpanded,
-                onDismissRequest = { isDropDownExpanded = false }, modifier = Modifier.background(color = Color.Black)) {
+                onDismissRequest = { isDropDownExpanded = false },
+                modifier = Modifier
+                    .background(color = Color.Black)
+                    ) {
                 DropdownMenuItem(onClick = { isDropDownExpanded = false }) {
                     Text(text = "공유하기", color = Color.White)
 
@@ -251,9 +255,7 @@ fun BuildingImage() {
                     Text(text = "신고하기", color = Color.Red)
 
                 }
-
             }
-
         }
     }
 }
