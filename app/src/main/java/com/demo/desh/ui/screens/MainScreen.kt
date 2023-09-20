@@ -1,5 +1,8 @@
 import android.widget.Toast
+import androidx.annotation.ContentView
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -7,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,6 +42,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +65,10 @@ import com.demo.desh.R
 import com.demo.desh.model.User
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.viewModel.MainViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
@@ -216,15 +225,64 @@ fun profile(){
 }
 
 @Composable
+fun ViewOne(){
+    Image(
+        painter = painterResource(R.drawable.place),
+        contentDescription = null,
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier.height(500.dp)
+    )
+
+}
+
+@Composable
+fun ViewTwo(){
+    Image(
+        painter = painterResource(R.drawable.place1),
+        contentDescription = null,
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier.height(500.dp).width(500.dp)
+    )
+
+}
+@Composable
+fun ViewThree(){
+    Image(
+        painter = painterResource(R.drawable.place2),
+        contentDescription = null,
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier.height(500.dp).width(500.dp)
+    )
+
+}
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun PagerContent(pagerState: PagerState){
+    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+        HorizontalPager(count = 3, state = pagerState) {
+            page ->
+            when(page) {
+                0 -> {ViewOne()}
+                1 -> {ViewTwo()}
+                2 -> {ViewThree()}
+            }
+        }
+    }
+}
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun ContentView1(){
+    val pagerState = rememberPagerState()
+    Box(modifier = Modifier.fillMaxWidth()) {
+
+        PagerContent(pagerState = pagerState)
+    }
+}
+@Composable
 fun BuildingImage() {
     var isDropDownExpanded by remember { mutableStateOf(false) }
-    Surface() {
-        Image(
-            painter = painterResource(R.drawable.place),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.height(500.dp)
-        )
+    Surface {
+        ContentView1()
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -239,7 +297,9 @@ fun BuildingImage() {
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(35.dp).background(color = Color(0x20C7C1C1), shape = CircleShape))
+                    modifier = Modifier
+                        .size(35.dp)
+                        .background(color = Color(0x20C7C1C1), shape = CircleShape))
             }
             DropdownMenu(
                 expanded = isDropDownExpanded,
