@@ -8,33 +8,21 @@ data class PreviewInfo(
     companion object {
         val testData = listOf<PreviewInfo>(
             PreviewInfo(
-                imageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen1.jpg",
+                imageUrl = "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/copernico-p_kICQCOM4s-unsplash.jpg",
                 deposit = 150000000,
                 monthly = 500
             ),
 
             PreviewInfo(
-                imageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen2.jpg",
+                imageUrl = "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/damir-kopezhanov-luseu9GtYzM-unsplash.jpg",
                 deposit = 250000000,
                 monthly = 600
             ),
 
             PreviewInfo(
-                imageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen3.jpg",
+                imageUrl = "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/jose-losada-DyFjxmHt3Es-unsplash.jpg",
                 deposit = 350000000,
                 monthly = 700
-            ),
-
-            PreviewInfo(
-                imageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen4.jpg",
-                deposit = 450000000,
-                monthly = 800
-            ),
-
-            PreviewInfo(
-                imageUrl = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/start_screen2.jpg",
-                deposit = 550000000,
-                monthly = 900
             ),
         )
     }

@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.demo.desh.R
 import com.demo.desh.login.KakaoLogin
-import com.demo.desh.login.NaverLogin
 import com.demo.desh.model.LoginPreviewInfo
 import com.demo.desh.viewModel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -54,7 +53,6 @@ fun LoginScreen(
     val testData = LoginPreviewInfo.testData
 
     Scaffold { innerPadding ->
-
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -91,7 +89,7 @@ fun LoginScreen(
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(24.dp)
+                        .padding(32.dp)
                 ) {
                     Text(
                         text = testData[pageIndex].introduceText,
@@ -122,9 +120,6 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter)
                 ) {
-
-                    Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 120.dp))
-
                     SocialLoginButtons(context, viewModel, goToMapScreen)
                 }
             }
@@ -144,10 +139,12 @@ private fun SocialLoginButtons(context: Context, viewModel: MainViewModel, goToM
 
         Spacer(modifier = Modifier.padding(4.dp))
 
+        /*
         SocialLoginIconButton(
             imageResource = R.drawable.naver_login,
             onClick = { coroutineScope.launch { NaverLogin.login(context, viewModel, goToMapScreen) } }
         )
+        */
     }
 }
 
@@ -160,8 +157,8 @@ private fun SocialLoginIconButton(
     IconButton(
         onClick = onClick,
         modifier = Modifier
-            .width(214.dp)
-            .height(42.dp)
+            .width(300.dp)
+            .height(60.dp)
     ) {
         Image(
             painter = painterResource(id = imageResource),

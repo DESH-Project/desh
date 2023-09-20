@@ -187,28 +187,19 @@ class MainViewModel(
         val size = random.nextInt(20, 30)
         val list = mutableListOf<District>()
 
-        val district = District(
-            id = -1,
-            address = UUID.randomUUID().toString(),
-            image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%E1%84%80%E1%85%A9%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8B%E1%85%B5.png",
-            price = 123456.0
+        val randomPhotoUrl = listOf(
+            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/copernico-p_kICQCOM4s-unsplash.jpg",
+            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/damir-kopezhanov-luseu9GtYzM-unsplash.jpg",
+            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/jose-losada-DyFjxmHt3Es-unsplash.jpg"
         )
 
-        val district2 = District(
-            id = -1,
-            address = UUID.randomUUID().toString(),
-            image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/191675017-%EC%96%BC%EC%96%B4%EB%B6%99%EC%9D%80-%ED%8C%8C%EB%8F%84-%EB%B2%BD%EC%A7%80-3d-%EA%B7%B8%EB%A6%BC.jpg",
-            price = 123456.0
-        )
-
-        list.add(district)
-        list.add(district2)
 
         for (i in 0 until size) {
+            val pick = random.nextInt(0, randomPhotoUrl.size)
             val district = District(
                 id = (i + 1).toLong(),
                 address = UUID.randomUUID().toString(),
-                image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
+                image = randomPhotoUrl[pick],
                 price = random.nextDouble(1.0, 1000.0)
             )
 

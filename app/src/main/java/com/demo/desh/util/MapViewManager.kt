@@ -3,6 +3,7 @@ package com.demo.desh.util
 import android.content.Context
 import android.util.Log
 import com.demo.desh.R
+import com.demo.desh.model.District
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.kakao.vectormap.KakaoMap
@@ -17,14 +18,14 @@ import com.kakao.vectormap.label.LabelStyles
 import java.lang.Exception
 
 object MapViewManager {
-    fun createMapView(context: Context, recommendInfo: ServerResponse<Recommend>?) : MapView {
-        val mv = MapView(context)
+    fun labelingOnMapView(mapView: MapView, recommendInfo: ServerResponse<Recommend>?) {
+        mapView.removeAllViews()
 
-        mv.start(
+        mapView.start(
             object : MapLifeCycleCallback() {
                 // 지도 API가 정상적으로 종료될 때 호출
                 override fun onMapDestroy() {
-                    TODO("Not yet implemented")
+                    mapView.pause()
                 }
 
                 // 인증 실패 및 지도 사용 중 에러 발생시 호출
@@ -38,7 +39,8 @@ object MapViewManager {
                 override fun onMapReady(kakaoMap: KakaoMap) {
                     val labelManager = kakaoMap.labelManager
                     val layer = labelManager?.layer
-                    val styles = labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.chamomile)))
+                    val styles =
+                        labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.chamomile)))
 
                     Log.e("KakaoMapReadyCallback onMapReady", "recommendInfo : $recommendInfo")
 
@@ -50,6 +52,31 @@ object MapViewManager {
 
                         layer?.addLabel(options)
                     }
+                }
+            }
+        )
+    }
+
+    fun createMapView(context: Context, recommendInfo: ServerResponse<Recommend>?) : MapView {
+        val mv = MapView(context)
+
+        mv.start(
+            object : MapLifeCycleCallback() {
+                // 지도 API가 정상적으로 종료될 때 호출
+                override fun onMapDestroy() {
+                    mv.pause()
+                }
+
+                // 인증 실패 및 지도 사용 중 에러 발생시 호출
+                override fun onMapError(error: Exception?) {
+                    TODO("Not yet implemented")
+                }
+            },
+
+            object : KakaoMapReadyCallback() {
+                // 인증 후 API가 정상적으로 실행될 때 호출
+                override fun onMapReady(kakaoMap: KakaoMap) {
+
                 }
 
                 // 지도 시작 시 확대/축소 줌 레벨 설정
@@ -86,40 +113,4 @@ object MapViewManager {
 
         return mv
     }
-
-    fun reCreateMapView(mapView: MapView, recommendInfo: ServerResponse<Recommend>?) {
-    }
-
-    /*
-    private fun makeMapView(markers: List<MapPOIItem>) : (context: Context) -> MapView {
-        return { context: Context ->
-            val mv = MapView(context)
-            markers.forEach { mv.addPOIItem(it) }
-            mv
-        }
-    }
-
-    private fun getMapItems(recommendInfo: ServerResponse<Recommend>?) : List<MapPOIItem> {
-        val markers = mutableListOf<MapPOIItem>()
-
-        if (recommendInfo?.data?.isNotEmpty() == true) {
-            val list = recommendInfo.data
-
-            list.forEach {
-                val marker = MapPOIItem()
-                marker.mapPoint = MapPoint.mapPointWithGeoCoord(it.lat, it.lng)
-                marker.markerType = MapPOIItem.MarkerType.RedPin
-                marker.selectedMarkerType = MapPOIItem.MarkerType.BluePin
-                marker.itemName = it.district
-
-                markers.add(marker)
-            }
-        }
-
-        return markers
-    }
-    private fun Long.formatDecimalSeparator(): String {
-        return toString()
-    }
-     */
 }

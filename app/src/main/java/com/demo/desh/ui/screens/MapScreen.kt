@@ -29,11 +29,9 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
@@ -64,6 +62,7 @@ import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.kakao.vectormap.MapView
 import de.charlex.compose.BottomDrawerScaffold
 
 
@@ -84,7 +83,6 @@ fun MapScreen(
     val onListMoreButtonClick = { index: Int -> goToRemainServiceListScreen(index)  }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchMapView()
         viewModel.fetchServiceList()
         viewModel.getLastMember()
     }
@@ -117,27 +115,37 @@ fun MapScreen(
         drawerGesturesEnabled = true,
         drawerBackgroundColor = Color(0xAA000000),  //Transparent drawer for custom Drawer shape
         drawerElevation = 0.dp,
+        drawerPeekHeight = 96.dp,
 
         content = {
             Scaffold { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
-                    SearchableTopBar(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .background(Color.Transparent),
+                    Column {
+                        SearchableTopBar(
+                            modifier = Modifier
+                                .padding(16.dp, 36.dp, 16.dp, 0.dp)
+                                .background(Color.Transparent),
 
-                        searchMode = searchMode ?: false,
-                        searchText = searchText ?: "",
-                        onSearchTextChanged = { viewModel.fetchSearchText(it) },
-                        onSearchButtonClicked = { viewModel.fetchSearchModeTrue() }
-                    )
+                            searchMode = searchMode ?: false,
+                            searchText = searchText ?: "",
+                            onSearchTextChanged = { viewModel.fetchSearchText(it) },
+                            onSearchButtonClicked = { viewModel.fetchSearchModeTrue() }
+                        )
 
-                    AndroidView(
-                        factory = { context -> MapViewManager.createMapView(context, recommendInfo) },
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxSize(),
-                    )
+                        AndroidView(
+                            factory = { context ->
+                                MapViewManager.createMapView(
+                                    context,
+                                    recommendInfo
+                                )
+                            },
+
+                            modifier = Modifier
+                                .fillMaxSize(),
+
+                            update = { mv: MapView -> MapViewManager.labelingOnMapView(mv, recommendInfo) }
+                        )
+                    }
                 }
             }
         }
@@ -161,15 +169,6 @@ private fun DrawerContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Row(
-            modifier = Modifier.background(Color.Transparent),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Switch(checked = false, onCheckedChange = { })
-        }
-
-        Spacer(modifier = Modifier.padding(0.dp, 24.dp, 0.dp, 0.dp))
-
         Spacer(modifier = Modifier.padding(0.dp, 8.dp, 0.dp, 0.dp))
 
         Divider(modifier = Modifier
@@ -326,14 +325,11 @@ private fun CreateListButton(
     onListButtonClick: (String) -> Unit,
     onListMoreButtonClick: (Int) -> Unit
 ) {
-    val index = 3
-    val previewServiceList = serviceList?.data?.slice(0 until index)?.toMutableList()
-
     LazyRow(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        itemsIndexed(previewServiceList ?: listOf()) { _, item ->
+        itemsIndexed(serviceList?.data ?: listOf()) { _, item ->
             val size = if (item[0] in 'a'..'z') 12 else 24
 
             Card(
@@ -349,11 +345,11 @@ private fun CreateListButton(
                     onClick = {
                         Log.e("MapScreen.CreateListButton", "Click item = $item")
                         onListButtonClick(item)
-                    }) {
+                    }
+                ) {
                     Text(text = item, color = Color.White)
                 }
             }
-
         }
     }
 }
@@ -414,7 +410,7 @@ fun SearchableTopBar(
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search Icon",
-                                tint = LocalContentColor.current.copy(alpha = 0.5f)
+                                /* tint = LocalContentColor.current.copy(alpha = 0.5f) */
                             )
                         }
                     }
@@ -428,7 +424,7 @@ fun SearchableTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopStart
         ) {
             TextButton(
                 onClick = onSearchButtonClicked
@@ -437,13 +433,6 @@ fun SearchableTopBar(
                     imageVector = Icons.Filled.Search,
                     contentDescription = "",
                     tint = Color.Black
-                )
-
-                Text(
-                    text = "검색하기",
-                    color = Color.Black,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold
                 )
             }
         }
