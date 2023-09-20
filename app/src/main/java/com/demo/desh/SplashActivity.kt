@@ -32,6 +32,8 @@ class SplashActivity : AppCompatActivity() {
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret, naverClientName)
         */
 
+        Thread.sleep(1500)
+
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
     }

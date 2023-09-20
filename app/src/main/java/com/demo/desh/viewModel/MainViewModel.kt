@@ -90,17 +90,6 @@ class MainViewModel(
         }
     }
 
-    private val _showBottomDrawer = MutableLiveData<Boolean>()
-    val showBottomDrawer : LiveData<Boolean> get() = _showBottomDrawer
-
-    fun showBottomDrawer() {
-        _showBottomDrawer.value = true
-    }
-
-    fun noShowBottomDrawer() {
-        _showBottomDrawer.value = false
-    }
-
     private val _serviceList = MutableLiveData<ServerResponse<String>>()
     val serviceList: LiveData<ServerResponse<String>> get() = _serviceList
 

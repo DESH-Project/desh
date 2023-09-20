@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
@@ -52,7 +52,18 @@ fun LoginScreen(
     val context = LocalContext.current
     val testData = LoginPreviewInfo.testData
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        floatingActionButton = {
+            SocialLoginButton(
+                context = context,
+                viewModel = viewModel,
+                goToMapScreen = goToMapScreen
+            )
+        },
+
+        floatingActionButtonPosition = FabPosition.Center
+
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -112,56 +123,26 @@ fun LoginScreen(
                         color = Color.White
                     )
                 }
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                ) {
-                    SocialLoginButtons(context, viewModel, goToMapScreen)
-                }
             }
         }
     }
 }
 
 @Composable
-private fun SocialLoginButtons(context: Context, viewModel: MainViewModel, goToMapScreen: () -> Unit) {
-    val coroutineScope = rememberCoroutineScope()
-
-    Column(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 32.dp)) {
-        SocialLoginIconButton(
-            imageResource = R.drawable.kakao_login_large_wide,
-            onClick = { coroutineScope.launch { KakaoLogin.login(context, viewModel, goToMapScreen) } },
-        )
-
-        Spacer(modifier = Modifier.padding(4.dp))
-
-        /*
-        SocialLoginIconButton(
-            imageResource = R.drawable.naver_login,
-            onClick = { coroutineScope.launch { NaverLogin.login(context, viewModel, goToMapScreen) } }
-        )
-        */
-    }
-}
-
-@Composable
-private fun SocialLoginIconButton(
-    imageResource: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+private fun SocialLoginButton(
+    context: Context,
+    viewModel: MainViewModel,
+    goToMapScreen: () -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val onKakaoLoginButtonClick = { coroutineScope.launch { KakaoLogin.login(context, viewModel, goToMapScreen) } }
+
     IconButton(
-        onClick = onClick,
-        modifier = Modifier
-            .width(300.dp)
-            .height(60.dp)
+        onClick = { onKakaoLoginButtonClick() },
+        modifier = Modifier.width(256.dp).height(90.dp)
     ) {
         Image(
-            painter = painterResource(id = imageResource),
+            painter = painterResource(id = R.drawable.kakao_login_large_wide),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.clip(RoundedCornerShape(8.dp))

@@ -133,16 +133,8 @@ fun MapScreen(
                         )
 
                         AndroidView(
-                            factory = { context ->
-                                MapViewManager.createMapView(
-                                    context,
-                                    recommendInfo
-                                )
-                            },
-
-                            modifier = Modifier
-                                .fillMaxSize(),
-
+                            factory = { context -> MapViewManager.createMapView(context) },
+                            modifier = Modifier.fillMaxSize(),
                             update = { mv: MapView -> MapViewManager.labelingOnMapView(mv, recommendInfo) }
                         )
                     }

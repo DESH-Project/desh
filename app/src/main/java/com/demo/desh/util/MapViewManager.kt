@@ -57,7 +57,7 @@ object MapViewManager {
         )
     }
 
-    fun createMapView(context: Context, recommendInfo: ServerResponse<Recommend>?) : MapView {
+    fun createMapView(context: Context) : MapView {
         val mv = MapView(context)
 
         mv.start(

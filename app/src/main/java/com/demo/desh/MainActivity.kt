@@ -62,23 +62,26 @@ sealed class MainNavigation(val route: String) {
 @Composable
 fun Root(viewModel: MainViewModel) {
     val navController = rememberNavController()
-    val member by viewModel.member.observeAsState()
 
     LaunchedEffect(Unit) {
         viewModel.deleteAllMember()
     }
 
     NavHost(
-        modifier = Modifier.padding(0.dp),
         navController = navController,
-        startDestination = if (member == null) MainNavigation.Login.route else MainNavigation.Start.route
+        startDestination = MainNavigation.Login.route
     ) {
 
         val realtyId = "realtyId"
         val serviceListIndex = "index"
 
         composable(route = MainNavigation.Login.route) {
-            val goToStartScreen = { navController.navigate(MainNavigation.Start.route) }
+            val goToStartScreen = { navController.navigate(MainNavigation.Start.route) {
+                popUpTo(navController.graph.id) {
+                    inclusive = false
+                }
+            } }
+
             LoginScreen(viewModel, goToStartScreen)
         }
 
