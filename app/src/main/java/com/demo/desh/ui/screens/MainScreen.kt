@@ -104,12 +104,12 @@ fun RealtyDetailScreen(
             )
             aroundbuilding()
             Spacer(modifier = Modifier.padding(0.dp, 10.dp))
-            Divider(
-                color = Color.White,
-                thickness = 1.dp,
-                modifier = Modifier.padding(end = 20.dp, start = 20.dp)
-            )
-            Spacer(modifier = Modifier.padding(0.dp, 3.dp))
+//            Divider(
+//                color = Color.White,
+//                thickness = 1.dp,
+//                modifier = Modifier.padding(end = 20.dp, start = 20.dp)
+//            )
+//            Spacer(modifier = Modifier.padding(0.dp, 3.dp))
             Text("주변상가", style = Typography2.bodyMedium, fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
             aroundstore("올리브영")
             aroundstore("편의점")
@@ -154,11 +154,7 @@ fun Top() {
                     contentDescription = null,
                     tint = if (checked) Color.White else Color.Black,
                     modifier = Modifier.size(28.dp)
-
-
                 )
-                
-
             }
             if(checked){
                 Toast.makeText(context, "찜하기를 선택하셨습니다.", Toast.LENGTH_SHORT).show()
