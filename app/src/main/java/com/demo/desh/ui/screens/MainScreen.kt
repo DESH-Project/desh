@@ -145,13 +145,15 @@ fun Top() {
 
                 checked = checked,
                 onCheckedChange = { ischecked -> checked = ischecked },
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.padding(vertical = 9.dp)
+
 
             ) {
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
-                    tint = if (checked) Color.White else Color.Black
+                    tint = if (checked) Color.White else Color.Black,
+                    modifier = Modifier.size(28.dp)
 
 
                 )

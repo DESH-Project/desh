@@ -96,7 +96,7 @@ fun PagerContent(pagerState: PagerState) {
             ) {
                 HorizontalPagerIndicator(
                     pagerState = pagerState
-                    , modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.BottomCenter).padding(top = 485.dp), activeColor = Color.Gray, inactiveColor = Color.White
+                    , modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.BottomCenter).padding(top = 485.dp), activeColor = Color.White, inactiveColor = Color.Gray
 
                 )
             }
