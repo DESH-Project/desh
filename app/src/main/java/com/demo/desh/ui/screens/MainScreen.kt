@@ -270,62 +270,75 @@ fun BuildingImage() {
     @Composable
     fun buildingdetail() {
         Column(modifier = Modifier.padding(15.dp, 10.dp)) {
-            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+            Row(modifier = Modifier.padding(horizontal = 3.dp)) {
                 Icon(
                     imageVector = Icons.Default.Place,
                     contentDescription = null,
                     tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier
+                        .size(50.dp)
+                        .padding(vertical = 12.dp)
                 )
-                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
                 Text(
                     "경기 남양주시 진접음 경복대로",
+                    modifier = Modifier.padding(vertical = 1.dp),
                     style = Typography2.bodySmall,
                     fontSize = 14.sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+
                 )
             }
 
-            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
-                Icon(
-                    imageVector = Icons.Default.AddCircle,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
-                )
-                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Row(modifier = Modifier.padding(horizontal = 6.dp)) {
+                    Icon(painter = painterResource(id = R.drawable.money), contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier
+                            .size(46.dp)
+                            .padding(vertical = 12.dp)
+                    )
+                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
                 Text(
                     "3000/200",
+                    modifier = Modifier.padding(1.dp),
                     style = Typography2.bodySmall,
                     fontSize = 14.sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+
                 )
             }
-            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+            Row(modifier = Modifier.padding(horizontal = 7.dp)) {
                 Icon(
-                    imageVector = Icons.Default.ExitToApp,
+                    painterResource(id =R.drawable.widthh ),
                     contentDescription = null,
                     tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier
+                        .size(44.dp)
+                        .padding(vertical = 12.dp)
                 )
-                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
                 Text(
                     "78.15m",
+                    modifier = Modifier.padding(vertical = 1.dp),
                     style = Typography2.bodySmall,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
             }
-            Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+            Row(modifier = Modifier.padding(horizontal = 3.dp)) {
                 Icon(
-                    imageVector = Icons.Default.LocationOn,
+                    imageVector = Icons.Default.Place,
                     contentDescription = null,
                     tint = Color.Gray,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier
+                        .size(50.dp)
+                        .padding(vertical = 12.dp)
                 )
-                Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+
+                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                 Text(
                     "12.7",
+                    modifier = Modifier.padding(1.dp),
                     style = Typography2.bodySmall,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
