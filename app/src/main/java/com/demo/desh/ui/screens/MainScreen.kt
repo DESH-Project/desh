@@ -62,6 +62,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.demo.desh.R
 import com.demo.desh.model.User
 import com.demo.desh.ui.screens.ContentView1
@@ -80,7 +82,7 @@ fun RealtyDetailScreen(
     viewModel: MainViewModel
 ) {
     Surface(color = Color(0xFF343434), contentColor = Color.White) {
-        
+        val navController = rememberNavController()
         val scrollState = rememberScrollState();
 
         Column(Modifier.verticalScroll(scrollState)) {
@@ -89,7 +91,7 @@ fun RealtyDetailScreen(
             BuildingImage()
             Top()
             Spacer(modifier = Modifier.padding(vertical = 5.dp))
-            profile()
+            profile1(navController)
             Spacer(modifier = Modifier.padding(0.dp, 0.dp))
             Divider(
                 color = Color.White,
@@ -197,9 +199,9 @@ fun Top() {
 
 
 @Composable
-fun profile() {
+fun profile1(navController: NavController) {
     Row() {
-        IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(start = 20.dp,)) {
+        IconButton(onClick = { }, modifier = Modifier.padding(start = 20.dp,)) {
 
             Image(
                 painter = painterResource(id = R.drawable.profile),
