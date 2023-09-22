@@ -2,127 +2,162 @@ package com.demo.desh.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.FabPosition
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.demo.desh.R
 import com.demo.desh.login.KakaoLogin
-import com.demo.desh.login.NaverLogin
+import com.demo.desh.model.LoginPreviewInfo
+import com.demo.desh.viewModel.MainViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun LoginScreen() {
-    val context = LocalContext.current
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        LogoText()
-
-        Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 120.dp))
-
-        SocialLoginButtons(context = context)
-    }
-}
-
-@Composable
-private fun LogoText() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "DESH",
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 80.sp,
-            fontStyle = FontStyle.Italic,
-            color = Color.LightGray
-        )
-
-        Text(
-            text = "소상공인을 위한 상권 추천 서비스",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            fontStyle = FontStyle.Normal,
-            color = Color.DarkGray
-        )
-    }
-}
-
-@Composable
-private fun SocialLoginButtons(context: Context) {
-    val loginWithKakaoText = "Sign In With Kakao"
-    val loginWithNaverText = "Sign In With Naver"
-    val loginGuideText = "아래 계정으로 서비스 시작하기"
-
-    val coroutineScope = rememberCoroutineScope()
-
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(256.dp)
-    ) {
-        Text(
-            text = loginGuideText,
-            color = Color.Black.copy(alpha = 0.5f),
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
-        )
-
-        Spacer(modifier = Modifier.padding(4.dp))
-
-        SocialLoginIconButton(
-            text = loginWithKakaoText,
-            imageResource = R.drawable.kakao_login_large_narrow,
-            onClick = { coroutineScope.launch { KakaoLogin.login(context) } }
-        )
-
-        SocialLoginIconButton(
-            text = loginWithNaverText,
-            imageResource = R.drawable.naver_login,
-            onClick = { coroutineScope.launch { NaverLogin.login(context) } }
-        )
-    }
-}
-
-@Composable
-private fun SocialLoginIconButton(
-    text: String,
-    imageResource: Int,
-    onClick: () -> Unit
+fun LoginScreen(
+    viewModel: MainViewModel,
+    goToMapScreen: () -> Unit
 ) {
+    val context = LocalContext.current
+    val textData = LoginPreviewInfo.textData
+
+    val previewImages by viewModel.previewImages.observeAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadPreviewImages()
+    }
+
+    Scaffold(
+        floatingActionButton = {
+            SocialLoginButton(
+                context = context,
+                viewModel = viewModel,
+                goToMapScreen = goToMapScreen
+            )
+        },
+
+        floatingActionButtonPosition = FabPosition.Center
+
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(Color.DarkGray)
+        ) {
+
+            HorizontalPager(
+                count = previewImages?.size ?: 1,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) { pageIndex ->
+
+                val size = previewImages?.size ?: 1
+                val model = previewImages?.get(pageIndex) ?: ""
+
+                AsyncImage(
+                    model = model,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxHeight()
+                )
+
+                Icon(
+                    imageVector = Icons.Outlined.ArrowForward,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(12.dp)
+                        .size(36.dp)
+                        .alpha(if (pageIndex == size - 1) 0f else 0.45f)
+                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(32.dp)
+                ) {
+                    Text(
+                        text = textData[pageIndex].introduceText,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+
+                    Text(
+                        text = textData[pageIndex].impactText,
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White
+                    )
+
+                    Text(
+                        text = textData[pageIndex].explainText,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SocialLoginButton(
+    context: Context,
+    viewModel: MainViewModel,
+    goToMapScreen: () -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val onKakaoLoginButtonClick = { coroutineScope.launch { KakaoLogin.login(context, viewModel, goToMapScreen) } }
+
     IconButton(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        onClick = { onKakaoLoginButtonClick() },
+        modifier = Modifier
+            .width(256.dp)
+            .height(90.dp)
     ) {
         Image(
-            painter = painterResource(id = imageResource),
-            contentDescription = text,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .width(256.dp)
-                .height(80.dp)
+            painter = painterResource(id = R.drawable.kakao_login_large_wide),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.clip(RoundedCornerShape(8.dp))
         )
     }
 }

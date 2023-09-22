@@ -97,6 +97,7 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
     // To use Kotlin annotation processing tool (kapt)
     kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:2.5.2"
 
     // Bottom Drawer Lib
     implementation 'de.charlex.compose:bottom-drawer-scaffold:1.1.0-beta02'

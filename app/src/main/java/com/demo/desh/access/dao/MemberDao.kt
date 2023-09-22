@@ -8,8 +8,11 @@ import com.demo.desh.access.entity.Member
 @Dao
 interface MemberDao {
     @Insert
-    fun insertMember(vararg member: Member)
+    suspend fun insertMember(vararg member: Member)
 
     @Query("select * from member")
-    fun findAllMember() : List<Member>
+    suspend fun findAllMember() : List<Member>
+
+    @Query("delete from member")
+    suspend fun deleteAllMember() : Unit
 }
