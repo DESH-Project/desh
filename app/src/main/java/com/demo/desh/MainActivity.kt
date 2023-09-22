@@ -4,13 +4,8 @@ import RealtyDetailScreen
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -49,14 +44,13 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-sealed class MainNavigation(val route: String) {
-    object Start : MainNavigation("start")
-    object Login : MainNavigation("login")
-    object Profile : MainNavigation("profile")
-    object Settings : MainNavigation("settings")
-    object Map : MainNavigation("map")
-    object RealtyDetail : MainNavigation("realtyDetail")
-    object RemainServiceList : MainNavigation("remainServiceList")
+sealed class Screen(val route: String) {
+    object Start : Screen("start")
+    object Login : Screen("login")
+    object Profile : Screen("profile")
+    object Map : Screen("map")
+    object RealtyDetail : Screen("realtyDetail")
+    object RemainServiceList : Screen("remainServiceList")
 }
 
 @Composable
@@ -69,14 +63,14 @@ fun Root(viewModel: MainViewModel) {
 
     NavHost(
         navController = navController,
-        startDestination = MainNavigation.Login.route
+        startDestination = Screen.Login.route
     ) {
 
         val realtyId = "realtyId"
         val serviceListIndex = "index"
 
-        composable(route = MainNavigation.Login.route) {
-            val goToStartScreen = { navController.navigate(MainNavigation.Start.route) {
+        composable(route = Screen.Login.route) {
+            val goToStartScreen = { navController.navigate(Screen.Start.route) {
                 popUpTo(navController.graph.id) {
                     inclusive = false
                 }
@@ -85,30 +79,30 @@ fun Root(viewModel: MainViewModel) {
             LoginScreen(viewModel, goToStartScreen)
         }
 
-        composable(route = MainNavigation.Start.route) {
-            val goToMapScreen = { navController.navigate(MainNavigation.Map.route) }
+        composable(route = Screen.Start.route) {
+            val goToMapScreen = { navController.navigate(Screen.Map.route) }
             StartScreen(viewModel, goToMapScreen)
         }
 
-        composable(route = MainNavigation.Profile.route) {
-            ProfileScreen()
-        }
-
-        composable(route = MainNavigation.Map.route) {
-            val goToRealtyDetail = { realtyId: Long -> navController.navigate(MainNavigation.RealtyDetail.route + "/$realtyId") }
-            val goToRemainServiceListScreen = { index: Int -> navController.navigate(MainNavigation.RemainServiceList.route + "/$index") }
+        composable(route = Screen.Map.route) {
+            val goToRealtyDetail = { realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$realtyId") }
+            val goToRemainServiceListScreen = { index: Int -> navController.navigate(Screen.RemainServiceList.route + "/$index") }
 
             MapScreen(viewModel, goToRealtyDetail, goToRemainServiceListScreen)
         }
 
-        composable(route = "${MainNavigation.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
+        composable(route = Screen.Profile.route) {
+            ProfileScreen()
+        }
+
+        composable(route = "${Screen.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
             backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
                 viewModel = viewModel,
                 realtyId = it.toLong()
             ) }
         }
 
-        composable(route = "${MainNavigation.RemainServiceList.route}/{${serviceListIndex}}") { backStackEntry ->
+        composable(route = "${Screen.RemainServiceList.route}/{${serviceListIndex}}") { backStackEntry ->
             backStackEntry.arguments?.getString(serviceListIndex)?.let { RemainServiceListScreen(
                 index = it.toInt(),
                 viewModel = viewModel
