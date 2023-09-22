@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -87,9 +88,9 @@ fun RealtyDetailScreen(
             // A surface container using the 'background' color from the theme
             BuildingImage()
             Top()
-            Spacer(modifier = Modifier.padding(10.dp))
+            Spacer(modifier = Modifier.padding(vertical = 5.dp))
             profile()
-            Spacer(modifier = Modifier.padding(0.dp, 10.dp))
+            Spacer(modifier = Modifier.padding(0.dp, 0.dp))
             Divider(
                 color = Color.White,
                 thickness = 1.dp,
@@ -202,26 +203,45 @@ fun Top() {
 
 
 @Composable
-fun profile(){
-    Row(modifier = Modifier.padding(20.dp,1.dp)) {
+fun profile() {
+    Row() {
+        IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(start = 20.dp,)) {
 
-        Image(
-            painter = painterResource(id = R.drawable.profile),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(64.dp)
+            Image(
+                painter = painterResource(id = R.drawable.profile),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(68.dp)
 
-        )
-        Column(modifier = Modifier.padding(5.dp,0.dp)){
-
-            Text("중개법인 김두식", style = Typography2.bodyMedium)
-
+            )
         }
-
+        Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Box() {
+                names(names = "중개법인 김두식", day1 = "4일전")
+            }
     }
 }
+@Composable
+fun names(names: String, day1: String) {
+
+        Text(
+            names,
+            fontSize = 15.sp,
+            style = Typography2.bodyMedium,
+        )
+        Text(
+            day1,
+            fontSize = 12.sp,
+            style = Typography2.bodyMedium, modifier = Modifier.padding(vertical = 30.dp)
+        )
+    
+}
+
+
+
+
 
 
 
