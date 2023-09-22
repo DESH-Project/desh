@@ -7,6 +7,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.demo.desh.R
+import customFontFamily
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -18,7 +19,26 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
 )
-    val nanum = FontFamily(Font(R.font.nanumsquareneo_cbd))
+val Typography2 = Typography(
+    bodyMedium = TextStyle(
+        fontFamily = customFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp
+
+    ),
+    bodySmall = TextStyle(
+        fontFamily = customFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 13.sp
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = customFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 35.sp
+    )
+
+)
+
     /* Other default text styles to override
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,

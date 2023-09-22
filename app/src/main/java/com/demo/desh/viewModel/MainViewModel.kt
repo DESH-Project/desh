@@ -1,10 +1,16 @@
 package com.demo.desh.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demo.desh.access.entity.Member
+import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.repository.UserRetrofitRepository
 import com.demo.desh.model.District
 import com.demo.desh.model.Realty
@@ -16,13 +22,69 @@ import java.util.UUID
 import kotlin.random.Random
 
 class MainViewModel(
-    private val userRetrofitRepository: UserRetrofitRepository
+    private val userRetrofitRepository: UserRetrofitRepository,
+    private val memberRepository: MemberRepository
 ) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
+    private val _previewImages = MutableLiveData<List<String>>()
+    val previewImages : LiveData<List<String>> get() = _previewImages
+
+    fun loadPreviewImages() {
+        viewModelScope.launch {
+            val result = userRetrofitRepository.getIntroImage()
+
+            if (result.isSuccessful) {
+                val images = result.body()?.data
+                _previewImages.value = images
+            }
+        }
+    }
+
+    private val _searchMode = MutableLiveData<Boolean>(false)
+    val searchMode : LiveData<Boolean> get() = _searchMode
+
+    fun fetchSearchModeTrue() {
+        _searchMode.value = true
+    }
+
+    fun fetchSearchModeFalse() {
+        _searchMode.value = false
+    }
+
+    private val _searchText = MutableLiveData<String>("")
+    val searchText : LiveData<String> get() = _searchText
+
+    fun fetchSearchText(text: String) {
+        _searchText.value = text
+    }
+
+
+    private val _member = MutableLiveData<Member?>()
+    val member: LiveData<Member?> get() = _member
+
+    fun getLastMember() {
+        viewModelScope.launch {
+            val result = memberRepository.findAllMember()
+            if (result.isEmpty()) _member.value = null
+            else _member.value = result.last()
+        }
+    }
+
+    fun deleteAllMember() {
+        viewModelScope.launch {
+            memberRepository.deleteAllMember()
+        }
+    }
+
+    fun insertMember(member: Member) {
+        viewModelScope.launch {
+            memberRepository.insertMember(member)
+        }
+    }
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
@@ -40,17 +102,6 @@ class MainViewModel(
                 _recommendInfo.value = body
             }
         }
-    }
-
-    private val _showBottomDrawer = MutableLiveData<Boolean>()
-    val showBottomDrawer : LiveData<Boolean> get() = _showBottomDrawer
-
-    fun showBottomDrawer() {
-        _showBottomDrawer.value = true
-    }
-
-    fun noShowBottomDrawer() {
-        _showBottomDrawer.value = false
     }
 
     private val _serviceList = MutableLiveData<ServerResponse<String>>()
@@ -139,11 +190,19 @@ class MainViewModel(
         val size = random.nextInt(20, 30)
         val list = mutableListOf<District>()
 
+        val randomPhotoUrl = listOf(
+            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/copernico-p_kICQCOM4s-unsplash.jpg",
+            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/damir-kopezhanov-luseu9GtYzM-unsplash.jpg",
+            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/jose-losada-DyFjxmHt3Es-unsplash.jpg"
+        )
+
+
         for (i in 0 until size) {
+            val pick = random.nextInt(0, randomPhotoUrl.size)
             val district = District(
                 id = (i + 1).toLong(),
                 address = UUID.randomUUID().toString(),
-                image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
+                image = randomPhotoUrl[pick],
                 price = random.nextDouble(1.0, 1000.0)
             )
 
