@@ -30,6 +30,20 @@ class MainViewModel(
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
+    private val _previewImages = MutableLiveData<List<String>>()
+    val previewImages : LiveData<List<String>> get() = _previewImages
+
+    fun loadPreviewImages() {
+        viewModelScope.launch {
+            val result = userRetrofitRepository.getIntroImage()
+
+            if (result.isSuccessful) {
+                val images = result.body()?.data
+                _previewImages.value = images
+            }
+        }
+    }
+
     private val _searchMode = MutableLiveData<Boolean>(false)
     val searchMode : LiveData<Boolean> get() = _searchMode
 

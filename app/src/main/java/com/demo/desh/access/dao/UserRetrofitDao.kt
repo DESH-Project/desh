@@ -31,17 +31,21 @@ interface UserRetrofitDao {
     suspend fun getServiceList(): Response<ServerResponse<String>>
 
     /* 전체 상권 추천 정보 */
-    @GET("recommend-all")
+    @GET("/recommend-all")
     suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>>
 
     /* 상권 추천 정보 */
-    @GET("recommend")
+    @GET("/recommend")
     suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<ServerResponse<Recommend>>
 
     /* 상권에 따른 상가 리스트 조회 */
-    @GET("stores")
+    @GET("/stores")
     suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<ServerResponse<District>>
 
-    @GET("store")
+    @GET("/store")
     suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<ServerResponse<Realty>>
+
+    /* 초기 이미지 */
+    @GET("/intro/image")
+    suspend fun getIntroImage() : Response<ServerResponse<String>>
 }

@@ -3,12 +3,10 @@ package com.demo.desh.ui.screens
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,6 +20,9 @@ import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +51,13 @@ fun LoginScreen(
     goToMapScreen: () -> Unit
 ) {
     val context = LocalContext.current
-    val testData = LoginPreviewInfo.testData
+    val textData = LoginPreviewInfo.textData
+
+    val previewImages by viewModel.previewImages.observeAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadPreviewImages()
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -72,13 +79,16 @@ fun LoginScreen(
         ) {
 
             HorizontalPager(
-                count = testData.size,
+                count = previewImages?.size ?: 1,
                 modifier = Modifier
                     .fillMaxSize()
             ) { pageIndex ->
 
+                val size = previewImages?.size ?: 1
+                val model = previewImages?.get(pageIndex) ?: ""
+
                 AsyncImage(
-                    model = testData[pageIndex].imageUrl,
+                    model = model,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -94,7 +104,7 @@ fun LoginScreen(
                         .align(Alignment.CenterEnd)
                         .padding(12.dp)
                         .size(36.dp)
-                        .alpha(if (pageIndex == testData.size - 1) 0f else 0.45f)
+                        .alpha(if (pageIndex == size - 1) 0f else 0.45f)
                 )
 
                 Column(
@@ -103,21 +113,21 @@ fun LoginScreen(
                         .padding(32.dp)
                 ) {
                     Text(
-                        text = testData[pageIndex].introduceText,
+                        text = textData[pageIndex].introduceText,
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
 
                     Text(
-                        text = testData[pageIndex].impactText,
+                        text = textData[pageIndex].impactText,
                         fontSize = 48.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.White
                     )
 
                     Text(
-                        text = testData[pageIndex].explainText,
+                        text = textData[pageIndex].explainText,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -139,7 +149,9 @@ private fun SocialLoginButton(
 
     IconButton(
         onClick = { onKakaoLoginButtonClick() },
-        modifier = Modifier.width(256.dp).height(90.dp)
+        modifier = Modifier
+            .width(256.dp)
+            .height(90.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.kakao_login_large_wide),

@@ -40,4 +40,8 @@ class UserRetrofitRepository {
     suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<ServerResponse<Realty>> {
         return userRetrofitDao.getRealtyDetail(realtyId, userId)
     }
+
+    suspend fun getIntroImage() : Response<ServerResponse<String>> {
+        return userRetrofitDao.getIntroImage()
+    }
 }
