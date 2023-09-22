@@ -105,12 +105,6 @@ fun RealtyDetailScreen(
             )
             aroundbuilding()
             Spacer(modifier = Modifier.padding(0.dp, 10.dp))
-//            Divider(
-//                color = Color.White,
-//                thickness = 1.dp,
-//                modifier = Modifier.padding(end = 20.dp, start = 20.dp)
-//            )
-//            Spacer(modifier = Modifier.padding(0.dp, 3.dp))
             Text("주변상가", style = Typography2.bodyMedium, fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
             aroundstore("올리브영")
             aroundstore("편의점")
@@ -238,13 +232,6 @@ fun names(names: String, day1: String) {
         )
     
 }
-
-
-
-
-
-
-
 @Composable
 fun BuildingImage() {
     var isDropDownExpanded by remember { mutableStateOf(false) }
