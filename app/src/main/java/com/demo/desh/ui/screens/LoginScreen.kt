@@ -37,10 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.demo.desh.R
+import com.demo.desh.login.KakaoLogin
 import com.demo.desh.model.LoginPreviewInfo
 import com.demo.desh.viewModel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -143,7 +145,7 @@ private fun SocialLoginButton(
     goToStartScreen: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    // val onKakaoLoginButtonClick = { coroutineScope.launch { KakaoLogin.login(context, viewModel, goToMapScreen) } }
+    val onKakaoLoginButtonClick = { coroutineScope.launch { KakaoLogin.login(context, viewModel, goToStartScreen) } }
     val onKakaoLoginButtonClickTest = { goToStartScreen() }
 
     IconButton(

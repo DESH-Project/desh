@@ -12,9 +12,9 @@ import retrofit2.Response
 abstract class SocialLogin {
     private val userRetrofitRepository = UserRetrofitRepository()
 
-    abstract fun login(context: Context, viewModel: MainViewModel, goToMapScreen: () -> Unit)
+    abstract fun login(context: Context, viewModel: MainViewModel, goToStartScreen: () -> Unit)
 
-    protected fun send(user: User, viewModel: MainViewModel, goToMapScreen: () -> Unit) {
+    protected fun send(user: User, viewModel: MainViewModel, goToStartScreen: () -> Unit) {
         val result = userRetrofitRepository.login(user)
 
         result.enqueue(object : Callback<Long> {
@@ -22,7 +22,7 @@ abstract class SocialLogin {
                 user.id = response.body()
 
                 saveMemberIntoRoomDB(user, viewModel)
-                goToMapScreen()
+                goToStartScreen()
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {

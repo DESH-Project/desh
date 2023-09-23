@@ -12,7 +12,7 @@ import com.kakao.sdk.user.UserApiClient
 object KakaoLogin: SocialLogin() {
     private const val TAG = "KakaoLoginObject"
 
-    override fun login(context: Context, viewModel: MainViewModel, goToMapScreen: () -> Unit) {
+    override fun login(context: Context, viewModel: MainViewModel, goToStartScreen: () -> Unit) {
         val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) Log.e(TAG, "로그인 실패 $error")
             else if (token != null) Log.e(TAG, "로그인 성공 ${token.accessToken} ${token.idToken}")
@@ -58,7 +58,7 @@ object KakaoLogin: SocialLogin() {
 
                 Log.d(TAG, "서버에 전송합니다")
 
-                send(kakaoUser!!, viewModel, goToMapScreen)
+                send(kakaoUser!!, viewModel, goToStartScreen)
             }
         }
     }

@@ -8,7 +8,6 @@ import android.util.Log
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
-import com.navercorp.nid.NaverIdLoginSDK
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,14 +22,6 @@ class SplashActivity : AppCompatActivity() {
         val keyHash = Utility.getKeyHash(this)
 
         Log.d(TAG, "keyHash : $keyHash")
-
-        /*
-        // 네아로 SDK 초기화 이슈 : https://github.com/naver/naveridlogin-sdk-android/issues/47
-        val naverClientId = getString(R.string.NAVER_OAUTH_CLIENT_ID)
-        val naverClientSecret = getString(R.string.NAVER_OAUTH_CLIENT_SECRET)
-        val naverClientName = getString(R.string.APP_NAME)
-        NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret, naverClientName)
-        */
 
         Thread.sleep(1500)
 

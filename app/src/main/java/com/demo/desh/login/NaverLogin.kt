@@ -1,5 +1,6 @@
 package com.demo.desh.login
 
+/*
 import android.content.Context
 import android.widget.Toast
 import com.demo.desh.model.User
@@ -67,3 +68,4 @@ object NaverLogin : SocialLogin() {
         NaverIdLoginSDK.authenticate(context, oauthLoginCallback)
     }
 }
+*/
