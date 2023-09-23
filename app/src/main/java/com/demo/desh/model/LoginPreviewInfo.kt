@@ -10,7 +10,7 @@ data class LoginPreviewInfo(
             LoginPreviewInfo(
                 introduceText = "지금 시작해보세요!",
                 impactText = "GOODPLACE",
-                explainText = "소상공인을 위한 상권추천 서비스! 지금 바로 시작하세요!"
+                explainText = "소상공인을 위한 상권추천 서비스\n지금 바로 시작하세요!"
             ),
 
             LoginPreviewInfo(
