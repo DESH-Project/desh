@@ -62,8 +62,6 @@ fun ViewThree(){
 fun PagerContent(pagerState: PagerState) {
 
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-
-
             HorizontalPager(count = 3, state = pagerState) { page ->
                 when (page) {
                     0 -> {
@@ -102,9 +100,6 @@ fun PagerContent(pagerState: PagerState) {
 fun ContentView1(){
     val pagerState = rememberPagerState()
     Box() {
-
         PagerContent(pagerState = pagerState)
-
-
     }
 }

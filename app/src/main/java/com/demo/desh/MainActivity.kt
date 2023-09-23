@@ -15,7 +15,6 @@ import com.demo.desh.access.room.MemberRoomDatabase
 import com.demo.desh.ui.screens.LoginScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
-import com.demo.desh.ui.screens.RemainServiceListScreen
 import com.demo.desh.ui.screens.StartScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.MainViewModel
@@ -50,7 +49,6 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile")
     object Map : Screen("map")
     object RealtyDetail : Screen("realtyDetail")
-    object RemainServiceList : Screen("remainServiceList")
 }
 
 @Composable
@@ -67,7 +65,6 @@ fun Root(viewModel: MainViewModel) {
     ) {
 
         val realtyId = "realtyId"
-        val serviceListIndex = "index"
 
         composable(route = Screen.Login.route) {
             val goToStartScreen = { navController.navigate(Screen.Start.route) {
@@ -86,9 +83,8 @@ fun Root(viewModel: MainViewModel) {
 
         composable(route = Screen.Map.route) {
             val goToRealtyDetail = { realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$realtyId") }
-            val goToRemainServiceListScreen = { index: Int -> navController.navigate(Screen.RemainServiceList.route + "/$index") }
 
-            MapScreen(viewModel, goToRealtyDetail, goToRemainServiceListScreen)
+            MapScreen(viewModel, goToRealtyDetail)
         }
 
         composable(route = Screen.Profile.route) {
@@ -99,13 +95,6 @@ fun Root(viewModel: MainViewModel) {
             backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
                 viewModel = viewModel,
                 realtyId = it.toLong()
-            ) }
-        }
-
-        composable(route = "${Screen.RemainServiceList.route}/{${serviceListIndex}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(serviceListIndex)?.let { RemainServiceListScreen(
-                index = it.toInt(),
-                viewModel = viewModel
             ) }
         }
     }

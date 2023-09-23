@@ -71,7 +71,6 @@ import de.charlex.compose.BottomDrawerScaffold
 fun MapScreen(
     viewModel: MainViewModel,
     goToRealtyDetail: (Long) -> Unit,
-    goToRemainServiceListScreen: (Int) -> Unit,
 ) {
     val serviceList by viewModel.serviceList.observeAsState()
     val recommendInfo by viewModel.recommendInfo.observeAsState()
@@ -80,7 +79,6 @@ fun MapScreen(
     val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
     val onServiceItemClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
     val onDistrictButtonClick = { districtName: String -> viewModel.fetchDistrictInfoList(districtName)}
-    val onListMoreButtonClick = { index: Int -> goToRemainServiceListScreen(index)  }
 
     LaunchedEffect(Unit) {
         viewModel.fetchServiceList()
@@ -106,7 +104,6 @@ fun MapScreen(
                 districtInfo = districtInfo,
                 recommendInfo = recommendInfo,
                 onServiceItemClick = onServiceItemClick,
-                onListMoreButtonClick = onListMoreButtonClick,
                 onDistrictButtonClick = onDistrictButtonClick,
                 onDistrictItemClick = onDistrictItemClick
             )
@@ -151,7 +148,6 @@ private fun DrawerContent(
     districtInfo: ServerResponse<District>?,
     recommendInfo: ServerResponse<Recommend>?,
     onServiceItemClick: (String) -> Unit,
-    onListMoreButtonClick: (Int) -> Unit,
     onDistrictButtonClick: (String) -> Unit,
     onDistrictItemClick: (Long) -> Unit
 ) {
@@ -172,7 +168,7 @@ private fun DrawerContent(
 
         Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp))
 
-        CreateListButton(serviceList, onServiceItemClick, onListMoreButtonClick)
+        CreateListButton(serviceList, onServiceItemClick)
 
         Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
 
@@ -315,7 +311,6 @@ private fun CreateDistrictPager(
 private fun CreateListButton(
     serviceList: ServerResponse<String>?,
     onListButtonClick: (String) -> Unit,
-    onListMoreButtonClick: (Int) -> Unit
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.SpaceAround,
