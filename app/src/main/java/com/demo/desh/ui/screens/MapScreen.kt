@@ -1,5 +1,6 @@
 package com.demo.desh.ui.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -44,8 +45,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -326,31 +329,76 @@ private fun CreateListButton(
     val buttonBgColor = if (isPressed) Color.Black else Color(0xFF444548)
     */
 
-    var selected by remember { mutableStateOf(false) }
-    val buttonBgColor = if (selected) Color.Black else Color(0xFF444548)
-    val onButtonSelected = { selected = !selected }
+    val buttonBgColor = Color(0xFF444548)
 
-    LazyRow(
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        itemsIndexed(keys?.toList() ?: listOf()) { _, item ->
-            val size = if (item[0] in 'a'..'z') 12 else 24
+    var selectedButton by rememberSaveable { mutableStateOf("") }
+    var isSubButtonShow by rememberSaveable { mutableStateOf(false) }
+    var subButton by rememberSaveable { mutableStateOf(mutableListOf<String>()) }
 
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                elevation = 8.dp,
-                modifier = Modifier
-                    .height(48.dp)
-                    .padding(4.dp)
-            ) {
-                TextButton(
+    val onButtonSelected = { item: String ->
+        Log.e("selectedButton", selectedButton)
+
+        val setButtonState = {
+            isSubButtonShow = true
+            selectedButton = item
+            subButton = map?.get(item)?.toMutableList() ?: mutableListOf()
+        }
+
+        if (selectedButton.isEmpty() or selectedButton.isBlank()) setButtonState()
+        else when (selectedButton) {
+            item -> isSubButtonShow = !isSubButtonShow
+            else -> setButtonState()
+        }
+    }
+
+    Column {
+        LazyRow(
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            itemsIndexed(keys?.toList() ?: listOf()) { _, item ->
+                val size = if (item[0] in 'a'..'z') 12 else 24
+
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = 8.dp,
                     modifier = Modifier
-                        .width(size.dp * item.length)
-                        .background(buttonBgColor),
-                    onClick = onButtonSelected
+                        .height(48.dp)
+                        .padding(4.dp),
+                    backgroundColor = buttonBgColor
                 ) {
-                    Text(text = item, color = Color.White)
+                    TextButton(
+                        modifier = Modifier
+                            .width(size.dp * item.length),
+                        onClick = { onButtonSelected(item) }
+                    ) {
+                        Text(text = item, color = Color.White)
+                    }
+                }
+            }
+        }
+
+        if (isSubButtonShow) {
+            LazyRow {
+                itemsIndexed(subButton) { _, item ->
+                    val size = if (item[0] in 'a'..'z') 12 else 24
+
+                    Card(
+                        shape = RoundedCornerShape(20.dp),
+                        elevation = 8.dp,
+                        modifier = Modifier
+                            .height(48.dp)
+                            .padding(4.dp)
+                    ) {
+                        TextButton(
+                            modifier = Modifier
+                                .width(size.dp * item.length)
+                                .background(buttonBgColor),
+                            onClick = { onListButtonClick(item) }
+                        ) {
+                            Text(text = item, color = Color.White)
+                        }
+                    }
                 }
             }
         }
