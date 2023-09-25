@@ -6,6 +6,7 @@ import com.demo.desh.util.RetrofitClient
 import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import retrofit2.Call
 import retrofit2.Response
@@ -21,7 +22,7 @@ class UserRetrofitRepository {
         return userRetrofitDao.sendRealtyInfo(realty)
     }
 
-    suspend fun getServiceList(): Response<ServerResponse<String>> {
+    suspend fun getServiceList(): Response<ServerResponseObj<Map<String, List<String>>>> {
         return userRetrofitDao.getServiceList()
     }
 

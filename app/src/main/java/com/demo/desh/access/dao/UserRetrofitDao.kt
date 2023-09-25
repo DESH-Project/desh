@@ -5,6 +5,7 @@ import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import retrofit2.Call
 import retrofit2.Response
@@ -28,7 +29,7 @@ interface UserRetrofitDao {
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
     @GET("/service")
-    suspend fun getServiceList(): Response<ServerResponse<String>>
+    suspend fun getServiceList(): Response<ServerResponseObj<Map<String, List<String>>>>
 
     /* 전체 상권 추천 정보 */
     @GET("/recommend-all")

@@ -9,6 +9,12 @@ data class ServerResponse<out T>(
     val status: Int = 200
 )
 
+data class ServerResponseObj<out T>(
+    val size: Int,
+    val data: T,
+    val status: Int = 200
+)
+
 data class Recommend(
     val lat: Double,
     val lng: Double,
@@ -86,9 +92,8 @@ data class LoginPreviewInfo(
                 introduceText = "GoodPlace에 오신 것을 환영합니다!",
                 impactText = "안녕하세요!",
                 explainText = "상권을 알아보고 계신가요?"
-            ),
-
             )
+        )
     }
 }
 

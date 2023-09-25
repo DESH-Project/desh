@@ -16,6 +16,7 @@ import com.demo.desh.model.District
 import com.demo.desh.model.Realty
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.ServerResponseObj
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.util.UUID
@@ -104,8 +105,8 @@ class MainViewModel(
         }
     }
 
-    private val _serviceList = MutableLiveData<ServerResponse<String>>()
-    val serviceList: LiveData<ServerResponse<String>> get() = _serviceList
+    private val _serviceList = MutableLiveData<ServerResponseObj<Map<String, List<String>>>>()
+    val serviceList: LiveData<ServerResponseObj<Map<String, List<String>>>> get() = _serviceList
 
     fun fetchServiceList() {
         viewModelScope.launch {

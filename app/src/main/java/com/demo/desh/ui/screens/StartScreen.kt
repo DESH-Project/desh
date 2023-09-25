@@ -1,5 +1,6 @@
 package com.demo.desh.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,7 +71,9 @@ fun StartScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) { pageIndex ->
+
                 val lastPage = testData.size - 1 == pageIndex
+                Log.e("StartScreen", "pageIndex : $pageIndex")
 
                 AsyncImage(
                     model = testData[pageIndex].imageUrl,
@@ -97,6 +100,7 @@ fun StartScreen(
                         .align(Alignment.TopStart)
                         .padding(24.dp)
                 ) {
+
                     val df = DecimalFormat("##,###만원")
                     val dep = testData[pageIndex].deposit / 10000
                     val text = "${df.format(dep)} / ${testData[pageIndex].monthly}"

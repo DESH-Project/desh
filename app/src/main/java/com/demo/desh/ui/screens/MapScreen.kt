@@ -9,6 +9,8 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +44,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,6 +62,7 @@ import coil.compose.AsyncImage
 import com.demo.desh.model.District
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.MainViewModel
@@ -144,7 +150,7 @@ fun MapScreen(
 @Composable
 private fun DrawerContent(
     user: User?,
-    serviceList: ServerResponse<String>?,
+    serviceList: ServerResponseObj<Map<String, List<String>>>?,
     districtInfo: ServerResponse<District>?,
     recommendInfo: ServerResponse<Recommend>?,
     onServiceItemClick: (String) -> Unit,
@@ -305,18 +311,30 @@ private fun CreateDistrictPager(
     }
 }
 
-
-
 @Composable
 private fun CreateListButton(
-    serviceList: ServerResponse<String>?,
+    serviceList: ServerResponseObj<Map<String, List<String>>>?,
     onListButtonClick: (String) -> Unit,
 ) {
+    val map = serviceList?.data
+    val keys = map?.keys
+
+    /*
+    // 버튼 눌림시 효과 MutableInteractionSource
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val buttonBgColor = if (isPressed) Color.Black else Color(0xFF444548)
+    */
+
+    var selected by remember { mutableStateOf(false) }
+    val buttonBgColor = if (selected) Color.Black else Color(0xFF444548)
+    val onButtonSelected = { selected = !selected }
+
     LazyRow(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        itemsIndexed(serviceList?.data ?: listOf()) { _, item ->
+        itemsIndexed(keys?.toList() ?: listOf()) { _, item ->
             val size = if (item[0] in 'a'..'z') 12 else 24
 
             Card(
@@ -324,15 +342,13 @@ private fun CreateListButton(
                 elevation = 8.dp,
                 modifier = Modifier
                     .height(48.dp)
-                    .padding(4.dp),
-                backgroundColor = Color(0xFF444548)
+                    .padding(4.dp)
             ) {
                 TextButton(
-                    modifier = Modifier.width(size.dp * item.length),
-                    onClick = {
-                        Log.e("MapScreen.CreateListButton", "Click item = $item")
-                        onListButtonClick(item)
-                    }
+                    modifier = Modifier
+                        .width(size.dp * item.length)
+                        .background(buttonBgColor),
+                    onClick = onButtonSelected
                 ) {
                     Text(text = item, color = Color.White)
                 }
