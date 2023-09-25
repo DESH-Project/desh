@@ -1,6 +1,5 @@
 package com.demo.desh.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,8 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.demo.desh.access.repository.MemberRepository
-import com.demo.desh.model.PreviewInfo
 import com.demo.desh.model.User
 import com.demo.desh.viewModel.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -50,14 +47,14 @@ fun StartScreen(
     viewModel: MainViewModel,
     goToMapScreen: () -> Unit
 ) {
-    val testData = PreviewInfo.testData
+    val previewStoreInfo by viewModel.previewStore.observeAsState()
+    val member by viewModel.member.observeAsState()
+    val user = member?.let { User.toUser(it) }
 
     LaunchedEffect(Unit) {
         viewModel.getLastMember()
+        viewModel.loadPreviewStore()
     }
-
-    val member by viewModel.member.observeAsState()
-    val user = member?.let { User.toUser(it) }
 
     Scaffold { innerPadding ->
         Box(
@@ -66,17 +63,23 @@ fun StartScreen(
                 .fillMaxSize()
                 .background(Color.DarkGray)
         ) {
+            val size = previewStoreInfo?.size ?: 1
+
             HorizontalPager(
-                count = testData.size,
+                count = size,
                 modifier = Modifier
                     .fillMaxSize()
             ) { pageIndex ->
 
-                val lastPage = testData.size - 1 == pageIndex
-                Log.e("StartScreen", "pageIndex : $pageIndex")
+                val data = previewStoreInfo?.get(pageIndex)
+                val lastPage = size - 1 == pageIndex
+
+                val df = DecimalFormat("##,###만원")
+                val dep = data?.deposit ?: 10000
+                val text = "${data?.pyung}평 시세\n${df.format(dep)} / ${data?.monthly ?: 200}"
 
                 AsyncImage(
-                    model = testData[pageIndex].imageUrl,
+                    model = data?.images?.get(0),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -100,11 +103,6 @@ fun StartScreen(
                         .align(Alignment.TopStart)
                         .padding(24.dp)
                 ) {
-
-                    val df = DecimalFormat("##,###만원")
-                    val dep = testData[pageIndex].deposit / 10000
-                    val text = "${df.format(dep)} / ${testData[pageIndex].monthly}"
-
                     Text(
                         text = text,
                         fontSize = 16.sp,

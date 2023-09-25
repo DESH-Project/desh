@@ -15,6 +15,17 @@ data class ServerResponseObj<out T>(
     val status: Int = 200
 )
 
+data class IntroStore(
+    val id: Int,
+    val name: String,
+    val address: String,
+    val price: Int,
+    val pyung: Int,
+    val images: List<String>,
+    val monthly: Int,
+    val deposit: Int
+)
+
 data class Recommend(
     val lat: Double,
     val lng: Double,
@@ -93,34 +104,6 @@ data class LoginPreviewInfo(
                 impactText = "안녕하세요!",
                 explainText = "상권을 알아보고 계신가요?"
             )
-        )
-    }
-}
-
-data class PreviewInfo(
-    val imageUrl: String,
-    val deposit: Int,
-    val monthly: Int
-) {
-    companion object {
-        val testData = listOf(
-            PreviewInfo(
-                imageUrl = "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/copernico-p_kICQCOM4s-unsplash.jpg",
-                deposit = 150000000,
-                monthly = 500
-            ),
-
-            PreviewInfo(
-                imageUrl = "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/damir-kopezhanov-luseu9GtYzM-unsplash.jpg",
-                deposit = 250000000,
-                monthly = 600
-            ),
-
-            PreviewInfo(
-                imageUrl = "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/jose-losada-DyFjxmHt3Es-unsplash.jpg",
-                deposit = 350000000,
-                monthly = 700
-            ),
         )
     }
 }

@@ -1,10 +1,5 @@
 package com.demo.desh.viewModel
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +8,7 @@ import com.demo.desh.access.entity.Member
 import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.repository.UserRetrofitRepository
 import com.demo.desh.model.District
+import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
@@ -29,6 +25,19 @@ class MainViewModel(
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
+    }
+
+    private val _previewStore = MutableLiveData<List<IntroStore>>()
+    val previewStore : LiveData<List<IntroStore>> get() = _previewStore
+
+    fun loadPreviewStore() {
+        viewModelScope.launch {
+            val result = userRetrofitRepository.getIntroStore()
+
+            if (result.isSuccessful) {
+                _previewStore.value = result.body()?.data
+            }
+        }
     }
 
     private val _previewImages = MutableLiveData<List<String>>()
@@ -96,7 +105,6 @@ class MainViewModel(
                 if (serviceName == DEFAULT_SERVICE_NAME) userRetrofitRepository.getRecommendationAllInfo()
                 else userRetrofitRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
 
-            Log.e("MapScreen : fetchMapView()", "res = $res, res body = ${res.body()?.data}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
@@ -111,7 +119,6 @@ class MainViewModel(
     fun fetchServiceList() {
         viewModelScope.launch {
             val res = userRetrofitRepository.getServiceList()
-            Log.e("MapScreen : fetchServiceList()", "res = $res, res body = ${res.body()}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
@@ -128,7 +135,6 @@ class MainViewModel(
             val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
             val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
 
-            Log.e("MapScreen : fetchDistrictInfoList()", "res = ${res.body()}")
 
             _districtInfo.value = randomDistrictSampleList()
 
@@ -159,7 +165,6 @@ class MainViewModel(
     fun fetchRealtyDetail(realtyId: Long, userId: Long) {
         viewModelScope.launch {
             val res = userRetrofitRepository.getRealtyDetail(realtyId, userId)
-            Log.e("MainViewModel.fetchRealtyDetail()", "res = ${res.body()}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!

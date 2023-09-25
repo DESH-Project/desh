@@ -1,18 +1,8 @@
 package com.demo.desh.util
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathFillType
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 import com.demo.desh.R
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
@@ -63,10 +53,8 @@ object MapViewManager {
                         setColor(Color(0x22FFFFFF).toArgb())
                     }
 
-                    Log.e("KakaoMapReadyCallback onMapReady", "recommendInfo : $recommendInfo")
 
                     recommendInfo?.data?.forEachIndexed { _, item ->
-                        Log.e("KakaoMap", "item : $item")
                         val options = LabelOptions.from(LatLng.from(item.lat, item.lng))
                             .setStyles(styles)
                             .setClickable(true)
