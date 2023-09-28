@@ -1,10 +1,10 @@
 package com.demo.desh.access.repository
 
 import android.util.Log
+import com.demo.desh.access.dao.UserRetrofitDao
 import com.demo.desh.model.District
 import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
-import com.demo.desh.util.RetrofitClient
 import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
@@ -16,12 +16,12 @@ import retrofit2.Response
 class UserRetrofitRepository {
     companion object {
         private const val TAG = "UserRetrofitRepository"
-    }
 
-    private val userRetrofitDao = RetrofitClient.userRetrofitDao
+        private val userRetrofitDao = UserRetrofitDao.userRetrofitDao
 
-    private fun logging(method: String, res: Any) {
-        Log.e(TAG, "method = $method, res = $res")
+        private fun logging(method: String, res: Any) {
+            Log.e(TAG, "method = $method, res = $res")
+        }
     }
 
     fun login(user: User): Call<Long> =

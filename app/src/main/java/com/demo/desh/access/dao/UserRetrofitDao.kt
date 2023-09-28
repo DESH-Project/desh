@@ -10,12 +10,30 @@ import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import retrofit2.Call
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface UserRetrofitDao {
+    companion object {
+        private const val host = "good-place.shop"
+        private const val domain = "http://$host/"
+
+        private val retrofit: Retrofit by lazy {
+            Retrofit.Builder()
+                .baseUrl(domain)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+        }
+
+        val userRetrofitDao: UserRetrofitDao by lazy {
+            retrofit.create(UserRetrofitDao::class.java)
+        }
+    }
+
     /* 소셜 로그인 성공시 서버에 유저 정보 전달 */
     @POST("login")
     fun login(@Body user: User): Call<Long>

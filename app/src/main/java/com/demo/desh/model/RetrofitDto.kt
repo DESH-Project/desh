@@ -32,7 +32,7 @@ data class Recommend(
     val service: String,
     val district: String,
     val predict: Long
-): Serializable
+)
 
 data class User(
     var id : Long? = null,
@@ -59,7 +59,7 @@ data class RealtyCreationReq(
     val pyung: Long,
     val squareMeter: Double,
     val userId: Long
-) : Serializable
+)
 
 data class District(
     val id: Long,

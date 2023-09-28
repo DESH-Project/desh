@@ -35,9 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             DeshprojectfeTheme {
-                Root(
-                    viewModel = viewModel
-                )
+                Root(viewModel = viewModel)
             }
         }
     }
