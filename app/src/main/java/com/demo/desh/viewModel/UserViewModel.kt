@@ -1,27 +1,25 @@
 package com.demo.desh.viewModel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demo.desh.access.entity.Member
-import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.util.login.KakaoLogin
 import com.demo.desh.model.District
 import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
+import com.demo.desh.model.User
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.util.UUID
 import kotlin.random.Random
 
-class MainViewModel(
-    private val userRetrofitRepository: UserRetrofitRepository,
-    private val memberRepository: MemberRepository
-) : ViewModel() {
+class UserViewModel(private val userRetrofitRepository: UserRetrofitRepository) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
@@ -54,6 +52,24 @@ class MainViewModel(
         }
     }
 
+    /* 카카오 소셜 로그인 */
+    private val _user : MutableLiveData<User?> = MutableLiveData(null)
+    val user : LiveData<User?> get() = _user
+    private val _userLoading : MutableLiveData<Boolean> = MutableLiveData(false)
+    val userLoading : LiveData<Boolean> get() = _userLoading
+
+    fun kakaoLogin(context: Context) {
+        viewModelScope.launch {
+            _userLoading.value = true
+
+            val res = KakaoLogin.login(context)
+            if (res != null) {
+                _user.value = res
+                _userLoading.value = false
+            }
+        }
+    }
+
     private val _searchMode = MutableLiveData<Boolean>(false)
     val searchMode : LiveData<Boolean> get() = _searchMode
 
@@ -73,28 +89,7 @@ class MainViewModel(
     }
 
 
-    private val _member = MutableLiveData<Member?>()
-    val member: LiveData<Member?> get() = _member
 
-    fun getLastMember() {
-        viewModelScope.launch {
-            val result = memberRepository.findAllMember()
-            if (result.isEmpty()) _member.value = null
-            else _member.value = result.last()
-        }
-    }
-
-    fun deleteAllMember() {
-        viewModelScope.launch {
-            memberRepository.deleteAllMember()
-        }
-    }
-
-    fun insertMember(member: Member) {
-        viewModelScope.launch {
-            memberRepository.insertMember(member)
-        }
-    }
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
@@ -104,7 +99,6 @@ class MainViewModel(
             val res =
                 if (serviceName == DEFAULT_SERVICE_NAME) userRetrofitRepository.getRecommendationAllInfo()
                 else userRetrofitRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
-
 
             if (res.isSuccessful) {
                 val body = res.body()!!

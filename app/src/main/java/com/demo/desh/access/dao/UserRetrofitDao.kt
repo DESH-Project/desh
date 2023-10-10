@@ -18,28 +18,12 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface UserRetrofitDao {
-    companion object {
-        private const val host = "good-place.shop"
-        private const val domain = "http://$host/"
-
-        private val retrofit: Retrofit by lazy {
-            Retrofit.Builder()
-                .baseUrl(domain)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-        }
-
-        val userRetrofitDao: UserRetrofitDao by lazy {
-            retrofit.create(UserRetrofitDao::class.java)
-        }
-    }
-
     /* 소셜 로그인 성공시 서버에 유저 정보 전달 */
     @POST("login")
-    fun login(@Body user: User): Call<Long>
+    suspend fun login(@Body user: User): Response<Long>
 
     /* 건물 정보 등록 */
-    @POST("/realty")
+    @POST("realty")
     suspend fun sendRealtyInfo(@Body realty: RealtyCreationReq): Response<Long>
 
     /* 내가 본 매물 정보 프리뷰 */
@@ -47,29 +31,29 @@ interface UserRetrofitDao {
     /* 내가 본 매물 정보 상세 */
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
-    @GET("/service")
+    @GET("service")
     suspend fun getServiceList(): Response<ServerResponseObj<Map<String, List<String>>>>
 
     /* 전체 상권 추천 정보 */
-    @GET("/recommend-all")
+    @GET("recommend-all")
     suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>>
 
     /* 상권 추천 정보 */
-    @GET("/recommend")
+    @GET("recommend")
     suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<ServerResponse<Recommend>>
 
     /* 상권에 따른 상가 리스트 조회 */
-    @GET("/stores")
+    @GET("stores")
     suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<ServerResponse<District>>
 
-    @GET("/store")
+    @GET("store")
     suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<ServerResponse<Realty>>
 
     /* 초기 이미지 */
-    @GET("/intro/image")
+    @GET("intro/image")
     suspend fun getIntroImage() : Response<ServerResponse<String>>
 
     /* 시작 스크린 상가 추천 */
-    @GET("/intro/list")
+    @GET("intro/list")
     suspend fun getIntroStore() : Response<ServerResponse<IntroStore>>
 }

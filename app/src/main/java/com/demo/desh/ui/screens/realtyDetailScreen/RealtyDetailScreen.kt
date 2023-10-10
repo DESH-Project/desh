@@ -56,15 +56,13 @@ import com.demo.desh.R
 import com.demo.desh.model.User
 import com.demo.desh.ui.screens.ContentView1
 import com.demo.desh.ui.theme.Typography2
-import com.demo.desh.viewModel.MainViewModel
+import com.demo.desh.viewModel.UserViewModel
 
 @Composable
 fun RealtyDetailScreen(
     realtyId: Long,
-    viewModel: MainViewModel
+    viewModel: UserViewModel
 ) {
-    val member by viewModel.member.observeAsState()
-    val user = member?.let { User.toUser(it) }
 
     Surface(color = Color(0xFF343434), contentColor = Color.White) {
         val scrollState = rememberScrollState();

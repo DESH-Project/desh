@@ -11,10 +11,10 @@ class Member {
     @ColumnInfo(name = "memberId")
     var id: Int = 0
 
-    @ColumnInfo(name = "nickname")
+    @ColumnInfo(name = "nickname", index = true)
     var nickname: String? = null
 
-    @ColumnInfo(name = "email")
+    @ColumnInfo(name = "email", index = true)
     var email: String? = null
 
     @ColumnInfo(name = "image")

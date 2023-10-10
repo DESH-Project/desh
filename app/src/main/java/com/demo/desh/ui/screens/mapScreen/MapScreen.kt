@@ -1,6 +1,5 @@
-package com.demo.desh.ui.screens
+package com.demo.desh.ui.screens.mapScreen
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -10,8 +9,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,9 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -68,7 +63,7 @@ import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import com.demo.desh.util.MapViewManager
-import com.demo.desh.viewModel.MainViewModel
+import com.demo.desh.viewModel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.kakao.vectormap.MapView
@@ -78,29 +73,29 @@ import de.charlex.compose.BottomDrawerScaffold
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
-    viewModel: MainViewModel,
+    userViewModel: UserViewModel,
     goToRealtyDetail: (Long) -> Unit,
 ) {
-    val serviceList by viewModel.serviceList.observeAsState()
-    val recommendInfo by viewModel.recommendInfo.observeAsState()
-    val districtInfo by viewModel.districtInfo.observeAsState()
+    Log.e("MapScreen", "MapScreen Launched")
+
+    val serviceList by userViewModel.serviceList.observeAsState()
+    val recommendInfo by userViewModel.recommendInfo.observeAsState()
+    val districtInfo by userViewModel.districtInfo.observeAsState()
+    val user by userViewModel.user.observeAsState()
 
     val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
-    val onServiceItemClick = { serviceName: String -> viewModel.fetchMapView(serviceName) }
-    val onDistrictButtonClick = { districtName: String -> viewModel.fetchDistrictInfoList(districtName)}
+    val onServiceItemClick = { serviceName: String -> userViewModel.fetchMapView(serviceName) }
+    val onDistrictButtonClick = { districtName: String -> userViewModel.fetchDistrictInfoList(districtName)}
 
     LaunchedEffect(Unit) {
-        viewModel.fetchServiceList()
-        viewModel.getLastMember()
+        userViewModel.fetchServiceList()
     }
 
-    val member by viewModel.member.observeAsState()
-    val user = member?.let { User.toUser(it) }
 
-    val searchMode by viewModel.searchMode.observeAsState()
-    val searchText by viewModel.searchText.observeAsState()
+    val searchMode by userViewModel.searchMode.observeAsState()
+    val searchText by userViewModel.searchText.observeAsState()
 
-    BackHandler { viewModel.fetchSearchModeFalse() }
+    BackHandler { userViewModel.fetchSearchModeFalse() }
 
     // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
@@ -134,8 +129,8 @@ fun MapScreen(
 
                             searchMode = searchMode ?: false,
                             searchText = searchText ?: "",
-                            onSearchTextChanged = { viewModel.fetchSearchText(it) },
-                            onSearchButtonClicked = { viewModel.fetchSearchModeTrue() }
+                            onSearchTextChanged = { userViewModel.fetchSearchText(it) },
+                            onSearchButtonClicked = { userViewModel.fetchSearchModeTrue() }
                         )
 
                         AndroidView(

@@ -1,59 +1,43 @@
-package com.demo.desh.ui.screens
+package com.demo.desh.ui.screens.startScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.demo.desh.model.User
-import com.demo.desh.viewModel.MainViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import java.text.DecimalFormat
+import com.demo.desh.viewModel.UserViewModel
 
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun StartScreen(
-    viewModel: MainViewModel,
+    userViewModel: UserViewModel,
     goToMapScreen: () -> Unit
 ) {
-    val previewStoreInfo by viewModel.previewStore.observeAsState()
-    val member by viewModel.member.observeAsState()
-    val user = member?.let { User.toUser(it) }
+    val user by userViewModel.user.observeAsState()
+    val previewStoreInfo by userViewModel.previewStore.observeAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getLastMember()
-        viewModel.loadPreviewStore()
+        userViewModel.loadPreviewStore()
     }
 
     Scaffold { innerPadding ->
@@ -64,8 +48,26 @@ fun StartScreen(
                 .background(Color.DarkGray)
         ) {
 
+            Text("user = $user")
+
             val size = previewStoreInfo?.size ?: 1
 
+            Button(
+                onClick = goToMapScreen,
+                colors = ButtonDefaults.buttonColors(Color(0xFFFF6A68)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp, 40.dp, 8.dp, 0.dp)
+            ) {
+                Text(
+                    text = "시작해보기",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            /*
             HorizontalPager(
                 count = size,
                 modifier = Modifier
@@ -162,22 +164,8 @@ fun StartScreen(
                         }
                     }
                 }
-
-                Button(
-                    onClick = goToMapScreen,
-                    colors = ButtonDefaults.buttonColors(Color(0xFFFF6A68)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp, 40.dp, 8.dp, 0.dp)
-                ) {
-                    Text(
-                        text = "시작해보기",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
             }
+            */
         }
     }
 }

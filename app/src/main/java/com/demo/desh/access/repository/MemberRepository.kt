@@ -10,7 +10,7 @@ class MemberRepository(private val memberDao: MemberDao) {
         private const val TAG = "MemberRepository"
     }
 
-    private fun logging(method: String, res: Any) {
+    private fun logging(method: String, res: Any?) {
         Log.e(TAG, "method = $method, res = $res")
     }
 
@@ -19,14 +19,28 @@ class MemberRepository(private val memberDao: MemberDao) {
             .insertMember(member)
             .also { logging("insertMember", it) }
 
-    suspend fun findAllMember() : List<Member> =
-        memberDao
-            .findAllMember()
-            .also { logging("findAllMember", it) }
-
     suspend fun deleteAllMember() : Unit =
         memberDao
             .deleteAllMember()
             .also { logging("deleteAllMember", it) }
 
+    suspend fun findMemberByEmail(email: String) : Member? =
+        memberDao
+            .findMemberByEmail(email)
+            .also { logging("findMemberByEmail", it) }
+
+    suspend fun findMemberByNickname(nickname: String) : Member? =
+        memberDao
+            .findMemberByNickname(nickname)
+            .also { logging("findMemberByNickname", it) }
+
+    suspend fun existsMemberByEmail(email: String) : Boolean =
+        memberDao
+            .existsMemberByEmail(email)
+            .also { logging("existsMemberByEmail", it) }
+
+    suspend fun existsMemberByNickname(nickname: String) : Boolean =
+        memberDao
+            .existsMemberByNickname(nickname)
+            .also { logging("existsMemberByNickname", it) }
 }

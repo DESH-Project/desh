@@ -1,17 +1,17 @@
-package com.demo.desh.viewModel
+package com.demo.desh.viewModel.factory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.viewModel.UserViewModel
 
 class MainViewModelFactory(
     private val userRetrofitRepository: UserRetrofitRepository = UserRetrofitRepository(),
-    private val memberRepository: MemberRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(userRetrofitRepository, memberRepository) as T
+        if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
+            return UserViewModel(userRetrofitRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel Class")
