@@ -17,7 +17,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material3.IconButton
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -149,7 +149,7 @@ private fun SocialLoginButton(
     val onKakaoLoginButtonClickTest = { goToStartScreen() }
 
     IconButton(
-        onClick = { onKakaoLoginButtonClickTest() },
+        onClick = { onKakaoLoginButtonClick() },
         modifier = Modifier
             .width(256.dp)
             .height(90.dp)

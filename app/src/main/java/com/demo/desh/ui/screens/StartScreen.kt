@@ -63,6 +63,7 @@ fun StartScreen(
                 .fillMaxSize()
                 .background(Color.DarkGray)
         ) {
+
             val size = previewStoreInfo?.size ?: 1
 
             HorizontalPager(
@@ -158,22 +159,23 @@ fun StartScreen(
                                 fontSize = 16.sp,
                             )
 
-                            Button(
-                                onClick = goToMapScreen,
-                                colors = ButtonDefaults.buttonColors(Color(0xFFFF6A68)),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp, 40.dp, 8.dp, 0.dp)
-                            ) {
-                                Text(
-                                    text = "시작해보기",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
-                                )
-                            }
                         }
                     }
+                }
+
+                Button(
+                    onClick = goToMapScreen,
+                    colors = ButtonDefaults.buttonColors(Color(0xFFFF6A68)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp, 40.dp, 8.dp, 0.dp)
+                ) {
+                    Text(
+                        text = "시작해보기",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 }
             }
         }
