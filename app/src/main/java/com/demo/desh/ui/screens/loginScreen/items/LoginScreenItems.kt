@@ -30,7 +30,7 @@ import com.demo.desh.ui.screens.common.CommonItems
 
 object LoginScreenItems {
     @Composable
-    internal fun SocialLoginButton(isLoading: Boolean, onKakaoLoginButtonClick: () -> Unit) {
+    internal fun SocialLoginButton(isLoading: Boolean, modifier: Modifier = Modifier, onKakaoLoginButtonClick: () -> Unit) {
         if (isLoading) {
             CommonItems.CustomCircularProgressIndicator()
         }

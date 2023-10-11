@@ -1,6 +1,7 @@
 package com.demo.desh.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,8 @@ import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.util.UUID
@@ -63,6 +66,7 @@ class UserViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
             _userLoading.value = true
 
             val res = KakaoLogin.login(context)
+            Log.e("kakaoLogin", "res = $res")
             if (res != null) {
                 _user.value = res
                 _userLoading.value = false

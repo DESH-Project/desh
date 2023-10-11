@@ -10,26 +10,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import com.demo.desh.access.entity.Member
 import com.demo.desh.model.LoginPreviewInfo
 import com.demo.desh.ui.screens.common.CommonItems
 import com.demo.desh.ui.screens.loginScreen.items.LoginScreenItems
-import com.demo.desh.viewModel.MemberRoomViewModel
 import com.demo.desh.viewModel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun LoginScreen(
     userViewModel: UserViewModel,
-    memberRoomViewModel: MemberRoomViewModel,
     goToStartScreen: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -51,7 +46,10 @@ fun LoginScreen(
 
     Scaffold(
         floatingActionButton = {
-            LoginScreenItems.SocialLoginButton(isLoading = userLoading ?: false, onKakaoLoginButtonClick = onKakaoLoginButtonClick)
+            LoginScreenItems.SocialLoginButton(
+                isLoading = userLoading ?: false,
+                onKakaoLoginButtonClick = onKakaoLoginButtonClick
+            )
         },
 
         floatingActionButtonPosition = FabPosition.Center

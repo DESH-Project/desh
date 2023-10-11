@@ -2,7 +2,6 @@ package com.demo.desh.viewModel.factory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.demo.desh.access.repository.MemberRepository
 import com.demo.desh.access.repository.UserRetrofitRepository
 import com.demo.desh.viewModel.UserViewModel
 
