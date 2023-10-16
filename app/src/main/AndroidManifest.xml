@@ -16,6 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.Deshprojectfe"
+        android:name=".MainApplication"
         tools:targetApi="31">
 
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="@string/KAKAO_NATIVE_APP_KEY"/>

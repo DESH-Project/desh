@@ -15,14 +15,17 @@ import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.util.UUID
+import javax.inject.Inject
 import kotlin.random.Random
 
-class UserViewModel(private val userRetrofitRepository: UserRetrofitRepository) : ViewModel() {
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val userRetrofitRepository: UserRetrofitRepository
+) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
@@ -58,18 +61,13 @@ class UserViewModel(private val userRetrofitRepository: UserRetrofitRepository) 
     /* 카카오 소셜 로그인 */
     private val _user : MutableLiveData<User?> = MutableLiveData(null)
     val user : LiveData<User?> get() = _user
-    private val _userLoading : MutableLiveData<Boolean> = MutableLiveData(false)
-    val userLoading : LiveData<Boolean> get() = _userLoading
 
     fun kakaoLogin(context: Context) {
         viewModelScope.launch {
-            _userLoading.value = true
-
             val res = KakaoLogin.login(context)
             Log.e("kakaoLogin", "res = $res")
             if (res != null) {
                 _user.value = res
-                _userLoading.value = false
             }
         }
     }

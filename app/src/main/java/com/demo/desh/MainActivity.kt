@@ -1,11 +1,12 @@
 package com.demo.desh
 
 import RealtyDetailScreen
+import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -15,14 +16,22 @@ import com.demo.desh.ui.screens.profileScreen.ProfileScreen
 import com.demo.desh.ui.screens.startScreen.StartScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.UserViewModel
-import com.demo.desh.viewModel.factory.MainViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
+class MainApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+    }
+}
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val userViewModel = ViewModelProvider(this, MainViewModelFactory())[UserViewModel::class.java]
+        val userViewModel: UserViewModel by viewModels()
 
         setContent {
             DeshprojectfeTheme {

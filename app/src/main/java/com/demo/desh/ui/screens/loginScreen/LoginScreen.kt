@@ -31,7 +31,7 @@ fun LoginScreen(
     val textData = LoginPreviewInfo.textData
 
     /* STATES */
-    val userLoading by userViewModel.userLoading.observeAsState()
+    val user by userViewModel.user.observeAsState()
     val previewImages by userViewModel.previewImages.observeAsState()
 
     /* HANDLERS */
@@ -47,7 +47,7 @@ fun LoginScreen(
     Scaffold(
         floatingActionButton = {
             LoginScreenItems.SocialLoginButton(
-                isLoading = userLoading ?: false,
+                isLoading = user == null,
                 onKakaoLoginButtonClick = onKakaoLoginButtonClick
             )
         },
@@ -55,6 +55,7 @@ fun LoginScreen(
         floatingActionButtonPosition = FabPosition.Center
 
     ) { innerPadding ->
+
         Box(
             modifier = Modifier
                 .padding(innerPadding)
