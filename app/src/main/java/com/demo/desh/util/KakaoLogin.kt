@@ -1,4 +1,4 @@
-package com.demo.desh.util.login
+package com.demo.desh.util
 
 import android.content.Context
 import android.util.Log
@@ -8,10 +8,10 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 
-object KakaoLogin: SocialLogin() {
+object KakaoLogin {
     private const val TAG = "KakaoLoginObject"
 
-    override fun login(context: Context, goToStartScreenWithUser: (User?) -> Unit) {
+    fun login(context: Context, goToStartScreenWithUser: (User?) -> Unit) {
         val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) Log.e(TAG, "[카카오 계정] 로그인 실패 $error")
             else if (token != null) Log.e(TAG, "[카카오 계정] 로그인 성공 ${token.accessToken} ${token.idToken}")

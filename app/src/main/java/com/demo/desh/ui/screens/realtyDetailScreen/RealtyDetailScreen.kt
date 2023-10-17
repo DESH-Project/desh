@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,7 +52,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demo.desh.R
-import com.demo.desh.model.User
 import com.demo.desh.ui.screens.ContentView1
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.viewModel.UserViewModel

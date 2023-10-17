@@ -89,6 +89,12 @@ fun DrawerContent(
 
         Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
 
+        MyChartParent()
+
+        Spacer(modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 16.dp))
+
+        MyChartParent2()
+
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start

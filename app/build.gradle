@@ -68,9 +68,17 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
 
-    // Chart Library https://billcorea.tistory.com/386
-    def latest_release = "0.2.4-alpha"
-    implementation("com.github.tehras:charts:$latest_release")
+    // Provides the utilities needed to use Vico in the view system.
+    implementation "com.patrykandpatrick.vico:views:1.6.3"
+
+    // Provides the utilities needed to use Vico in Jetpack Compose.
+    implementation "com.patrykandpatrick.vico:compose:1.6.3"
+
+    // An optional addition for `vico.compose` that creates a `ChartStyle` based on an M2 Material Theme.
+    implementation "com.patrykandpatrick.vico:compose-m2:1.6.3"
+
+    // An optional addition for `vico.compose` that creates a `ChartStyle` based on an M3 Material Theme.
+    implementation "com.patrykandpatrick.vico:compose-m3:1.6.3"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:2.44"

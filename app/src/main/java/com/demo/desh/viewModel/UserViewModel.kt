@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.access.UserRetrofitRepository
 import com.demo.desh.model.District
 import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty

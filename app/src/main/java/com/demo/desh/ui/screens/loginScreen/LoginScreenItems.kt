@@ -28,7 +28,7 @@ import com.demo.desh.R
 import com.demo.desh.model.LoginPreviewInfo
 
 @Composable
-internal fun SocialLoginButton(modifier: Modifier = Modifier, onKakaoLoginButtonClick: () -> Unit) {
+internal fun SocialLoginButton(onKakaoLoginButtonClick: () -> Unit) {
     IconButton(
         onClick = onKakaoLoginButtonClick,
         modifier = Modifier

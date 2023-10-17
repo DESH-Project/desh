@@ -1,4 +1,4 @@
-package com.demo.desh.access.dao
+package com.demo.desh.access
 
 import com.demo.desh.model.District
 import com.demo.desh.model.IntroStore

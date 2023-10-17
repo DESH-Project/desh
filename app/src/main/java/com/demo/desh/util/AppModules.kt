@@ -1,7 +1,7 @@
 package com.demo.desh.util
 
-import com.demo.desh.access.dao.UserRetrofitDao
-import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.access.UserRetrofitDao
+import com.demo.desh.access.UserRetrofitRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

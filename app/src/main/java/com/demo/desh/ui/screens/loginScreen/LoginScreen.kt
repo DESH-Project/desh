@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.demo.desh.model.LoginPreviewInfo
 import com.demo.desh.model.User
-import com.demo.desh.ui.screens.common.CommonItems
-import com.demo.desh.util.login.KakaoLogin
+import com.demo.desh.ui.screens.CustomCircularProgressIndicator
+import com.demo.desh.util.KakaoLogin
 import com.demo.desh.viewModel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -49,11 +49,7 @@ fun LoginScreen(
     }
 
     Scaffold(
-        floatingActionButton = {
-            SocialLoginButton(
-                onKakaoLoginButtonClick = onKakaoLoginButtonClick
-            )
-        },
+        floatingActionButton = { SocialLoginButton(onKakaoLoginButtonClick) },
 
         floatingActionButtonPosition = FabPosition.Center
 
@@ -68,7 +64,7 @@ fun LoginScreen(
 
             /* 이미지 로딩 */
             if (previewImages == null) {
-                CommonItems.CustomCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                CustomCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
             else {
