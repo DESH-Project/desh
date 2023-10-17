@@ -1,13 +1,10 @@
 package com.demo.desh.viewModel
 
-import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demo.desh.access.repository.UserRetrofitRepository
-import com.demo.desh.util.login.KakaoLogin
 import com.demo.desh.model.District
 import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
@@ -62,15 +59,10 @@ class UserViewModel @Inject constructor(
     private val _user : MutableLiveData<User?> = MutableLiveData(null)
     val user : LiveData<User?> get() = _user
 
-    fun kakaoLogin(context: Context) {
-        viewModelScope.launch {
-            val res = KakaoLogin.login(context)
-            Log.e("kakaoLogin", "res = $res")
-            if (res != null) {
-                _user.value = res
-            }
-        }
+    fun fetchUser(user: User?) {
+        _user.value = user
     }
+
 
     private val _searchMode = MutableLiveData<Boolean>(false)
     val searchMode : LiveData<Boolean> get() = _searchMode

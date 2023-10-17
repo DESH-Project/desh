@@ -5,5 +5,5 @@ import com.demo.desh.model.User
 
 
 abstract class SocialLogin {
-    abstract suspend fun login(context: Context) : User?
+    abstract fun login(context: Context, goToStartScreenWithUser: (User?) -> Unit)
 }

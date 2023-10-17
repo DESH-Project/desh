@@ -15,8 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.demo.desh.model.LoginPreviewInfo
+import com.demo.desh.model.User
 import com.demo.desh.ui.screens.common.CommonItems
-import com.demo.desh.ui.screens.loginScreen.items.LoginScreenItems
+import com.demo.desh.util.login.KakaoLogin
 import com.demo.desh.viewModel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -36,8 +37,11 @@ fun LoginScreen(
 
     /* HANDLERS */
     val onKakaoLoginButtonClick = {
-        userViewModel.kakaoLogin(context)
-        goToStartScreen()
+        val goToStartScreenWithUser = { user: User? ->
+            goToStartScreen()
+            userViewModel.fetchUser(user)
+        }
+        KakaoLogin.login(context, goToStartScreenWithUser)
     }
 
     LaunchedEffect(Unit) {
@@ -46,8 +50,7 @@ fun LoginScreen(
 
     Scaffold(
         floatingActionButton = {
-            LoginScreenItems.SocialLoginButton(
-                isLoading = user == null,
+            SocialLoginButton(
                 onKakaoLoginButtonClick = onKakaoLoginButtonClick
             )
         },
@@ -78,18 +81,18 @@ fun LoginScreen(
                     val size = previewImages?.size ?: 1
                     val model = previewImages?.get(pageIndex) ?: ""
 
-                    LoginScreenItems.CustomAsyncImage(
+                    CustomAsyncImage(
                         model = model,
                         modifier = Modifier.align(Alignment.Center)
                     )
 
-                    LoginScreenItems.CustomArrowNextIcon(
+                    CustomArrowNextIcon(
                         pageIndex = pageIndex,
                         modifier = Modifier.align(Alignment.CenterEnd),
                         size = size
                     )
 
-                    LoginScreenItems.LoginIntroTextColumn(
+                    LoginIntroTextColumn(
                         textData = textData,
                         modifier = Modifier.align(Alignment.TopStart),
                         pageIndex = pageIndex

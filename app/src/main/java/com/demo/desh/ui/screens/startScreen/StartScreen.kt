@@ -33,7 +33,6 @@ fun StartScreen(
     userViewModel: UserViewModel,
     goToMapScreen: () -> Unit
 ) {
-    val user by userViewModel.user.observeAsState()
     val previewStoreInfo by userViewModel.previewStore.observeAsState()
 
     LaunchedEffect(Unit) {
@@ -47,9 +46,6 @@ fun StartScreen(
                 .fillMaxSize()
                 .background(Color.DarkGray)
         ) {
-
-            Text("user = $user")
-
             val size = previewStoreInfo?.size ?: 1
 
             Button(

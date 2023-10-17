@@ -11,13 +11,10 @@ import com.kakao.sdk.user.UserApiClient
 object KakaoLogin: SocialLogin() {
     private const val TAG = "KakaoLoginObject"
 
-    override suspend fun login(context: Context) : User? {
+    override fun login(context: Context, goToStartScreenWithUser: (User?) -> Unit) {
         val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) Log.e(TAG, "[카카오 계정] 로그인 실패 $error")
-            else if (token != null) Log.e(
-                TAG,
-                "[카카오 계정] 로그인 성공 ${token.accessToken} ${token.idToken}"
-            )
+            else if (token != null) Log.e(TAG, "[카카오 계정] 로그인 성공 ${token.accessToken} ${token.idToken}")
         }
 
         val instance = UserApiClient.instance
@@ -41,7 +38,6 @@ object KakaoLogin: SocialLogin() {
         }
 
         // 로그인한 사용자 정보 불러오기
-        var kUser: User? = null
         instance.me { user, error ->
             if (error != null) Log.e(TAG, "사용자 정보 요청 실패 $error")
             else if (user != null) {
@@ -52,14 +48,14 @@ object KakaoLogin: SocialLogin() {
                 val email = account?.email
                 val profileImageUrl = account?.profile?.profileImageUrl
 
-                kUser = User(
+                val kUser = User(
                     nickname = nickname!!,
                     email = email!!,
                     profileImageUrl = profileImageUrl!!,
                 )
+
+                goToStartScreenWithUser(kUser)
             }
         }
-
-        return kUser
     }
 }

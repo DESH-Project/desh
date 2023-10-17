@@ -68,6 +68,10 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
 
+    // Chart Library https://billcorea.tistory.com/386
+    def latest_release = "0.2.4-alpha"
+    implementation("com.github.tehras:charts:$latest_release")
+
     // Hilt
     implementation "com.google.dagger:hilt-android:2.44"
     kapt "com.google.dagger:hilt-compiler:2.44"
