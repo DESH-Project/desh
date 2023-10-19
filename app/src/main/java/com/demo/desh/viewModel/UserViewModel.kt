@@ -64,32 +64,15 @@ class UserViewModel @Inject constructor(
     }
 
 
-    private val _searchMode = MutableLiveData<Boolean>(false)
-    val searchMode : LiveData<Boolean> get() = _searchMode
-
-    fun fetchSearchModeTrue() {
-        _searchMode.value = true
-    }
-
-    fun fetchSearchModeFalse() {
-        _searchMode.value = false
-    }
-
-    private val _searchText = MutableLiveData<String>("")
-    val searchText : LiveData<String> get() = _searchText
-
-    fun fetchSearchText(text: String) {
-        _searchText.value = text
-    }
-
-
-
-
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
+    private val _selectedServiceName = MutableLiveData<String>(DEFAULT_SERVICE_NAME)
+    val selectedServiceName : LiveData<String> get() = _selectedServiceName
 
     fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {
+            _selectedServiceName.value = serviceName
+
             val res =
                 if (serviceName == DEFAULT_SERVICE_NAME) userRetrofitRepository.getRecommendationAllInfo()
                 else userRetrofitRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
@@ -122,7 +105,6 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
             val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
-
 
             _districtInfo.value = randomDistrictSampleList()
 

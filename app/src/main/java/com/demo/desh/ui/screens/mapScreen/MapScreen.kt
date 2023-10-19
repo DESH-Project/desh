@@ -30,22 +30,19 @@ fun MapScreen(
     val recommendInfo by userViewModel.recommendInfo.observeAsState()
     val districtInfo by userViewModel.districtInfo.observeAsState()
     val user by userViewModel.user.observeAsState()
-    val searchMode by userViewModel.searchMode.observeAsState()
-    val searchText by userViewModel.searchText.observeAsState()
+    val selectedServiceName by userViewModel.selectedServiceName.observeAsState()
 
-    val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
     val onServiceItemClick = { serviceName: String -> userViewModel.fetchMapView(serviceName) }
+    val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
     val onDistrictButtonClick = { districtName: String -> userViewModel.fetchDistrictInfoList(districtName)}
+
+    val defaultBackgroundColor = Color(0xAA000000)
 
     LaunchedEffect(Unit) {
         userViewModel.fetchServiceList()
     }
 
-    BackHandler {
-        userViewModel.fetchSearchModeFalse()
-    }
-
-    // https://github.com/ch4rl3x/BottomDrawerScaffold    -->   BottomDrawerScaffold Library
+    // https://github.com/ch4rl3x/BottomDrawerScaffold --> BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
     // https://developersbreach.com/modal-bottom-sheet-jetpack-compose-android/
     BottomDrawerScaffold(
@@ -53,8 +50,10 @@ fun MapScreen(
             DrawerContent(
                 user = user,
                 serviceList = serviceList,
-                districtInfo = districtInfo,
                 recommendInfo = recommendInfo,
+                districtInfo = districtInfo,
+                selectedServiceName = selectedServiceName,
+                defaultBackgroundColor = defaultBackgroundColor,
                 onServiceItemClick = onServiceItemClick,
                 onDistrictButtonClick = onDistrictButtonClick,
                 onDistrictItemClick = onDistrictItemClick
@@ -62,7 +61,7 @@ fun MapScreen(
         },
 
         drawerGesturesEnabled = true,
-        drawerBackgroundColor = Color(0xAA000000),  //Transparent drawer for custom Drawer shape
+        drawerBackgroundColor = defaultBackgroundColor,
         drawerElevation = 0.dp,
         drawerPeekHeight = 96.dp,
 
