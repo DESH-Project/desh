@@ -106,26 +106,11 @@ class UserViewModel @Inject constructor(
             val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
             val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
 
-            _districtInfo.value = randomDistrictSampleList()
-
-            /*
             if (res.isSuccessful) {
                 val body = res.body()!!
-
-                if (body.list.isEmpty()) {
-                    val sample = District(
-                        id = 1L,
-                        address = "서울시 노원구 상계 1동",
-                        image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
-                        price = 12.7
-                    )
-
-                    body.list.add(sample)
-                }
-
-                _districtInfo.value = body
+                if (body.size == 0) _districtInfo.value = randomDistrictSampleList()
+                else _districtInfo.value = body
             }
-            */
         }
     }
 
@@ -171,7 +156,6 @@ class UserViewModel @Inject constructor(
             "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/damir-kopezhanov-luseu9GtYzM-unsplash.jpg",
             "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/jose-losada-DyFjxmHt3Es-unsplash.jpg"
         )
-
 
         for (i in 0 until size) {
             val pick = random.nextInt(0, randomPhotoUrl.size)

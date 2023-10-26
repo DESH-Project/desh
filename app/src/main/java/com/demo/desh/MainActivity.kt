@@ -52,9 +52,7 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun Root(
-    userViewModel: UserViewModel,
-) {
+fun Root(userViewModel: UserViewModel) {
     val navController = rememberNavController()
 
     NavHost(
@@ -88,10 +86,7 @@ fun Root(
         }
 
         composable(route = "${Screen.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(
-                viewModel = userViewModel,
-                realtyId = it.toLong()
-            ) }
+            backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(it.toLong(), userViewModel) }
         }
     }
 }

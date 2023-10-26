@@ -28,19 +28,34 @@ import com.demo.desh.R
 import com.demo.desh.model.LoginPreviewInfo
 
 @Composable
-internal fun SocialLoginButton(onKakaoLoginButtonClick: () -> Unit) {
-    IconButton(
-        onClick = onKakaoLoginButtonClick,
-        modifier = Modifier
-            .width(256.dp)
-            .height(100.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.kakao_login_large_wide),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.clip(RoundedCornerShape(8.dp))
-        )
+fun SocialLoginButton(onKakaoLoginButtonClick: () -> Unit) {
+    Column(modifier = Modifier.padding(vertical = 10.dp)) {
+        IconButton(
+            onClick = onKakaoLoginButtonClick,
+            modifier = Modifier.padding(bottom = 10.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.kakao_login_large_wide),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(15.dp))
+                    .width(345.dp)
+                    .height(50.dp)
+            )
+        }
+
+        IconButton(onClick = onKakaoLoginButtonClick) {
+            Image(
+                painter = painterResource(id = R.drawable.btng),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(15.dp))
+                    .width(345.dp)
+                    .height(50.dp)
+            )
+        }
     }
 }
 

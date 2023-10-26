@@ -2,10 +2,18 @@ package com.demo.desh.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import customFontFamily
+import com.demo.desh.R
+
+val customFontFamily = FontFamily(
+    Font(R.font.notosanskr_bold, FontWeight.Bold, FontStyle.Normal),
+    Font(R.font.notosanskr_medium, FontWeight.Medium, FontStyle.Normal),
+    Font(R.font.notosanskr_regular, FontWeight.Normal, FontStyle.Normal)
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(

@@ -9,12 +9,12 @@ import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
-class UserRetrofitRepository @Inject constructor(
-    private val userRetrofitDao: UserRetrofitDao
-) {
+class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: UserRetrofitDao) {
     companion object {
         private const val TAG = "UserRetrofitRepository"
 
@@ -23,50 +23,53 @@ class UserRetrofitRepository @Inject constructor(
         }
     }
 
-    suspend fun login(user: User): Response<Long> =
-        userRetrofitDao
-            .login(user)
-            .also { logging("login", it) }
-
-    suspend fun sendRealtyInfo(realty: RealtyCreationReq): Response<Long> =
+    suspend fun sendRealtyInfo(realty: RealtyCreationReq): Response<Long> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .sendRealtyInfo(realty)
             .also { logging("sendRealtyInfo", it) }
+    }
 
-    suspend fun getServiceList(): Response<ServerResponseObj<Map<String, List<String>>>> =
+    suspend fun getServiceList(): Response<ServerResponseObj<Map<String, List<String>>>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getServiceList()
             .also { logging("getServiceList", it) }
+    }
 
-    suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>> =
+    suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getRecommendationAllInfo()
             .also { logging("getRecommendationAllInfo", it) }
+    }
 
-    suspend fun getRecommendationInfo(encodedServiceName: String): Response<ServerResponse<Recommend>> =
+    suspend fun getRecommendationInfo(encodedServiceName: String): Response<ServerResponse<Recommend>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getRecommendationInfo(encodedServiceName)
             .also { logging("getRecommendationInfo", it) }
+    }
 
-    suspend fun getDistrictInfo(encodedDistrictName: String): Response<ServerResponse<District>> =
+    suspend fun getDistrictInfo(encodedDistrictName: String): Response<ServerResponse<District>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getStoreList(encodedDistrictName)
             .also { logging("getDistrictInfo", it) }
+    }
 
-    suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<ServerResponse<Realty>> =
+    suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<ServerResponse<Realty>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getRealtyDetail(realtyId, userId)
             .also { logging("getRealtyDetail", it) }
+    }
 
 
-    suspend fun getIntroImage(): Response<ServerResponse<String>> =
+    suspend fun getIntroImage(): Response<ServerResponse<String>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getIntroImage()
             .also { logging("getIntroImage", it) }
+    }
 
-    suspend fun getIntroStore(): Response<ServerResponse<IntroStore>> =
+    suspend fun getIntroStore(): Response<ServerResponse<IntroStore>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getIntroStore()
             .also { logging("getIntroStore", it) }
+    }
 
 }

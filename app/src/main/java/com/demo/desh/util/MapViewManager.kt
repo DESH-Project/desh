@@ -37,6 +37,14 @@ object MapViewManager {
                 override fun onMapError(error: Exception?) {
                     TODO("Not yet implemented")
                 }
+
+                override fun onMapResumed() {
+                    super.onMapResumed()
+                }
+
+                override fun onMapPaused() {
+                    super.onMapPaused()
+                }
             },
 
             object : KakaoMapReadyCallback() {

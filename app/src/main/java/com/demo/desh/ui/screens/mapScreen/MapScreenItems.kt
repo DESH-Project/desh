@@ -1,5 +1,6 @@
 package com.demo.desh.ui.screens.mapScreen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -73,6 +74,7 @@ fun DrawerContent(
     val lps = 32.dp  // Large Padding Size
 
     Column(
+        modifier = Modifier.background(dbc),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -153,6 +155,7 @@ fun DrawerContent(
     }
 }
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CreateServiceListButton(
     serviceList: ServerResponseObj<Map<String, List<String>>>?,

@@ -1,12 +1,11 @@
 package com.demo.desh.ui.screens.mapScreen
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,7 +17,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.UserViewModel
 import com.kakao.vectormap.MapView
-import de.charlex.compose.BottomDrawerScaffold
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -45,8 +43,8 @@ fun MapScreen(
     // https://github.com/ch4rl3x/BottomDrawerScaffold --> BottomDrawerScaffold Library
     // https://stackoverflow.com/questions/67854169/how-to-implement-bottomappbar-and-bottomdrawer-pattern-using-android-jetpack-com
     // https://developersbreach.com/modal-bottom-sheet-jetpack-compose-android/
-    BottomDrawerScaffold(
-        drawerContent = {
+    BottomSheetScaffold(
+        sheetContent = {
             DrawerContent(
                 user = user,
                 serviceList = serviceList,
@@ -63,31 +61,28 @@ fun MapScreen(
         drawerGesturesEnabled = true,
         drawerBackgroundColor = defaultBackgroundColor,
         drawerElevation = 0.dp,
-        drawerPeekHeight = 96.dp,
 
         content = {
-            Scaffold { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    Column {
-                        /*
-                        SearchableTopBar(
-                            modifier = Modifier
-                                .padding(16.dp, 36.dp, 16.dp, 0.dp)
-                                .background(Color.Transparent),
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column {
+                    /*
+                    SearchableTopBar(
+                        modifier = Modifier
+                            .padding(16.dp, 36.dp, 16.dp, 0.dp)
+                            .background(Color.Transparent),
 
-                            searchMode = searchMode ?: false,
-                            searchText = searchText ?: "",
-                            onSearchTextChanged = { userViewModel.fetchSearchText(it) },
-                            onSearchButtonClicked = { userViewModel.fetchSearchModeTrue() }
-                        )
-                        */
+                        searchMode = searchMode ?: false,
+                        searchText = searchText ?: "",
+                        onSearchTextChanged = { userViewModel.fetchSearchText(it) },
+                        onSearchButtonClicked = { userViewModel.fetchSearchModeTrue() }
+                    )
+                    */
 
-                        AndroidView(
-                            factory = { context -> MapViewManager.createMapView(context) },
-                            modifier = Modifier.fillMaxSize(),
-                            update = { mv: MapView -> MapViewManager.labelingOnMapView(mv, recommendInfo) }
-                        )
-                    }
+                    AndroidView(
+                        factory = { context -> MapViewManager.createMapView(context) },
+                        modifier = Modifier.fillMaxSize(),
+                        update = { mv: MapView -> MapViewManager.labelingOnMapView(mv, recommendInfo) }
+                    )
                 }
             }
         }
