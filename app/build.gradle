@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -47,6 +48,11 @@ android {
     }
 }
 
+// Allow references to generated code
+kapt {
+    correctErrorTypes true
+}
+
 dependencies {
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')
@@ -62,6 +68,17 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
 
+    // vico chart lib
+    def vico_version = "1.12.0"
+    implementation "com.patrykandpatrick.vico:views:$vico_version"
+    implementation "com.patrykandpatrick.vico:compose:$vico_version"
+    implementation "com.patrykandpatrick.vico:compose-m2:$vico_version"
+    implementation "com.patrykandpatrick.vico:compose-m3:$vico_version"
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:2.44"
+    kapt "com.google.dagger:hilt-compiler:2.44"
+
     // ViewPager
     implementation("com.google.accompanist:accompanist-pager:0.20.1")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.20.1")
@@ -72,8 +89,6 @@ dependencies {
 
     // OAuth2 Library
     implementation "com.kakao.sdk:v2-user:2.15.0" // 카카오 로그인
-    implementation 'com.google.android.gms:play-services-auth:20.6.0' // 구글 로그인
-    implementation 'com.navercorp.nid:oauth-jdk8:5.7.0' // jdk 8
 
     // Retrofit2
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -90,14 +105,6 @@ dependencies {
 
     // Kakao Map
     implementation 'com.kakao.maps.open:android:2.5.0'
-
-    // Room DB
-    def room_version = "2.5.2"
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    // To use Kotlin annotation processing tool (kapt)
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-ktx:2.5.2"
 
     // Bottom Drawer Lib
     implementation 'de.charlex.compose:bottom-drawer-scaffold:1.1.0-beta02'

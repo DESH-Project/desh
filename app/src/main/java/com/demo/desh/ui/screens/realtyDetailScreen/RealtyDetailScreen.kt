@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Colors
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -28,10 +29,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -52,28 +56,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.demo.desh.R
 import com.demo.desh.model.User
 import com.demo.desh.ui.screens.ContentView1
 import com.demo.desh.ui.theme.Typography2
-import com.demo.desh.viewModel.MainViewModel
+import com.demo.desh.viewModel.UserViewModel
 
 @Composable
 fun RealtyDetailScreen(
     realtyId: Long,
-    viewModel: MainViewModel
+    userViewModel: UserViewModel
 ) {
-    val member by viewModel.member.observeAsState()
-    val user = member?.let { User.toUser(it) }
+    val user by userViewModel.user.observeAsState()
 
-    Surface(color = Color(0xFF343434), contentColor = Color.White) {
+    Surface(
+        color = Color(0xFF343434),
+        contentColor = Color.White
+    ) {
         val scrollState = rememberScrollState();
 
         Column(Modifier.verticalScroll(scrollState)) {
-
-            // A surface container using the 'background' color from the theme
             BuildingImage()
             Top()
             Spacer(modifier = Modifier.padding(vertical = 5.dp))
@@ -93,26 +95,17 @@ fun RealtyDetailScreen(
             )
             aroundbuilding()
             Spacer(modifier = Modifier.padding(0.dp, 10.dp))
-            Text("주변상가", style = Typography2.bodyMedium, fontSize = 20.sp, modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp))
-            aroundstore("올리브영")
-            aroundstore("편의점")
-            aroundstore("롯데리아")
-            aroundstore("아마스빈")
-            aroundstore("메가커피")
-
-
+            Text("주변상권", style = Typography2.bodyMedium, fontSize = 18.sp, modifier = Modifier.padding(vertical = 1.dp, horizontal = 19.dp))
+            aroundstore("삼각지역(4호선, 6호선), 신용산역(4호선), 마포역(5호선),")
+            aroundstore("숙대입구역(4호선), 효찰공원앞역(경의중앙선, 6호선),")
+            aroundstore("공덕역(공항철도), 경의중앙선,5호선,6호선), 남양역(1호선),")
+            aroundstore("용산역(1호선, 경의중앙선, KTX호남선, KTX전라선")
+            Spacer(modifier = Modifier.padding(0.dp, 20.dp))
         }
-
     }
 }
 
-val customFontFamily = FontFamily(
-    Font(R.font.notosanskr_bold, FontWeight.Bold, FontStyle.Normal),
-    Font(R.font.notosanskr_extrabold, FontWeight.ExtraBold, FontStyle.Normal),
-    Font(R.font.notosanskr_extralight, FontWeight.Light, FontStyle.Normal),
-    Font(R.font.notosanskr_medium, FontWeight.Medium, FontStyle.Normal),
-    Font(R.font.notosanskr_semibold, FontWeight.SemiBold, FontStyle.Normal)
-)
+
 
 @Composable
 fun Top() {
@@ -125,12 +118,9 @@ fun Top() {
             Spacer(modifier = Modifier.padding(100.dp, 0.dp))
 
             IconToggleButton(
-
                 checked = checked,
                 onCheckedChange = { ischecked -> checked = ischecked },
                 modifier = Modifier.padding(vertical = 9.dp)
-
-
             ) {
                 Icon(
                     imageVector = Icons.Default.Star,
@@ -139,6 +129,7 @@ fun Top() {
                     modifier = Modifier.size(28.dp)
                 )
             }
+
             if(checked){
                 Toast.makeText(context, "찜하기를 선택하셨습니다.", Toast.LENGTH_SHORT).show()
             }
@@ -149,14 +140,13 @@ fun Top() {
 
         Row() {
             Card(
-
+                backgroundColor = (Color.Black),
                 modifier = Modifier
                     .height(40.dp)
-                    .width(85.dp), shape = RoundedCornerShape(10.dp), backgroundColor = Color(
-                    0x33000000
-                )
+                    .width(85.dp)
 
-            ) {
+            )
+            {
                 Text(
                     "# 베이커리",
                     style = Typography2.bodySmall,
@@ -166,12 +156,11 @@ fun Top() {
             }
             Spacer(modifier = Modifier.padding(5.dp, 0.dp))
             Card(
+                backgroundColor = Color.Black , // 카드의 배경색을 파란색으로 설정
                 modifier = Modifier
                     .height(40.dp)
-                    .width(85.dp), shape = RoundedCornerShape(10.dp), backgroundColor = Color(0x33000000)
+                    .width(85.dp)
             ) {
-
-
                 Text(
                     "# 카페",
                     style = Typography2.bodySmall,
@@ -222,6 +211,7 @@ fun names(names: String, day1: String) {
 @Composable
 fun BuildingImage() {
     var isDropDownExpanded by remember { mutableStateOf(false) }
+
     Surface {
         ContentView1()
         Box(
@@ -285,7 +275,8 @@ fun buildingdetail() {
         }
 
         Row(modifier = Modifier.padding(horizontal = 6.dp)) {
-            Icon(painter = painterResource(id = R.drawable.money), contentDescription = null,
+            Icon(
+                painter = painterResource(id = R.drawable.money), contentDescription = null,
                 tint = Color.Gray,
                 modifier = Modifier
                     .size(46.dp)
@@ -303,7 +294,7 @@ fun buildingdetail() {
         }
         Row(modifier = Modifier.padding(horizontal = 7.dp)) {
             Icon(
-                painterResource(id =R.drawable.widthh ),
+                painterResource(id = R.drawable.widthh),
                 contentDescription = null,
                 tint = Color.Gray,
                 modifier = Modifier
@@ -339,12 +330,14 @@ fun buildingdetail() {
             )
         }
 
-        Text(
-            "애뜨왈커피 로스팅 공장에서 운영하는 베이커리 카페로 젊은 감성있는 인테리어와 많은 주차 공간을 확보하고 있습니다.",
-            style = Typography2.bodySmall,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(horizontal = 40.dp)
-        )
+        Row() {
+            Text(
+                "애뜨왈커피 로스팅 공장에서 운영하는 베이커리 카페로 젊은 감성있는 인테리어와 많은 주차 공간을 확보하고 있습니다..",
+                style = Typography2.bodySmall,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(horizontal = 40.dp))
+
+        }
     }
 }
 
@@ -352,9 +345,9 @@ fun buildingdetail() {
 fun aroundbuilding() {
     Column {
         Text(
-            "주변상권",
+            "주변상가",
             style = Typography2.bodyMedium,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             modifier = Modifier.padding(vertical = 5.dp, horizontal = 19.dp)
         )
 
@@ -378,22 +371,13 @@ fun aroundbuilding() {
 @Composable
 fun aroundstore(pharse: String) {
     Column() {
-        Card(
-            backgroundColor = Color.Gray,
-            modifier = Modifier
-                .padding(horizontal = 19.dp)
-                .height(40.dp)
-                .width(380.dp), shape = RoundedCornerShape(5.dp)
 
-        ) {
-            Text(
-                text = pharse,
-                style = Typography2.bodySmall,
-                fontSize = 15.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-        Spacer(modifier = Modifier.padding(vertical = 10.dp))
+        Text(
+            text = pharse,
+            style = Typography2.bodySmall,
+            fontSize = 13.sp,
+            modifier = Modifier.padding(horizontal = 30.dp)
+        )
 
     }
 }

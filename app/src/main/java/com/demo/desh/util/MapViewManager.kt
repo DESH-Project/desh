@@ -1,20 +1,9 @@
 package com.demo.desh.util
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathFillType
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 import com.demo.desh.R
-import com.demo.desh.model.District
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.kakao.vectormap.KakaoMap
@@ -29,52 +18,9 @@ import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
 import com.kakao.vectormap.shape.DotPoints
 import com.kakao.vectormap.shape.PolygonOptions
-import com.kakao.vectormap.shape.PolygonStyle
 import com.kakao.vectormap.shape.PolygonStyles
 import com.kakao.vectormap.shape.PolygonStylesSet
 import java.lang.Exception
-
-@Composable
-fun rememberVector(): ImageVector {
-    return remember {
-        ImageVector.Builder(
-            name = "vector",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 960f,
-            viewportHeight = 960f
-        ).apply {
-            path(
-                fill = SolidColor(Color.Black),
-                fillAlpha = 1.0f,
-                stroke = null,
-                strokeAlpha = 1.0f,
-                strokeLineWidth = 1.0f,
-                strokeLineCap = StrokeCap.Butt,
-                strokeLineJoin = StrokeJoin.Miter,
-                strokeLineMiter = 1.0f,
-                pathFillType = PathFillType.NonZero
-            ) {
-                moveTo(480f, -120f)
-                quadToRelative(-33f, 0f, -56.5f, -23.5f)
-                reflectiveQuadTo(400f, -200f)
-                quadToRelative(0f, -33f, 23.5f, -56.5f)
-                reflectiveQuadTo(480f, -280f)
-                quadToRelative(33f, 0f, 56.5f, 23.5f)
-                reflectiveQuadTo(560f, -200f)
-                quadToRelative(0f, 33f, -23.5f, 56.5f)
-                reflectiveQuadTo(480f, -120f)
-                close()
-                moveToRelative(-80f, -240f)
-                verticalLineToRelative(-480f)
-                horizontalLineToRelative(160f)
-                verticalLineToRelative(480f)
-                horizontalLineTo(400f)
-                close()
-            }
-        }.build()
-    }
-}
 
 object MapViewManager {
     fun labelingOnMapView(mapView: MapView, recommendInfo: ServerResponse<Recommend>?) {
@@ -90,6 +36,14 @@ object MapViewManager {
                 // 인증 실패 및 지도 사용 중 에러 발생시 호출
                 override fun onMapError(error: Exception?) {
                     TODO("Not yet implemented")
+                }
+
+                override fun onMapResumed() {
+                    super.onMapResumed()
+                }
+
+                override fun onMapPaused() {
+                    super.onMapPaused()
                 }
             },
 
@@ -107,10 +61,8 @@ object MapViewManager {
                         setColor(Color(0x22FFFFFF).toArgb())
                     }
 
-                    Log.e("KakaoMapReadyCallback onMapReady", "recommendInfo : $recommendInfo")
 
                     recommendInfo?.data?.forEachIndexed { _, item ->
-                        Log.e("KakaoMap", "item : $item")
                         val options = LabelOptions.from(LatLng.from(item.lat, item.lng))
                             .setStyles(styles)
                             .setClickable(true)
@@ -141,12 +93,10 @@ object MapViewManager {
             object : MapLifeCycleCallback() {
                 // 지도 API가 정상적으로 종료될 때 호출
                 override fun onMapDestroy() {
-                    mv.pause()
                 }
 
                 // 인증 실패 및 지도 사용 중 에러 발생시 호출
                 override fun onMapError(error: Exception?) {
-                    TODO("Not yet implemented")
                 }
             },
 

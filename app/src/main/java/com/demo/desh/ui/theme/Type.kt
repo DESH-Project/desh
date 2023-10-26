@@ -4,10 +4,16 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.demo.desh.R
-import customFontFamily
+
+val customFontFamily = FontFamily(
+    Font(R.font.notosanskr_bold, FontWeight.Bold, FontStyle.Normal),
+    Font(R.font.notosanskr_medium, FontWeight.Medium, FontStyle.Normal),
+    Font(R.font.notosanskr_regular, FontWeight.Normal, FontStyle.Normal)
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -19,6 +25,7 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
 )
+
 val Typography2 = Typography(
     bodyMedium = TextStyle(
         fontFamily = customFontFamily,

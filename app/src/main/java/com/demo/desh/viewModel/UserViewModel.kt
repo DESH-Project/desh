@@ -1,33 +1,44 @@
 package com.demo.desh.viewModel
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demo.desh.access.entity.Member
-import com.demo.desh.access.repository.MemberRepository
-import com.demo.desh.access.repository.UserRetrofitRepository
+import com.demo.desh.access.UserRetrofitRepository
 import com.demo.desh.model.District
+import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.ServerResponseObj
+import com.demo.desh.model.User
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.util.UUID
+import javax.inject.Inject
 import kotlin.random.Random
 
-class MainViewModel(
-    private val userRetrofitRepository: UserRetrofitRepository,
-    private val memberRepository: MemberRepository
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val userRetrofitRepository: UserRetrofitRepository
 ) : ViewModel() {
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
+    }
+
+    private val _previewStore = MutableLiveData<List<IntroStore>>()
+    val previewStore : LiveData<List<IntroStore>> get() = _previewStore
+
+    fun loadPreviewStore() {
+        viewModelScope.launch {
+            val result = userRetrofitRepository.getIntroStore()
+
+            if (result.isSuccessful) {
+                _previewStore.value = result.body()?.data
+            }
+        }
     }
 
     private val _previewImages = MutableLiveData<List<String>>()
@@ -44,58 +55,27 @@ class MainViewModel(
         }
     }
 
-    private val _searchMode = MutableLiveData<Boolean>(false)
-    val searchMode : LiveData<Boolean> get() = _searchMode
+    /* 카카오 소셜 로그인 */
+    private val _user : MutableLiveData<User?> = MutableLiveData(null)
+    val user : LiveData<User?> get() = _user
 
-    fun fetchSearchModeTrue() {
-        _searchMode.value = true
+    fun fetchUser(user: User?) {
+        _user.value = user
     }
 
-    fun fetchSearchModeFalse() {
-        _searchMode.value = false
-    }
-
-    private val _searchText = MutableLiveData<String>("")
-    val searchText : LiveData<String> get() = _searchText
-
-    fun fetchSearchText(text: String) {
-        _searchText.value = text
-    }
-
-
-    private val _member = MutableLiveData<Member?>()
-    val member: LiveData<Member?> get() = _member
-
-    fun getLastMember() {
-        viewModelScope.launch {
-            val result = memberRepository.findAllMember()
-            if (result.isEmpty()) _member.value = null
-            else _member.value = result.last()
-        }
-    }
-
-    fun deleteAllMember() {
-        viewModelScope.launch {
-            memberRepository.deleteAllMember()
-        }
-    }
-
-    fun insertMember(member: Member) {
-        viewModelScope.launch {
-            memberRepository.insertMember(member)
-        }
-    }
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
     val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
+    private val _selectedServiceName = MutableLiveData<String>(DEFAULT_SERVICE_NAME)
+    val selectedServiceName : LiveData<String> get() = _selectedServiceName
 
     fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {
+            _selectedServiceName.value = serviceName
+
             val res =
                 if (serviceName == DEFAULT_SERVICE_NAME) userRetrofitRepository.getRecommendationAllInfo()
                 else userRetrofitRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
-
-            Log.e("MapScreen : fetchMapView()", "res = $res, res body = ${res.body()?.data}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
@@ -104,13 +84,12 @@ class MainViewModel(
         }
     }
 
-    private val _serviceList = MutableLiveData<ServerResponse<String>>()
-    val serviceList: LiveData<ServerResponse<String>> get() = _serviceList
+    private val _serviceList = MutableLiveData<ServerResponseObj<Map<String, List<String>>>>()
+    val serviceList: LiveData<ServerResponseObj<Map<String, List<String>>>> get() = _serviceList
 
     fun fetchServiceList() {
         viewModelScope.launch {
             val res = userRetrofitRepository.getServiceList()
-            Log.e("MapScreen : fetchServiceList()", "res = $res, res body = ${res.body()}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
@@ -127,28 +106,11 @@ class MainViewModel(
             val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
             val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
 
-            Log.e("MapScreen : fetchDistrictInfoList()", "res = ${res.body()}")
-
-            _districtInfo.value = randomDistrictSampleList()
-
-            /*
             if (res.isSuccessful) {
                 val body = res.body()!!
-
-                if (body.list.isEmpty()) {
-                    val sample = District(
-                        id = 1L,
-                        address = "서울시 노원구 상계 1동",
-                        image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
-                        price = 12.7
-                    )
-
-                    body.list.add(sample)
-                }
-
-                _districtInfo.value = body
+                if (body.size == 0) _districtInfo.value = randomDistrictSampleList()
+                else _districtInfo.value = body
             }
-            */
         }
     }
 
@@ -158,7 +120,6 @@ class MainViewModel(
     fun fetchRealtyDetail(realtyId: Long, userId: Long) {
         viewModelScope.launch {
             val res = userRetrofitRepository.getRealtyDetail(realtyId, userId)
-            Log.e("MainViewModel.fetchRealtyDetail()", "res = ${res.body()}")
 
             if (res.isSuccessful) {
                 val body = res.body()!!
@@ -195,7 +156,6 @@ class MainViewModel(
             "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/damir-kopezhanov-luseu9GtYzM-unsplash.jpg",
             "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/jose-losada-DyFjxmHt3Es-unsplash.jpg"
         )
-
 
         for (i in 0 until size) {
             val pick = random.nextInt(0, randomPhotoUrl.size)

@@ -1,73 +1,72 @@
-package com.demo.desh.ui.screens
+package com.demo.desh.ui.screens.loginScreen
 
-import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material3.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.demo.desh.R
 import com.demo.desh.model.LoginPreviewInfo
-import com.demo.desh.viewModel.MainViewModel
+import com.demo.desh.model.User
+import com.demo.desh.ui.theme.Typography2
+import com.demo.desh.util.KakaoLogin
+import com.demo.desh.viewModel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun LoginScreen(
-    viewModel: MainViewModel,
+    userViewModel: UserViewModel,
     goToStartScreen: () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        userViewModel.loadPreviewImages()
+    }
+
     val context = LocalContext.current
     val textData = LoginPreviewInfo.textData
+    val pagerState = rememberPagerState()
 
-    val previewImages by viewModel.previewImages.observeAsState()
+    /* STATES */
+    val previewImages by userViewModel.previewImages.observeAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadPreviewImages()
+    /* HANDLERS */
+    val onKakaoLoginButtonClick = {
+        val goToStartScreenWithUser = { user: User? ->
+            goToStartScreen()
+            userViewModel.fetchUser(user)
+        }
+
+        KakaoLogin.login(context, goToStartScreenWithUser)
     }
 
     Scaffold(
-        floatingActionButton = {
-            SocialLoginButton(
-                context = context,
-                viewModel = viewModel,
-                goToStartScreen = goToStartScreen,
-            )
-        },
-
+        floatingActionButton = { SocialLoginButton(onKakaoLoginButtonClick) },
         floatingActionButtonPosition = FabPosition.Center
-
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -75,23 +74,19 @@ fun LoginScreen(
                 .fillMaxSize()
                 .background(Color.DarkGray)
         ) {
+            val size = previewImages?.size ?: 1
 
             HorizontalPager(
-                count = previewImages?.size ?: 1,
-                modifier = Modifier
-                    .fillMaxSize()
+                count = size,
+                state = pagerState
             ) { pageIndex ->
-
-                val size = previewImages?.size ?: 1
                 val model = previewImages?.get(pageIndex) ?: ""
 
                 AsyncImage(
                     model = model,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxHeight()
+                    contentScale = ContentScale.Inside,
+                    modifier = Modifier.padding(bottom = 290.dp)
                 )
 
                 Icon(
@@ -105,58 +100,40 @@ fun LoginScreen(
                         .alpha(if (pageIndex == size - 1) 0f else 0.45f)
                 )
 
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(32.dp)
-                ) {
+                Column(modifier = Modifier.padding(top = 410.dp)) {
                     Text(
                         text = textData[pageIndex].introduceText,
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        style = Typography2.bodyMedium,
+                        color = Color.White,
+                        modifier = Modifier.padding(horizontal = 29.dp)
                     )
 
                     Text(
                         text = textData[pageIndex].impactText,
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 50.sp,
+                        modifier = Modifier.padding(horizontal = 27.dp)
                     )
 
                     Text(
                         text = textData[pageIndex].explainText,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        style = Typography2.bodySmall,
+                        color = Color.White,
+                        modifier = Modifier.padding(horizontal = 29.dp)
                     )
                 }
             }
+
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier.padding(top = 462.dp, start = 32.dp),
+                indicatorHeight = 5.dp,
+                spacing = 5.dp,
+                activeColor = Color.White,
+                indicatorShape = RectangleShape,
+                indicatorWidth = 32.dp
+            )
         }
-    }
-}
-
-@Composable
-private fun SocialLoginButton(
-    context: Context,
-    viewModel: MainViewModel,
-    goToStartScreen: () -> Unit
-) {
-    val coroutineScope = rememberCoroutineScope()
-    // val onKakaoLoginButtonClick = { coroutineScope.launch { KakaoLogin.login(context, viewModel, goToMapScreen) } }
-    val onKakaoLoginButtonClickTest = { goToStartScreen() }
-
-    IconButton(
-        onClick = { onKakaoLoginButtonClickTest() },
-        modifier = Modifier
-            .width(256.dp)
-            .height(90.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.kakao_login_large_wide),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.clip(RoundedCornerShape(8.dp))
-        )
     }
 }

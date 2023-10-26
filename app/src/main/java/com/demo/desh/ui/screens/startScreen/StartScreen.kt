@@ -1,62 +1,43 @@
-package com.demo.desh.ui.screens
+package com.demo.desh.ui.screens.startScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.demo.desh.access.repository.MemberRepository
-import com.demo.desh.model.PreviewInfo
-import com.demo.desh.model.User
-import com.demo.desh.viewModel.MainViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import java.text.DecimalFormat
+import com.demo.desh.viewModel.UserViewModel
 
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun StartScreen(
-    viewModel: MainViewModel,
+    userViewModel: UserViewModel,
     goToMapScreen: () -> Unit
 ) {
-    val testData = PreviewInfo.testData
+    val previewStoreInfo by userViewModel.previewStore.observeAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getLastMember()
+        userViewModel.loadPreviewStore()
     }
-
-    val member by viewModel.member.observeAsState()
-    val user = member?.let { User.toUser(it) }
 
     Scaffold { innerPadding ->
         Box(
@@ -65,15 +46,39 @@ fun StartScreen(
                 .fillMaxSize()
                 .background(Color.DarkGray)
         ) {
+            val size = previewStoreInfo?.size ?: 1
+
+            Button(
+                onClick = goToMapScreen,
+                colors = ButtonDefaults.buttonColors(Color(0xFFFF6A68)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp, 40.dp, 8.dp, 0.dp)
+            ) {
+                Text(
+                    text = "시작해보기",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            /*
             HorizontalPager(
-                count = testData.size,
+                count = size,
                 modifier = Modifier
                     .fillMaxSize()
             ) { pageIndex ->
-                val lastPage = testData.size - 1 == pageIndex
+
+                val data = previewStoreInfo?.get(pageIndex)
+                val lastPage = size - 1 == pageIndex
+
+                val df = DecimalFormat("##,###만원")
+                val dep = data?.deposit ?: 10000
+                val text = "${data?.pyung}평 시세\n${df.format(dep)} / ${data?.monthly ?: 200}"
 
                 AsyncImage(
-                    model = testData[pageIndex].imageUrl,
+                    model = data?.images?.get(0),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -97,10 +102,6 @@ fun StartScreen(
                         .align(Alignment.TopStart)
                         .padding(24.dp)
                 ) {
-                    val df = DecimalFormat("##,###만원")
-                    val dep = testData[pageIndex].deposit / 10000
-                    val text = "${df.format(dep)} / ${testData[pageIndex].monthly}"
-
                     Text(
                         text = text,
                         fontSize = 16.sp,
@@ -156,24 +157,11 @@ fun StartScreen(
                                 fontSize = 16.sp,
                             )
 
-                            Button(
-                                onClick = goToMapScreen,
-                                colors = ButtonDefaults.buttonColors(Color(0xFFFF6A68)),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp, 40.dp, 8.dp, 0.dp)
-                            ) {
-                                Text(
-                                    text = "시작해보기",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
-                                )
-                            }
                         }
                     }
                 }
             }
+            */
         }
     }
 }
