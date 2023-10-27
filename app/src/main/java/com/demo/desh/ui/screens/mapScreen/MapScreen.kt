@@ -24,10 +24,12 @@ fun MapScreen(
     userViewModel: UserViewModel,
     goToRealtyDetail: (Long) -> Unit,
 ) {
+    val user = userViewModel.user.value
+
+    /* STATES */
     val serviceList by userViewModel.serviceList.observeAsState()
     val recommendInfo by userViewModel.recommendInfo.observeAsState()
     val districtInfo by userViewModel.districtInfo.observeAsState()
-    val user by userViewModel.user.observeAsState()
     val selectedServiceName by userViewModel.selectedServiceName.observeAsState()
 
     val onServiceItemClick = { serviceName: String -> userViewModel.fetchMapView(serviceName) }

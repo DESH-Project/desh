@@ -1,7 +1,6 @@
 package com.demo.desh.ui.screens.startScreen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,12 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
@@ -52,7 +48,9 @@ fun StartScreen(
         userViewModel.loadPreviewStore()
     }
 
-    val user by userViewModel.user.observeAsState()
+    val user = userViewModel.user.value
+
+    /* STATES */
     val previewStoreInfo by userViewModel.previewStore.observeAsState()
 
     Scaffold(

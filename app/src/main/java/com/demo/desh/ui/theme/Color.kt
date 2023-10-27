@@ -11,4 +11,7 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val Black = Color(0xFF000000)
-val ButtonColor = Color(0x5000000)
+
+/* App Custom Colors */
+val DefaultBackgroundColor = Color(0xFF343434)
+val HighlightColor = Color(0xFFFF6A68)

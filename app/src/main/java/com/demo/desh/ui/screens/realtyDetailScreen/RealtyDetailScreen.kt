@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -50,6 +51,8 @@ import com.demo.desh.model.DropdownItem
 import com.demo.desh.ui.screens.CustomDropdownMenu
 import com.demo.desh.ui.screens.CustomUserIconMenu
 import com.demo.desh.ui.screens.UserProfileCard
+import com.demo.desh.ui.theme.DefaultBackgroundColor
+import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.viewModel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -80,8 +83,9 @@ fun RealtyDetailScreen(
     realtyId: Long,
     userViewModel: UserViewModel
 ) {
+    val user = userViewModel.user.value
+
     /* STATES */
-    val user by userViewModel.user.observeAsState()
     val scrollState = rememberScrollState()
 
     /* DUMMY */
@@ -103,7 +107,7 @@ fun RealtyDetailScreen(
 
     Scaffold(
         topBar = { TopBarContent(modifier = Modifier.fillMaxWidth()) },
-        backgroundColor = Color(0xFF343434),
+        backgroundColor = DefaultBackgroundColor,
         contentColor = Color.White,
     ) { innerPadding ->
         Box(
@@ -111,6 +115,12 @@ fun RealtyDetailScreen(
                 .padding(innerPadding)
                 .verticalScroll(state = scrollState)
         ) {
+            /*
+            if (buildingInfo == null) {
+                CircularProgressIndicator()
+            }
+            */
+
             ConstraintLayout(modifier = Modifier.fillMaxSize()) {
                 val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
 
@@ -313,7 +323,9 @@ fun BuildingInfoUi(
         Divider(modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp), color = Color.Gray)
 
         // Line 4 (건물 정보)
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)) {
             BuildingInfoMaker(imageVector = Icons.Default.LocationOn, text = buildingInfo.address)
             BuildingInfoMaker(imageVector = Icons.Default.Info, text = "3000 / 200")
             BuildingInfoMaker(imageVector = Icons.Default.Home, text = "${buildingInfo.pyung}평(${String.format("%.2f", buildingInfo.squareMeter)})")
@@ -334,7 +346,7 @@ fun BuildingInfoUi(
 fun ChatButton(modifier: Modifier = Modifier) {
     Button(
         onClick = { /*TODO*/ },
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red, contentColor = Color.White),
+        colors = ButtonDefaults.buttonColors(backgroundColor = HighlightColor, contentColor = Color.White),
         shape = RoundedCornerShape(15.dp)
     ) {
         Text(text = "문의하기", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -380,7 +392,7 @@ fun NearbyBuildingPreviewUi(
             text = "인근 상가 정보도 확인해보세요!",
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
-            color = Color(0xFFFF6A68)
+            color = HighlightColor
         )
 
         Spacer(modifier = Modifier.padding(vertical = 6.dp))
