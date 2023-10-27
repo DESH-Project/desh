@@ -301,8 +301,7 @@ fun CreateRecommendPager(
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .clickable { onDistrictButtonClick(list[page].district) }
+            modifier = Modifier.clickable { onDistrictButtonClick(list[page].district) }
         ) {
             val item = list[page]
 

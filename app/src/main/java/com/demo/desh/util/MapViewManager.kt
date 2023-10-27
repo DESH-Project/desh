@@ -103,7 +103,9 @@ object MapViewManager {
             object : KakaoMapReadyCallback() {
                 // 인증 후 API가 정상적으로 실행될 때 호출
                 override fun onMapReady(kakaoMap: KakaoMap) {
-
+                    kakaoMap.setOnPoiClickListener { kakaoMap, position, layerId, poiId ->
+                        kakaoMap.moveCamera(CameraUpdateFactory.zoomIn())
+                    }
                 }
 
                 // 지도 시작 시 확대/축소 줌 레벨 설정

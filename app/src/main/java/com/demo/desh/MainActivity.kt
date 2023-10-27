@@ -34,11 +34,7 @@ class MainActivity : AppCompatActivity() {
         val userViewModel: UserViewModel by viewModels()
 
         setContent {
-            DeshprojectfeTheme {
-                Root(
-                    userViewModel = userViewModel,
-                )
-            }
+            DeshprojectfeTheme { Root(userViewModel) }
         }
     }
 }

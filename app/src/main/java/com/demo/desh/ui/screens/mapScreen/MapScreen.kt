@@ -32,7 +32,7 @@ fun MapScreen(
 
     val onServiceItemClick = { serviceName: String -> userViewModel.fetchMapView(serviceName) }
     val onDistrictItemClick = { realtyId: Long -> goToRealtyDetail(realtyId) }
-    val onDistrictButtonClick = { districtName: String -> userViewModel.fetchDistrictInfoList(districtName)}
+    val onDistrictButtonClick = { districtName: String -> userViewModel.fetchDistrictInfoList(districtName) }
 
     val defaultBackgroundColor = Color(0xAA000000)
 
@@ -65,23 +65,10 @@ fun MapScreen(
         content = {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column {
-                    /*
-                    SearchableTopBar(
-                        modifier = Modifier
-                            .padding(16.dp, 36.dp, 16.dp, 0.dp)
-                            .background(Color.Transparent),
-
-                        searchMode = searchMode ?: false,
-                        searchText = searchText ?: "",
-                        onSearchTextChanged = { userViewModel.fetchSearchText(it) },
-                        onSearchButtonClicked = { userViewModel.fetchSearchModeTrue() }
-                    )
-                    */
-
                     AndroidView(
                         factory = { context -> MapViewManager.createMapView(context) },
                         modifier = Modifier.fillMaxSize(),
-                        update = { mv: MapView -> MapViewManager.labelingOnMapView(mv, recommendInfo) }
+                        update = { mapView: MapView -> MapViewManager.labelingOnMapView(mapView, recommendInfo) }
                     )
                 }
             }

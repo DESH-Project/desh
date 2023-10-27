@@ -53,4 +53,11 @@ interface UserRetrofitDao {
     /* 시작 스크린 상가 추천 */
     @GET("intro/list")
     suspend fun getIntroStore() : Response<ServerResponse<IntroStore>>
+
+    /* 상가 찜하기 */
+    @GET("dibs")
+    suspend fun sendPickedStore(
+        @Query("realty-id") userId: Long,
+        @Query("user-id") realtyId: Long
+    ) : Response<ServerResponse<Int>>
 }
