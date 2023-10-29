@@ -77,13 +77,13 @@ data class LoginPreviewInfo(
         val textData = listOf(
             LoginPreviewInfo(
                 introduceText = "1:1로 다이렉트 대화하기",
-                impactText = "소통하세요",
+                impactText = "직접\n소통하세요",
                 explainText = "제공자와 1:1 대화를 통해\n안전하고 확실한 상권을 알아보세요!"
             ),
 
             LoginPreviewInfo(
                 introduceText = "주변 상가 정보 알아보기",
-                impactText = "확인하세요",
+                impactText = "쉽게\n확인하세요",
                 explainText = "혹시 상권을 알아보고 계신가요?\n지도를 통해 한눈에 상권 정보를 보여드릴게요!"
             ),
 

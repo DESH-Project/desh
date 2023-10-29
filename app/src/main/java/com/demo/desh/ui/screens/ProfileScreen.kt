@@ -1,4 +1,4 @@
-package com.demo.desh.ui.screens.profileScreen
+package com.demo.desh.ui.screens
 
 import androidx.compose.runtime.Composable
 

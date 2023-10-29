@@ -1,3 +1,5 @@
+package com.demo.desh.ui.screens
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,20 +18,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -48,9 +49,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import com.demo.desh.model.DropdownItem
-import com.demo.desh.ui.screens.CustomDropdownMenu
-import com.demo.desh.ui.screens.CustomUserIconMenu
-import com.demo.desh.ui.screens.UserProfileCard
+import com.demo.desh.ui.CustomDropdownMenu
+import com.demo.desh.ui.CustomIconMenu
+import com.demo.desh.ui.UserProfileCard
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
@@ -218,7 +219,10 @@ fun TopBarContent(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.padding(start = 2.dp, end = 2.dp))
 
-            CustomUserIconMenu()
+            CustomIconMenu(
+                vector = Icons.Default.AccountCircle,
+                onIconClick = { }
+            )
         }
     }
 }

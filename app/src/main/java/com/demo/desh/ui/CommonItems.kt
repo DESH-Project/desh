@@ -1,4 +1,4 @@
-package com.demo.desh.ui.screens
+package com.demo.desh.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
@@ -19,7 +18,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,22 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.demo.desh.model.DropdownItem
-
-@Composable
-fun CustomDivideLine() {
-    val mod = Modifier
-        .background(color = Color.White)
-        .width(40.dp)
-        .alpha(0.6f)
-
-    Divider(modifier = mod, thickness = 4.dp)
-}
 
 @Composable
 fun CustomFullDivideLine() {
@@ -55,12 +44,16 @@ fun CustomFullDivideLine() {
 }
 
 @Composable
-fun CustomUserIconMenu() {
-    IconButton(onClick = { /*TODO*/ }) {
+fun CustomIconMenu(
+    vector: ImageVector,
+    onIconClick: () -> Unit,
+    tint: Color = Color.White
+) {
+    IconButton(onClick = onIconClick) {
         Icon(
-            imageVector = Icons.Default.AccountCircle,
+            imageVector = vector,
             contentDescription = null,
-            tint = Color.White,
+            tint = tint,
             modifier = Modifier
                 .size(35.dp)
                 .background(color = Color(0x20C7C1C1), shape = CircleShape)
@@ -76,7 +69,10 @@ fun CustomDropdownMenu(
     items: List<DropdownItem>,
     modifier: Modifier = Modifier
 ) {
-    Box(contentAlignment = Alignment.Center) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
         IconButton(onClick = onDropdownExpand) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
@@ -88,9 +84,7 @@ fun CustomDropdownMenu(
         DropdownMenu(
             expanded = isDropDownExpanded,
             onDismissRequest = onDropdownClose,
-            modifier = Modifier
-                .background(Color.Black)
-                .wrapContentSize()
+            modifier = Modifier.wrapContentSize()
         ) {
             items.forEachIndexed { idx, item ->
                 DropdownMenuItem(onClick = { }) {
