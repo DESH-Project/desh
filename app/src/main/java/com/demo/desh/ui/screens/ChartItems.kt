@@ -1,4 +1,4 @@
-package com.demo.desh.ui.screens.mapScreen
+package com.demo.desh.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth

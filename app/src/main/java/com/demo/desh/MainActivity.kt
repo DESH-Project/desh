@@ -1,6 +1,6 @@
 package com.demo.desh
 
-import RealtyDetailScreen
+import com.demo.desh.ui.screens.RealtyDetailScreen
 import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,10 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.demo.desh.ui.screens.loginScreen.LoginScreen
-import com.demo.desh.ui.screens.mapScreen.MapScreen
-import com.demo.desh.ui.screens.profileScreen.ProfileScreen
-import com.demo.desh.ui.screens.startScreen.StartScreen
+import com.demo.desh.ui.screens.LoginScreen
+import com.demo.desh.ui.screens.MapScreen
+import com.demo.desh.ui.screens.ProfileScreen
+import com.demo.desh.ui.screens.StartScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,11 +34,7 @@ class MainActivity : AppCompatActivity() {
         val userViewModel: UserViewModel by viewModels()
 
         setContent {
-            DeshprojectfeTheme {
-                Root(
-                    userViewModel = userViewModel,
-                )
-            }
+            DeshprojectfeTheme { Root(userViewModel) }
         }
     }
 }

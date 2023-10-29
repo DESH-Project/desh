@@ -76,22 +76,22 @@ data class LoginPreviewInfo(
     companion object {
         val textData = listOf(
             LoginPreviewInfo(
-                introduceText = "지금 시작해보세요!",
+                introduceText = "1:1로 다이렉트 대화하기",
+                impactText = "직접\n소통하세요",
+                explainText = "제공자와 1:1 대화를 통해\n안전하고 확실한 상권을 알아보세요!"
+            ),
+
+            LoginPreviewInfo(
+                introduceText = "주변 상가 정보 알아보기",
+                impactText = "쉽게\n확인하세요",
+                explainText = "혹시 상권을 알아보고 계신가요?\n지도를 통해 한눈에 상권 정보를 보여드릴게요!"
+            ),
+
+            LoginPreviewInfo(
+                introduceText = "지금 시작해보세요",
                 impactText = "GOODPLACE",
                 explainText = "소상공인을 위한 상권추천 서비스\n지금 바로 시작하세요!"
             ),
-
-            LoginPreviewInfo(
-                introduceText = "1:1로 다이렉트 대화하기",
-                impactText = "소통하세요",
-                explainText = "제공자와 1:1 대화 커뮤니티를 통한 안전하고 확실한 상권을 알아보세요!"
-            ),
-
-            LoginPreviewInfo(
-                introduceText = "GoodPlace에 오신 것을 환영합니다!",
-                impactText = "안녕하세요!",
-                explainText = "상권을 알아보고 계신가요?"
-            )
         )
     }
 }

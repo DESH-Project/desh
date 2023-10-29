@@ -55,13 +55,37 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    /* 카카오 소셜 로그인 */
+    /* 카카오 소셜 로그인 & 서버 전송 */
     private val _user : MutableLiveData<User?> = MutableLiveData(null)
     val user : LiveData<User?> get() = _user
 
     fun fetchUser(user: User?) {
-        _user.value = user
+        viewModelScope.launch {
+            if (user != null) {
+                val res = userRetrofitRepository.login(user)
+                if (res.isSuccessful) {
+                    user.id = res.body()
+                }
+
+                _user.value = user
+            }
+        }
     }
+
+    /* 상가 건물 찜하기 */
+    private var _starCount = MutableLiveData<ServerResponse<Int>>()
+    val starCount: LiveData<ServerResponse<Int>> get() = _starCount
+
+    fun sendPickedStore(userId: Long, realtyId: Long) {
+        viewModelScope.launch {
+            val res = userRetrofitRepository.sendPickedStore(userId, realtyId)
+
+            if (res.isSuccessful) {
+                _starCount.value = res.body()!!
+            }
+        }
+    }
+
 
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()

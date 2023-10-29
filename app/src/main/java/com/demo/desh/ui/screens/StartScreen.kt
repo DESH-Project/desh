@@ -1,53 +1,59 @@
-package com.demo.desh.ui.screens.startScreen
+package com.demo.desh.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Divider
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.FabPosition
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.demo.desh.viewModel.UserViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import java.text.DecimalFormat
 
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun StartScreen(
     userViewModel: UserViewModel,
     goToMapScreen: () -> Unit
 ) {
-    val previewStoreInfo by userViewModel.previewStore.observeAsState()
-
     LaunchedEffect(Unit) {
         userViewModel.loadPreviewStore()
     }
 
-    Scaffold { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(Color.DarkGray)
-        ) {
-            val size = previewStoreInfo?.size ?: 1
+    /* STATES */
+    val previewStoreInfo by userViewModel.previewStore.observeAsState()
+    val user by userViewModel.user.observeAsState()
 
+    Scaffold(
+        floatingActionButton = {
             Button(
                 onClick = goToMapScreen,
                 colors = ButtonDefaults.buttonColors(Color(0xFFFF6A68)),
@@ -62,8 +68,18 @@ fun StartScreen(
                     fontSize = 16.sp
                 )
             }
+        },
 
-            /*
+        floatingActionButtonPosition = FabPosition.End
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(Color.DarkGray)
+        ) {
+            val size = previewStoreInfo?.size ?: 1
+
             HorizontalPager(
                 count = size,
                 modifier = Modifier
@@ -156,32 +172,10 @@ fun StartScreen(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                             )
-
                         }
                     }
                 }
             }
-            */
-        }
-    }
-}
-
-@Composable
-private fun ImageIndexBar(modifier: Modifier, size: Int, page: Int) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        for (now in 0 until size) {
-            Divider(
-                modifier = Modifier
-                    .background(if (now == page) Color.White else Color.Gray)
-                    .height(4.dp)
-                    .width(36.dp)
-                    .alpha(0.6f)
-            )
-            
-            Spacer(modifier = Modifier.padding(2.dp))
         }
     }
 }

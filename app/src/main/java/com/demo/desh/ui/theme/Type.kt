@@ -30,13 +30,13 @@ val Typography2 = Typography(
     bodyMedium = TextStyle(
         fontFamily = customFontFamily,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp
+        fontSize = 22.sp
 
     ),
     bodySmall = TextStyle(
         fontFamily = customFontFamily,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 13.sp
+        fontSize = 16.sp
     ),
     bodyLarge = TextStyle(
         fontFamily = customFontFamily,
