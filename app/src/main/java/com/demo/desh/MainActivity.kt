@@ -13,7 +13,6 @@ import androidx.navigation.compose.rememberNavController
 import com.demo.desh.ui.screens.LoginScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
-import com.demo.desh.ui.screens.StartScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,11 +39,11 @@ class MainActivity : AppCompatActivity() {
 }
 
 sealed class Screen(val route: String) {
-    object Start : Screen("start")
     object Login : Screen("login")
     object Profile : Screen("profile")
     object Map : Screen("map")
     object RealtyDetail : Screen("realtyDetail")
+    object RealtyAdd : Screen("realtyAdd")
 }
 
 @Composable
@@ -58,18 +57,13 @@ fun Root(userViewModel: UserViewModel) {
         val realtyId = "realtyId"
 
         composable(route = Screen.Login.route) {
-            val goToStartScreen = { navController.navigate(Screen.Start.route) {
+            val goToMapScreen = { navController.navigate(Screen.Map.route) {
                 popUpTo(navController.graph.id) {
                     inclusive = false
                 }
             } }
 
-            LoginScreen(userViewModel, goToStartScreen)
-        }
-
-        composable(route = Screen.Start.route) {
-            val goToMapScreen = { navController.navigate(Screen.Map.route) }
-            StartScreen(userViewModel, goToMapScreen)
+            LoginScreen(userViewModel, goToMapScreen)
         }
 
         composable(route = Screen.Map.route) {
