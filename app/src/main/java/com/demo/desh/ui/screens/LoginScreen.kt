@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
@@ -50,7 +49,7 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun LoginScreen(
     userViewModel: UserViewModel,
-    goToStartScreen: () -> Unit,
+    goToMapScreen: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         userViewModel.loadPreviewImages()
@@ -65,12 +64,12 @@ fun LoginScreen(
 
     /* HANDLERS */
     val onKakaoLoginButtonClick = {
-        val goToStartScreenWithUser = { user: User? ->
-            goToStartScreen()
+        val goToMapScreenWithUser = { user: User? ->
+            goToMapScreen()
             userViewModel.fetchUser(user)
         }
 
-        KakaoLogin.login(context, goToStartScreenWithUser)
+        KakaoLogin.login(context, goToMapScreenWithUser)
     }
 
     Scaffold { innerPadding ->

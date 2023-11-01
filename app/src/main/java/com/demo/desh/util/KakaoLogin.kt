@@ -11,7 +11,7 @@ import com.kakao.sdk.user.UserApiClient
 object KakaoLogin {
     private const val TAG = "KakaoLoginObject"
 
-    fun login(context: Context, goToStartScreenWithUser: (User?) -> Unit) {
+    fun login(context: Context, goToMapScreenWithUser: (User?) -> Unit) {
         val mCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) Log.e(TAG, "[카카오 계정] 로그인 실패 $error")
             else if (token != null) Log.e(TAG, "[카카오 계정] 로그인 성공 ${token.accessToken} ${token.idToken}")
@@ -54,7 +54,7 @@ object KakaoLogin {
                     profileImageUrl = profileImageUrl!!,
                 )
 
-                goToStartScreenWithUser(kUser)
+                goToMapScreenWithUser(kUser)
             }
         }
     }
