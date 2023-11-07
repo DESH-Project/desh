@@ -53,7 +53,7 @@ object MapViewManager {
                     val labelManager = kakaoMap.labelManager
                     val layer = labelManager?.layer
                     val styles =
-                        labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.chamomile)))
+                        labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.ic_launcher_background)))
 
                     val dimScreenLayer = kakaoMap.dimScreenManager?.dimScreenLayer
                     dimScreenLayer?.apply {

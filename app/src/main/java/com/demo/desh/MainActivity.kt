@@ -54,7 +54,9 @@ fun Root(userViewModel: UserViewModel) {
         navController = navController,
         startDestination = Screen.Login.route
     ) {
+
         val realtyId = "realtyId"
+        val userId = "userId"
 
         composable(route = Screen.Login.route) {
             val goToMapScreen = { navController.navigate(Screen.Map.route) {
@@ -67,16 +69,29 @@ fun Root(userViewModel: UserViewModel) {
         }
 
         composable(route = Screen.Map.route) {
-            val goToRealtyDetail = { realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$realtyId") }
-            MapScreen(userViewModel, goToRealtyDetail)
-        }
-
-        composable(route = Screen.Profile.route) {
-            ProfileScreen()
+            val goToRealtyDetailScreen = { realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$realtyId") }
+            val goToProfileScreen = { userId: Long -> navController.navigate(Screen.Profile.route + "/$userId") }
+            MapScreen(userViewModel, goToRealtyDetailScreen, goToProfileScreen)
         }
 
         composable(route = "${Screen.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(realtyId)?.let { RealtyDetailScreen(it.toLong(), userViewModel) }
+            val goToProfileScreen = { navController.navigate(Screen.Profile.route) }
+
+            backStackEntry.arguments?.getString(realtyId)?.let {
+                RealtyDetailScreen(it.toLong(), userViewModel, goToProfileScreen)
+            }
+        }
+        
+        // [ uid != null ] -> 다른 유저의 프로필을 보는 경우
+        composable(route = "${Screen.Profile.route}/{${userId}}") { backStackEntry ->
+            backStackEntry.arguments?.getString(userId)?.let {
+                ProfileScreen(it.toLong(), userViewModel)
+            }
+        }
+
+        // [ uid == null ] -> 내 자신의 프로필을 보는 경우
+        composable(route = Screen.Profile.route) {
+            ProfileScreen(userViewModel = userViewModel)
         }
     }
 }

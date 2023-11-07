@@ -9,16 +9,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +36,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.demo.desh.model.DropdownItem
+import com.demo.desh.ui.theme.DefaultBackgroundColor
+
+@Composable
+fun CommonScaffoldForm(
+    topBarContent: @Composable () -> Unit,
+    mainContent: @Composable () -> Unit
+) {
+    Scaffold(
+        scaffoldState = rememberScaffoldState(),
+        topBar = topBarContent,
+        backgroundColor = DefaultBackgroundColor,
+        contentColor = Color.White,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(state = rememberScrollState())
+        ) {
+            mainContent()
+        }
+    }
+}
 
 @Composable
 fun CustomFullDivideLine() {
