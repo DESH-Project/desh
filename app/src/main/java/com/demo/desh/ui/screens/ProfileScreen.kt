@@ -5,24 +5,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,18 +32,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import com.demo.desh.model.User
+import com.demo.desh.model.dummyImageList
 import com.demo.desh.ui.CommonScaffoldForm
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.viewModel.UserViewModel
 
-val dummyImageList = listOf(
-    "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/87114f2a-3c05-4c12-82d2-1d996f6a51d2.png",
-    "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/21e33cf3-b1dc-439d-af3a-0bd5d728a581.png",
-    "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/d3dbe6e2-6513-44a7-a261-c04ff6328bd1.png",
-    "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/87114f2a-3c05-4c12-82d2-1d996f6a51d2.png",
-    "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/21e33cf3-b1dc-439d-af3a-0bd5d728a581.png",
-    "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/d3dbe6e2-6513-44a7-a261-c04ff6328bd1.png",
-)
+
 
 @Composable
 fun ProfileScreen(
@@ -59,10 +48,11 @@ fun ProfileScreen(
     val user by userViewModel.user.observeAsState()
 
     CommonScaffoldForm(
+        scrollable = false,
         topBarContent = { /*TODO*/ }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (userProfileRef, postAndLikeButtonRef, postAndLikeContentRef) = createRefs()
+            val (userProfileRef, postAndLikeButtonRef, postAndLikeContentRef, remainsMarginRef) = createRefs()
 
             UserProfile(
                 user = user,
@@ -89,6 +79,10 @@ fun ProfileScreen(
                         top.linkTo(anchor = postAndLikeButtonRef.bottom, margin = 24.dp)
                     }
             )
+
+            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                top.linkTo(anchor = postAndLikeContentRef.bottom, margin = 60.dp)
+            })
         }
     }
 }

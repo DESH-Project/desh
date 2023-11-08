@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demo.desh.access.UserRetrofitRepository
 import com.demo.desh.model.District
-import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
@@ -26,19 +25,6 @@ class UserViewModel @Inject constructor(
     companion object {
         private const val DEFAULT_SERVICE_NAME = "전체"
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
-    }
-
-    private val _previewStore = MutableLiveData<List<IntroStore>>()
-    val previewStore : LiveData<List<IntroStore>> get() = _previewStore
-
-    fun loadPreviewStore() {
-        viewModelScope.launch {
-            val result = userRetrofitRepository.getIntroStore()
-
-            if (result.isSuccessful) {
-                _previewStore.value = result.body()?.data
-            }
-        }
     }
 
     private val _previewImages = MutableLiveData<List<String>>()

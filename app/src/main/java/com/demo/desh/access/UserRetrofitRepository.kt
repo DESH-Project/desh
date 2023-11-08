@@ -2,7 +2,6 @@ package com.demo.desh.access
 
 import android.util.Log
 import com.demo.desh.model.District
-import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.model.Recommend
@@ -65,17 +64,10 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .also { logging("getRealtyDetail", it) }
     }
 
-
     suspend fun getIntroImage(): Response<ServerResponse<String>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getIntroImage()
             .also { logging("getIntroImage", it) }
-    }
-
-    suspend fun getIntroStore(): Response<ServerResponse<IntroStore>> = withContext(Dispatchers.IO) {
-        userRetrofitDao
-            .getIntroStore()
-            .also { logging("getIntroStore", it) }
     }
 
     suspend fun sendPickedStore(userId: Long, realtyId: Long): Response<ServerResponse<Int>> = withContext(Dispatchers.IO) {

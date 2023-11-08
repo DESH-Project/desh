@@ -1,7 +1,6 @@
 package com.demo.desh.access
 
 import com.demo.desh.model.District
-import com.demo.desh.model.IntroStore
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.model.Recommend
@@ -50,9 +49,6 @@ interface UserRetrofitDao {
     @GET("intro/image")
     suspend fun getIntroImage() : Response<ServerResponse<String>>
 
-    /* 시작 스크린 상가 추천 */
-    @GET("intro/list")
-    suspend fun getIntroStore() : Response<ServerResponse<IntroStore>>
 
     /* 상가 찜하기 */
     @GET("dibs")

@@ -40,9 +40,11 @@ import com.demo.desh.ui.theme.DefaultBackgroundColor
 
 @Composable
 fun CommonScaffoldForm(
+    scrollable: Boolean,
     topBarContent: @Composable () -> Unit,
     mainContent: @Composable () -> Unit
 ) {
+
     Scaffold(
         scaffoldState = rememberScaffoldState(),
         topBar = topBarContent,
@@ -50,9 +52,9 @@ fun CommonScaffoldForm(
         contentColor = Color.White,
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .verticalScroll(state = rememberScrollState())
+            modifier =
+                if (scrollable) Modifier.padding(innerPadding).verticalScroll(state = rememberScrollState())
+                else Modifier.padding(innerPadding)
         ) {
             mainContent()
         }

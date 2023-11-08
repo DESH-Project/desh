@@ -10,9 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.demo.desh.ui.screens.ChatListScreen
+import com.demo.desh.ui.screens.ChatRoomScreen
 import com.demo.desh.ui.screens.LoginScreen
 import com.demo.desh.ui.screens.MapScreen
 import com.demo.desh.ui.screens.ProfileScreen
+import com.demo.desh.ui.screens.RealtyAddScreen
 import com.demo.desh.ui.theme.DeshprojectfeTheme
 import com.demo.desh.viewModel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,6 +47,8 @@ sealed class Screen(val route: String) {
     object Map : Screen("map")
     object RealtyDetail : Screen("realtyDetail")
     object RealtyAdd : Screen("realtyAdd")
+    object ChatRoom : Screen("chatRoom")
+    object ChatList : Screen("chatList")
 }
 
 @Composable
@@ -57,6 +62,7 @@ fun Root(userViewModel: UserViewModel) {
 
         val realtyId = "realtyId"
         val userId = "userId"
+        val chatRoomId = "chatRoomId"
 
         composable(route = Screen.Login.route) {
             val goToMapScreen = { navController.navigate(Screen.Map.route) {
@@ -76,9 +82,10 @@ fun Root(userViewModel: UserViewModel) {
 
         composable(route = "${Screen.RealtyDetail.route}/{${realtyId}}") { backStackEntry ->
             val goToProfileScreen = { navController.navigate(Screen.Profile.route) }
+            val goToChatListScreen = { navController.navigate(Screen.ChatList.route) }
 
             backStackEntry.arguments?.getString(realtyId)?.let {
-                RealtyDetailScreen(it.toLong(), userViewModel, goToProfileScreen)
+                RealtyDetailScreen(it.toLong(), userViewModel, goToProfileScreen, goToChatListScreen)
             }
         }
         
@@ -92,6 +99,20 @@ fun Root(userViewModel: UserViewModel) {
         // [ uid == null ] -> 내 자신의 프로필을 보는 경우
         composable(route = Screen.Profile.route) {
             ProfileScreen(userViewModel = userViewModel)
+        }
+
+        composable(route = Screen.ChatList.route) {
+            ChatListScreen()
+        }
+
+        composable(route = "${Screen.ChatRoom.route}/{${chatRoomId}}") { backStackEntry ->
+            backStackEntry.arguments?.getString(chatRoomId)?.let {
+                ChatRoomScreen(it.toLong())
+            }
+        }
+
+        composable(route = Screen.RealtyAdd.route) {
+            RealtyAddScreen()
         }
     }
 }
