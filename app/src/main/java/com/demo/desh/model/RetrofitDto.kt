@@ -2,13 +2,13 @@ package com.demo.desh.model
 
 import java.io.Serializable
 
-data class ServerResponse<out T>(
+data class ServerResponse<out T> (
     val size: Int,
     val data: List<T>,
     val status: Int = 200
 )
 
-data class ServerResponseObj<out T>(
+data class ServerResponseObj<out T> (
     val size: Int,
     val data: T,
     val status: Int = 200

@@ -35,6 +35,7 @@ import com.demo.desh.R
 import com.demo.desh.model.LoginPreviewInfo
 import com.demo.desh.model.User
 import com.demo.desh.ui.CommonScaffoldForm
+import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.util.KakaoLogin
@@ -48,7 +49,7 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun LoginScreen(
     userViewModel: UserViewModel,
-    goToMapScreen: () -> Unit,
+    goToMapScreen: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         userViewModel.loadPreviewImages()
@@ -59,11 +60,12 @@ fun LoginScreen(
     val pagerState = rememberPagerState()
 
     /* STATES */
+    val open by userViewModel.open.observeAsState(initial = true)
     val previewImages by userViewModel.previewImages.observeAsState()
 
     /* HANDLERS */
     val onKakaoLoginButtonClick = {
-        val goToMapScreenWithUser = { user: User? ->
+        val goToMapScreenWithUser = { user: User ->
             userViewModel.fetchUser(user)
             goToMapScreen()
         }
@@ -71,67 +73,72 @@ fun LoginScreen(
         KakaoLogin.login(context, goToMapScreenWithUser)
     }
 
-    CommonScaffoldForm(
-        scrollable = false,
-        topBarContent = { /*TODO*/ }
-    ) {
-        val size = previewImages?.size ?: 1
+    if (open) {
+        LoadingDialog()
+    }
 
-        HorizontalPager(
-            count = size,
-            state = pagerState
-        ) { pageIndex ->
-            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (imageRef, indicatorRef, userManualPageRef) = createRefs()
-                val model = previewImages?.get(pageIndex) ?: ""
+    else {
+        CommonScaffoldForm(
+            topBarContent = { /*TODO*/ }
+        ) {
+            val size = previewImages?.size ?: 1
 
-                AsyncImage(
-                    model = model,
-                    contentDescription = null,
-                    contentScale = ContentScale.Inside,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(530.dp)
-                        .constrainAs(imageRef) {
-                            centerHorizontallyTo(parent)
-                        }
-                )
+            HorizontalPager(
+                count = size,
+                state = pagerState
+            ) { pageIndex ->
+                ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                    val (imageRef, indicatorRef, userManualPageRef) = createRefs()
+                    val model = previewImages?.get(pageIndex) ?: ""
 
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    indicatorHeight = 5.dp,
-                    spacing = 5.dp,
-                    activeColor = Color.White,
-                    indicatorShape = RectangleShape,
-                    indicatorWidth = 32.dp,
-                    modifier = Modifier
-                        .constrainAs(indicatorRef) {
-                            top.linkTo(anchor = imageRef.bottom)
-                            centerHorizontallyTo(imageRef)
-                            bottom.linkTo(anchor = userManualPageRef.top)
-                        }
-                )
-
-                when (pageIndex) {
-                    (size - 1) -> {
-                        LastPage(
-                            onKakaoLoginButtonClick = onKakaoLoginButtonClick,
-                            modifier = Modifier
-                                .constrainAs(userManualPageRef) {
-                                    top.linkTo(anchor = indicatorRef.bottom, margin = 16.dp)
-                                    centerHorizontallyTo(other = parent)
-                                }
-                        )
-                    }
-
-                    in (0 until size - 1) -> {
-                        UserManualPage(
-                            textData = textData[pageIndex],
-                            modifier = Modifier.constrainAs(userManualPageRef) {
-                                top.linkTo(anchor = indicatorRef.bottom, margin = 16.dp)
-                                start.linkTo(anchor = parent.start, margin = 20.dp)
+                    AsyncImage(
+                        model = model,
+                        contentDescription = null,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(530.dp)
+                            .constrainAs(imageRef) {
+                                centerHorizontallyTo(parent)
                             }
-                        )
+                    )
+
+                    HorizontalPagerIndicator(
+                        pagerState = pagerState,
+                        indicatorHeight = 5.dp,
+                        spacing = 5.dp,
+                        activeColor = Color.White,
+                        indicatorShape = RectangleShape,
+                        indicatorWidth = 32.dp,
+                        modifier = Modifier
+                            .constrainAs(indicatorRef) {
+                                top.linkTo(anchor = imageRef.bottom)
+                                centerHorizontallyTo(imageRef)
+                                bottom.linkTo(anchor = userManualPageRef.top)
+                            }
+                    )
+
+                    when (pageIndex) {
+                        (size - 1) -> {
+                            LastPage(
+                                onKakaoLoginButtonClick = onKakaoLoginButtonClick,
+                                modifier = Modifier
+                                    .constrainAs(userManualPageRef) {
+                                        top.linkTo(anchor = indicatorRef.bottom, margin = 16.dp)
+                                        centerHorizontallyTo(other = parent)
+                                    }
+                            )
+                        }
+
+                        in (0 until size - 1) -> {
+                            UserManualPage(
+                                textData = textData[pageIndex],
+                                modifier = Modifier.constrainAs(userManualPageRef) {
+                                    top.linkTo(anchor = indicatorRef.bottom, margin = 16.dp)
+                                    start.linkTo(anchor = parent.start, margin = 20.dp)
+                                }
+                            )
+                        }
                     }
                 }
             }

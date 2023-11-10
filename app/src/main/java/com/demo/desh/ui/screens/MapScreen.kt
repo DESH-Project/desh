@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -56,6 +55,7 @@ import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.User
 import com.demo.desh.ui.CustomFullDivideLine
 import com.demo.desh.ui.CustomIconMenu
+import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.util.MapViewManager
@@ -75,27 +75,23 @@ fun MapScreen(
         userViewModel.fetchServiceList()
     }
 
+    val user = userViewModel.user.value!!
+
     /* STATES */
-    val user by userViewModel.user.observeAsState()
+    val open by userViewModel.open.observeAsState(initial = false)
     val serviceList by userViewModel.serviceList.observeAsState()
     val recommendInfo by userViewModel.recommendInfo.observeAsState()
     val districtInfo by userViewModel.districtInfo.observeAsState()
     val selectedServiceName by userViewModel.selectedServiceName.observeAsState()
 
+    /* HANDLERS */
     val onServiceItemClick = { serviceName: String -> userViewModel.fetchMapView(serviceName) }
     val onDistrictItemClick = { realtyId: Long -> goToRealtyDetailScreen(realtyId) }
     val onDistrictButtonClick = { districtName: String -> userViewModel.fetchDistrictInfoList(districtName) }
     val goToProfileScreenWithUser = { userId: Long -> goToProfileScreen(userId) }
 
-    if (user == null) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.LightGray)
-        ) {
-            CircularProgressIndicator()
-        }
+    if (open) {
+        LoadingDialog(progressIndicatorSize = 80.dp, progressIndicatorColor = Color.Gray)
     }
 
     BottomSheetScaffold(
@@ -106,7 +102,7 @@ fun MapScreen(
                 onServiceItemClick = onServiceItemClick,
                 goToProfileScreenWithUser = goToProfileScreenWithUser
             )
-         },
+        },
 
         sheetContent = {
             DrawerContent(
@@ -140,7 +136,7 @@ fun MapScreen(
 @Composable
 fun TopMapBar(
     serviceList: Map<String, List<String>>,
-    user: User?,
+    user: User,
     onServiceItemClick: (String) -> Unit,
     goToProfileScreenWithUser: (Long) -> Unit
 ) {
@@ -184,7 +180,7 @@ fun TopMapBar(
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
             CustomIconMenu(
                 vector = Icons.Default.AccountCircle,
-                onIconClick = { goToProfileScreenWithUser(user?.id!!) },
+                onIconClick = { goToProfileScreenWithUser(user.id!!) },
                 tint = Color.DarkGray
             )
         }
@@ -278,7 +274,7 @@ fun BottomSheet(
 
 @Composable
 fun DrawerContent(
-    user: User?,
+    user: User,
     recommendInfo: ServerResponse<Recommend>?,
     districtInfo: ServerResponse<District>?,
     selectedServiceName: String?,
@@ -308,7 +304,7 @@ fun DrawerContent(
                 ) {
                     Row(modifier = Modifier.padding(dps)) {
                         Text(
-                            text = "\'${user?.nickname}\'",
+                            text = "\'${user.nickname}\'",
                             color = HighlightColor,
                             fontWeight = FontWeight.Bold,
                             fontSize = lts

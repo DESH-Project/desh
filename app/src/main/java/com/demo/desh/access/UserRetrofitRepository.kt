@@ -22,10 +22,16 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
         }
     }
 
-    suspend fun login(user: User): Response<Long> = withContext(Dispatchers.IO) {
-        userRetrofitDao
+    suspend fun login(user: User): Response<Long> {
+        return userRetrofitDao
             .login(user)
             .also { logging("login", it) }
+    }
+
+    suspend fun getUserInfo(userId: Long) : Response<ServerResponseObj<User>> = withContext(Dispatchers.IO) {
+        userRetrofitDao
+            .getUserInfo(userId)
+            .also { logging("getUserInfo", it) }
     }
 
     suspend fun sendRealtyInfo(realty: RealtyCreationReq): Response<Long> = withContext(Dispatchers.IO) {
@@ -64,8 +70,8 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .also { logging("getRealtyDetail", it) }
     }
 
-    suspend fun getIntroImage(): Response<ServerResponse<String>> = withContext(Dispatchers.IO) {
-        userRetrofitDao
+    suspend fun getIntroImage(): Response<ServerResponse<String>> {
+        return userRetrofitDao
             .getIntroImage()
             .also { logging("getIntroImage", it) }
     }

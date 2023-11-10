@@ -20,6 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -38,17 +39,19 @@ import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.viewModel.UserViewModel
 
 
-
 @Composable
 fun ProfileScreen(
-    userId: Long? = null,
+    userId: Long,
     userViewModel: UserViewModel
 ) {
+    LaunchedEffect(Unit) {
+        userViewModel.getUserInfo(userId)
+    }
+
     /* STATES */
-    val user by userViewModel.user.observeAsState()
+    val user by userViewModel.targetUser.observeAsState()
 
     CommonScaffoldForm(
-        scrollable = false,
         topBarContent = { /*TODO*/ }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {

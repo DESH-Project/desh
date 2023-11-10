@@ -89,16 +89,10 @@ fun Root(userViewModel: UserViewModel) {
             }
         }
         
-        // [ uid != null ] -> 다른 유저의 프로필을 보는 경우
         composable(route = "${Screen.Profile.route}/{${userId}}") { backStackEntry ->
             backStackEntry.arguments?.getString(userId)?.let {
                 ProfileScreen(it.toLong(), userViewModel)
             }
-        }
-
-        // [ uid == null ] -> 내 자신의 프로필을 보는 경우
-        composable(route = Screen.Profile.route) {
-            ProfileScreen(userViewModel = userViewModel)
         }
 
         composable(route = Screen.ChatList.route) {

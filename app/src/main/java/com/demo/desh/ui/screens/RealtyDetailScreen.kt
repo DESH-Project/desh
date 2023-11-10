@@ -80,7 +80,6 @@ fun RealtyDetailScreen(
     /* HANDLERS */
 
     CommonScaffoldForm(
-        scrollable = true,
         topBarContent = {
             TopBarContent(
                 goToProfileScreen = goToProfileScreen,

@@ -12,7 +12,12 @@ import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.net.URLEncoder
 import java.util.UUID
 import javax.inject.Inject
@@ -27,36 +32,61 @@ class UserViewModel @Inject constructor(
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
+    private var _open = MutableLiveData<Boolean>(false)
+    val open : LiveData<Boolean> get() = _open
+
+
+    /* 로그인 화면 미리보기 이미지 */
     private val _previewImages = MutableLiveData<List<String>>()
     val previewImages : LiveData<List<String>> get() = _previewImages
 
     fun loadPreviewImages() {
-        viewModelScope.launch {
-            val result = userRetrofitRepository.getIntroImage()
+        _open.value = true
 
-            if (result.isSuccessful) {
-                val images = result.body()?.data
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getIntroImage() }.await()
+
+            if (def.isSuccessful) {
+                val images = def.body()?.data
                 _previewImages.value = images
+                _open.value = false
             }
         }
     }
 
     /* 카카오 소셜 로그인 & 서버 전송 */
-    private val _user : MutableLiveData<User?> = MutableLiveData(null)
-    val user : LiveData<User?> get() = _user
+    private val _user : MutableLiveData<User> = MutableLiveData()
+    val user : LiveData<User> get() = _user
 
-    fun fetchUser(user: User?) {
-        viewModelScope.launch {
-            if (user != null) {
-                val res = userRetrofitRepository.login(user)
-                if (res.isSuccessful) {
-                    user.id = res.body()
-                }
+    fun fetchUser(user: User) {
+        _open.value = true
 
+        runBlocking {
+            val res = async(Dispatchers.IO) { userRetrofitRepository.login(user) }.await()
+
+            if (res.isSuccessful) {
+                user.id = res.body()
                 _user.value = user
+                _open.value = false
             }
         }
     }
+
+
+    /* 유저 상세정보 조회 */
+    private val _targetUser : MutableLiveData<User> = MutableLiveData()
+    val targetUser : LiveData<User> get() = _targetUser
+
+    fun getUserInfo(userId: Long) =
+        viewModelScope.launch {
+            val res = userRetrofitRepository.getUserInfo(userId)
+
+            if (res.isSuccessful) {
+                val result = res.body()!!.data
+                _targetUser.value = result
+            }
+        }
+
 
     /* 상가 건물 찜하기 */
     private var _starCount = MutableLiveData<ServerResponse<Int>>()
@@ -71,7 +101,6 @@ class UserViewModel @Inject constructor(
             }
         }
     }
-
 
 
     private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()

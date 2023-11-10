@@ -11,12 +11,17 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UserRetrofitDao {
     /* 소셜 로그인 성공시 서버에 유저 정보 전달 */
     @POST("login")
     suspend fun login(@Body user: User): Response<Long>
+
+    /* 유저 상세정보 조회 */
+    @GET("user/{uid}")
+    suspend fun getUserInfo(@Path("uid") userId: Long) : Response<ServerResponseObj<User>>
 
     /* 건물 정보 등록 */
     @POST("realty")
@@ -56,4 +61,5 @@ interface UserRetrofitDao {
         @Query("realty-id") userId: Long,
         @Query("user-id") realtyId: Long
     ) : Response<ServerResponse<Int>>
+
 }

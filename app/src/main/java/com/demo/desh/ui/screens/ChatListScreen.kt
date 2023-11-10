@@ -45,7 +45,6 @@ import com.demo.desh.ui.CommonScaffoldForm
 @Composable
 fun ChatListScreen() {
     CommonScaffoldForm(
-        scrollable = false,
         topBarContent = { /*TODO*/ }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
