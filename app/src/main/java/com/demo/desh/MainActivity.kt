@@ -96,7 +96,7 @@ fun Root(userViewModel: UserViewModel) {
         }
 
         composable(route = Screen.ChatList.route) {
-            ChatListScreen()
+            ChatListScreen(userViewModel)
         }
 
         composable(route = "${Screen.ChatRoom.route}/{${chatRoomId}}") { backStackEntry ->

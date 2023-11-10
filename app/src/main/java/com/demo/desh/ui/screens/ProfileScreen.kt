@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -23,21 +25,62 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
+import com.demo.desh.model.RealtyPreview
+import com.demo.desh.model.RealtyPreviewInfoForReg
+import com.demo.desh.model.RealtyPreviewInfoForStar
 import com.demo.desh.model.User
-import com.demo.desh.model.dummyImageList
 import com.demo.desh.ui.CommonScaffoldForm
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.viewModel.UserViewModel
+import java.util.logging.Logger
 
+val log: Logger = Logger.getLogger("ProfileScreen")
+
+@JvmName("forReg")
+fun UserViewModel.makeDummy(dums: List<RealtyPreviewInfoForReg>) : List<RealtyPreview> =
+    dums.map {
+        val res = RealtyPreview(
+            id = it.id,
+            address = it.name,
+            deposit = 10000L,
+            monthly = it.monthlyRental,
+            previewImage = it.previewImage
+        )
+
+        log.warning(res.toString())
+
+        res
+    }
+
+@JvmName("forStar")
+fun UserViewModel.makeDummy(dums: List<RealtyPreviewInfoForStar>) : List<RealtyPreview> =
+    dums.map {
+        val res = RealtyPreview(
+            id = it.id,
+            address = it.address,
+            deposit = it.deposit,
+            monthly = it.monthlyRental,
+            previewImage = it.images.getOrNull(0) ?: ""
+        )
+
+        log.warning(res.toString())
+
+        res
+    }
 
 @Composable
 fun ProfileScreen(
@@ -46,12 +89,31 @@ fun ProfileScreen(
 ) {
     LaunchedEffect(Unit) {
         userViewModel.getUserInfo(userId)
+        userViewModel.getUserRegStore(userId)
     }
 
     /* STATES */
+    val open by userViewModel.open.observeAsState(initial = false)
     val user by userViewModel.targetUser.observeAsState()
+    // val userRegStore by userViewModel.userRegStore.observeAsState()
+    // val userPickedStore by userViewModel.userPickedStore.observeAsState()
+    val userRealtyPreview by userViewModel.userRealtyPreview.observeAsState()
+
+    var btnSelected by rememberSaveable { mutableStateOf(true) }
+
+    /* HANDLERS */
+    val onPostBtnClick = {
+        userViewModel.getUserPickedStore(userId)
+        btnSelected = true
+    }
+
+    val onStarBtnClick = {
+        userViewModel.getUserRegStore(userId)
+        btnSelected = false
+    }
 
     CommonScaffoldForm(
+        pbarOpen = open,
         topBarContent = { /*TODO*/ }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
@@ -67,15 +129,18 @@ fun ProfileScreen(
             )
 
             PostAndLikeButton(
+                onPostBtnClick = onPostBtnClick,
+                onStarBtnClick = onStarBtnClick,
+                btnSelected = btnSelected,
                 modifier = Modifier
                     .constrainAs(postAndLikeButtonRef) {
                         centerHorizontallyTo(parent)
-                        top.linkTo(anchor = userProfileRef.bottom, margin = 36.dp)
+                        top.linkTo(anchor = userProfileRef.bottom, margin = 24.dp)
                     },
             )
 
             PostAndLikeContent(
-                previewImageList = dummyImageList,
+                userRealtyPreview = userRealtyPreview,
                 modifier = Modifier
                     .constrainAs(postAndLikeContentRef) {
                         centerHorizontallyTo(parent)
@@ -92,24 +157,37 @@ fun ProfileScreen(
 
 @Composable
 fun PostAndLikeContent(
-    previewImageList: List<String>,
+    userRealtyPreview: List<RealtyPreview>?,
     modifier: Modifier = Modifier
 ) {
-   LazyVerticalGrid(
-       modifier = modifier,
-       columns = GridCells.Fixed(2),
-       contentPadding = PaddingValues(10.dp),
-       content = {
-           items(previewImageList) {
-               Card(
-                   modifier = Modifier
-                       .height(360.dp)
-               ) {
-                   AsyncImage(model = it, contentDescription = null)
-               }
-           }
-       }
-   )
+    if (userRealtyPreview.isNullOrEmpty()) {
+        Box(modifier.fillMaxSize()) {
+            Text(
+                text = "표시할 콘텐츠가 없습니다.",
+                fontSize = 36.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.Center),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+
+    else {
+        LazyVerticalGrid(
+            userScrollEnabled = true,
+            modifier = modifier,
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(15.dp),
+            content = {
+                items(userRealtyPreview) {
+                    Card(modifier = Modifier.wrapContentSize()) {
+                        AsyncImage(model = it.previewImage, contentDescription = null)
+                    }
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -142,17 +220,10 @@ fun UserProfile(
             )
 
             Text(
-                text = "고객의 니즈에 맞는 전문 맞춤 컨설팅으로",
+                text = user?.description ?: "유저 소개가 없습니다.",
                 fontSize = 13.sp,
                 color = Color.LightGray,
                 modifier = Modifier.padding(top = 62.dp)
-            )
-
-            Text(
-                text = "고객 만족까지 함께합니다.",
-                fontSize = 13.sp,
-                color = Color.LightGray,
-                modifier = Modifier.padding(top = 90.dp)
             )
         }
     }
@@ -160,32 +231,48 @@ fun UserProfile(
 
 @Composable
 fun PostAndLikeButton(
-    modifier: Modifier = Modifier,
+    onPostBtnClick: () -> Unit,
+    onStarBtnClick: () -> Unit,
+    btnSelected: Boolean,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        PreviewListButton(buttonText = "포스트", onClick = { })
-        PreviewListButton(buttonText = "찜하기", onClick = { })
+        PreviewListButton(
+            buttonText = "포스트",
+            btnSelected = btnSelected,
+            onClick = onPostBtnClick
+        )
+
+        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+
+        PreviewListButton(
+            buttonText = "찜하기",
+            btnSelected = !btnSelected,
+            onClick = onStarBtnClick
+        )
     }
 }
 
 @Composable
 fun PreviewListButton(
     buttonText: String,
+    btnSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val buttonColors = ButtonDefaults.buttonColors(
+        containerColor = if (btnSelected) HighlightColor else Color.DarkGray,
+        contentColor = Color.White
+    )
+
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = HighlightColor,
-            contentColor = Color.White,
-            disabledContainerColor = Color.DarkGray,
-            disabledContentColor = Color.LightGray
-        ),
+        colors = buttonColors,
         modifier = Modifier
-            .height(50.dp)
+            .height(40.dp)
+            .width(120.dp)
             .clip(shape = RoundedCornerShape(42.dp))
     ) {
         Row(
@@ -194,7 +281,8 @@ fun PreviewListButton(
         ) {
             Text(
                 text = buttonText,
-                fontSize = 26.sp,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
                 color = Color.White
             )
         }

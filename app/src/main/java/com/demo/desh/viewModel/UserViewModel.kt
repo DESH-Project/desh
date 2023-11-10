@@ -7,17 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.demo.desh.access.UserRetrofitRepository
 import com.demo.desh.model.District
 import com.demo.desh.model.Realty
+import com.demo.desh.model.RealtyPreview
+import com.demo.desh.model.RealtyPreviewInfoForReg
+import com.demo.desh.model.RealtyPreviewInfoForStar
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
+import com.demo.desh.ui.screens.makeDummy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.net.URLEncoder
 import java.util.UUID
 import javax.inject.Inject
@@ -32,7 +35,7 @@ class UserViewModel @Inject constructor(
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
-    private var _open = MutableLiveData<Boolean>(false)
+    private var _open = MutableLiveData(false)
     val open : LiveData<Boolean> get() = _open
 
 
@@ -62,7 +65,10 @@ class UserViewModel @Inject constructor(
         _open.value = true
 
         runBlocking {
-            val res = async(Dispatchers.IO) { userRetrofitRepository.login(user) }.await()
+            val res = async(Dispatchers.IO) {
+                delay(1500)
+                userRetrofitRepository.login(user)
+            }.await()
 
             if (res.isSuccessful) {
                 user.id = res.body()
@@ -71,7 +77,6 @@ class UserViewModel @Inject constructor(
             }
         }
     }
-
 
     /* 유저 상세정보 조회 */
     private val _targetUser : MutableLiveData<User> = MutableLiveData()
@@ -87,6 +92,50 @@ class UserViewModel @Inject constructor(
             }
         }
 
+    /* 유저가 찜한 상가 목록 리스트 가져오기 */
+    private var _userPickedStore = MutableLiveData<List<RealtyPreviewInfoForStar>>()
+    val userPickedStore : LiveData<List<RealtyPreviewInfoForStar>> get() = _userPickedStore
+
+    fun getUserPickedStore(userId: Long) {
+        _open.value = true
+
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getUserPickedStoreList(userId) }.await()
+
+            if (def.isSuccessful) {
+                val res = def.body()!!.data
+                _userPickedStore.value = res
+                _userRealtyPreview.value = makeDummy(res)
+
+                _open.value = false
+            }
+        }
+    }
+
+    /* 유저가 등록한 상가 목록 리스트 가져오기 */
+    private var _userRegStore = MutableLiveData<List<RealtyPreviewInfoForReg>>()
+    val userRegStore : LiveData<List<RealtyPreviewInfoForReg>> get() = _userRegStore
+
+    fun getUserRegStore(userId: Long) {
+        _open.value = true
+
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getUserRegisterStoreList(userId) }.await()
+
+            if (def.isSuccessful) {
+                val res = def.body()!!.data
+                _userRegStore.value = res
+                _userRealtyPreview.value = makeDummy(res)
+
+                _open.value = false
+            }
+        }
+    }
+
+    private var _userRealtyPreview = MutableLiveData<List<RealtyPreview>?>(listOf())
+    val userRealtyPreview : LiveData<List<RealtyPreview>?> get() = _userRealtyPreview
+
+    // ------
 
     /* 상가 건물 찜하기 */
     private var _starCount = MutableLiveData<ServerResponse<Int>>()

@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -51,10 +49,10 @@ import com.demo.desh.ui.theme.DefaultBackgroundColor
 
 @Composable
 fun CommonScaffoldForm(
+    pbarOpen: Boolean,
     topBarContent: @Composable () -> Unit,
     mainContent: @Composable () -> Unit
 ) {
-
     Scaffold(
         scaffoldState = rememberScaffoldState(),
         topBar = topBarContent,
@@ -62,7 +60,8 @@ fun CommonScaffoldForm(
         contentColor = Color.White,
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            mainContent()
+            if (pbarOpen) LoadingDialog()
+            else mainContent()
         }
     }
 }

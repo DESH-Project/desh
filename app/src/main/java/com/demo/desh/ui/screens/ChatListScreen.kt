@@ -25,6 +25,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -41,10 +43,15 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import com.demo.desh.model.ChatRoomPreviewInfo
 import com.demo.desh.ui.CommonScaffoldForm
+import com.demo.desh.viewModel.UserViewModel
 
 @Composable
-fun ChatListScreen() {
+fun ChatListScreen(userViewModel: UserViewModel) {
+    /* STATES */
+    val open by userViewModel.open.observeAsState(initial = false)
+
     CommonScaffoldForm(
+        pbarOpen = open,
         topBarContent = { /*TODO*/ }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {

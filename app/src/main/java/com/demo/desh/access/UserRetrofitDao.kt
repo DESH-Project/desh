@@ -3,6 +3,8 @@ package com.demo.desh.access
 import com.demo.desh.model.District
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
+import com.demo.desh.model.RealtyPreviewInfoForReg
+import com.demo.desh.model.RealtyPreviewInfoForStar
 import com.demo.desh.model.Recommend
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
@@ -26,10 +28,6 @@ interface UserRetrofitDao {
     /* 건물 정보 등록 */
     @POST("realty")
     suspend fun sendRealtyInfo(@Body realty: RealtyCreationReq): Response<Long>
-
-    /* 내가 본 매물 정보 프리뷰 */
-
-    /* 내가 본 매물 정보 상세 */
 
     /* 조회 가능한 허용된 서비스 업종 리스트 */
     @GET("service")
@@ -62,4 +60,11 @@ interface UserRetrofitDao {
         @Query("user-id") realtyId: Long
     ) : Response<ServerResponse<Int>>
 
+    /* 유저가 찜한 상가 리스트 조회 */
+    @GET("{uid}/dib")
+    suspend fun getPickedStoreList(@Path("uid") userId: Long) : Response<ServerResponse<RealtyPreviewInfoForStar>>
+
+    /* 유저가 등록한 상가 리스트 조회 */
+    @GET("{uid}/realty")
+    suspend fun getRegisterStoreList(@Path("uid") userId: Long) : Response<ServerResponse<RealtyPreviewInfoForReg>>
 }

@@ -75,11 +75,13 @@ fun RealtyDetailScreen(
 ) {
 
     /* STATES */
+    val open by userViewModel.open.observeAsState(initial = false)
     val user by userViewModel.user.observeAsState()
 
     /* HANDLERS */
 
     CommonScaffoldForm(
+        pbarOpen = open,
         topBarContent = {
             TopBarContent(
                 goToProfileScreen = goToProfileScreen,

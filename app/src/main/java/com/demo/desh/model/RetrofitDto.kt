@@ -26,7 +26,8 @@ data class User(
     var id : Long? = null,
     var nickname : String,
     var email : String,
-    var profileImageUrl : String
+    var profileImageUrl : String,
+    var description: String = ""
 ) : Serializable
 
 data class RealtyCreationReq(
@@ -57,3 +58,25 @@ data class Realty(
     val userId: Long
 )
 
+data class RealtyPreviewInfoForStar(
+    val id: Long = 1L,
+    val deposit: Long = 10000L,
+    val monthlyRental: Int = 100,
+    val images: List<String> = listOf(""),
+    val address: String = "",
+)
+
+data class RealtyPreviewInfoForReg(
+    val id: Long = 1L,
+    val name: String = "",
+    val monthlyRental: Int = 1,
+    val previewImage: String = ""
+)
+
+data class RealtyPreview(
+    val id: Long,
+    val address: String,
+    val deposit: Long,
+    val monthly: Int,
+    val previewImage: String,
+)

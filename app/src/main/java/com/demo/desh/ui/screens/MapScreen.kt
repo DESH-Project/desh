@@ -94,43 +94,45 @@ fun MapScreen(
         LoadingDialog(progressIndicatorSize = 80.dp, progressIndicatorColor = Color.Gray)
     }
 
-    BottomSheetScaffold(
-        topBar = {
-            TopMapBar(
-                serviceList = serviceList?.data ?: mapOf(),
-                user = user,
-                onServiceItemClick = onServiceItemClick,
-                goToProfileScreenWithUser = goToProfileScreenWithUser
-            )
-        },
+    else {
+        BottomSheetScaffold(
+            topBar = {
+                TopMapBar(
+                    serviceList = serviceList?.data ?: mapOf(),
+                    user = user,
+                    onServiceItemClick = onServiceItemClick,
+                    goToProfileScreenWithUser = goToProfileScreenWithUser
+                )
+            },
 
-        sheetContent = {
-            DrawerContent(
-                user = user,
-                recommendInfo = recommendInfo,
-                districtInfo = districtInfo,
-                selectedServiceName = selectedServiceName,
-                onDistrictButtonClick = onDistrictButtonClick,
-                onDistrictItemClick = onDistrictItemClick
-            )
-        },
+            sheetContent = {
+                DrawerContent(
+                    user = user,
+                    recommendInfo = recommendInfo,
+                    districtInfo = districtInfo,
+                    selectedServiceName = selectedServiceName,
+                    onDistrictButtonClick = onDistrictButtonClick,
+                    onDistrictItemClick = onDistrictItemClick
+                )
+            },
 
-        drawerGesturesEnabled = true,
-        drawerBackgroundColor = DefaultBackgroundColor,
-        drawerElevation = 0.dp,
+            drawerGesturesEnabled = true,
+            drawerBackgroundColor = DefaultBackgroundColor,
+            drawerElevation = 0.dp,
 
-        content = {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column {
-                    AndroidView(
-                        factory = { context -> MapViewManager.createMapView(context) },
-                        modifier = Modifier.fillMaxSize(),
-                        update = { mapView: MapView -> MapViewManager.labelingOnMapView(mapView, recommendInfo) }
-                    )
+            content = {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column {
+                        AndroidView(
+                            factory = { context -> MapViewManager.createMapView(context) },
+                            modifier = Modifier.fillMaxSize(),
+                            update = { mapView: MapView -> MapViewManager.labelingOnMapView(mapView, recommendInfo) }
+                        )
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
