@@ -59,7 +59,7 @@ fun CommonScaffoldForm(
         backgroundColor = DefaultBackgroundColor,
         contentColor = Color.White,
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             if (pbarOpen) LoadingDialog()
             else mainContent()
         }

@@ -52,7 +52,6 @@ interface UserRetrofitDao {
     @GET("intro/image")
     suspend fun getIntroImage() : Response<ServerResponse<String>>
 
-
     /* 상가 찜하기 */
     @GET("dibs")
     suspend fun sendPickedStore(

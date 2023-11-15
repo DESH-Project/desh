@@ -1,7 +1,9 @@
 package com.demo.desh.util
 
+import com.demo.desh.access.ChatRetrofitDao
 import com.demo.desh.access.UserRetrofitDao
-import com.demo.desh.access.UserRetrofitRepository
+import com.demo.desh.repository.ChatRetrofitRepository
+import com.demo.desh.repository.UserRetrofitRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,6 +23,12 @@ class AppModules {
 
     @Singleton
     @Provides
+    fun provideChatRetrofitRepository(chatRetrofitDao: ChatRetrofitDao) : ChatRetrofitRepository {
+        return ChatRetrofitRepository(chatRetrofitDao)
+    }
+
+    @Singleton
+    @Provides
     fun provideRetrofit() : Retrofit {
         val host = "good-place.shop"
         val domain = "http://$host/"
@@ -35,5 +43,11 @@ class AppModules {
     @Provides
     fun provideUserRetrofitDao(retrofit: Retrofit) : UserRetrofitDao {
         return retrofit.create(UserRetrofitDao::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideChatRetrofitDao(retrofit: Retrofit) : ChatRetrofitDao {
+        return retrofit.create(ChatRetrofitDao::class.java)
     }
 }

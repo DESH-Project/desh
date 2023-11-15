@@ -71,12 +71,12 @@ fun RealtyDetailScreen(
     realtyId: Long,
     userViewModel: UserViewModel,
     goToProfileScreen: () -> Unit,
-    goToChatListScreen: () -> Unit
+    goToChatListScreen: (Long) -> Unit
 ) {
+    val user = userViewModel.user.value
 
     /* STATES */
     val open by userViewModel.open.observeAsState(initial = false)
-    val user by userViewModel.user.observeAsState()
 
     /* HANDLERS */
 
@@ -85,12 +85,12 @@ fun RealtyDetailScreen(
         topBarContent = {
             TopBarContent(
                 goToProfileScreen = goToProfileScreen,
-                goToChatListScreen = goToChatListScreen,
+                goToChatListScreen = { goToChatListScreen(user?.id ?: 1L) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
     ) {
-        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        ConstraintLayout {
             val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
 
             // 건물 이미지 Pager & Indicator

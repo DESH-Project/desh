@@ -1,6 +1,7 @@
-package com.demo.desh.access
+package com.demo.desh.repository
 
 import android.util.Log
+import com.demo.desh.access.UserRetrofitDao
 import com.demo.desh.model.District
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq

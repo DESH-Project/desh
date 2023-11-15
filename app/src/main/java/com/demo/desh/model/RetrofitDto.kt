@@ -1,17 +1,16 @@
 package com.demo.desh.model
 
 import java.io.Serializable
+import java.time.LocalDateTime
 
 data class ServerResponse<out T> (
     val size: Int,
     val data: List<T>,
-    val status: Int = 200
 )
 
 data class ServerResponseObj<out T> (
     val size: Int,
     val data: T,
-    val status: Int = 200
 )
 
 data class Recommend(
@@ -79,4 +78,26 @@ data class RealtyPreview(
     val deposit: Long,
     val monthly: Int,
     val previewImage: String,
+)
+
+/* Chat Dto */
+data class ChatInfo(
+    val id: Long,
+    val chatroom: ChatData
+)
+
+data class ChatData(
+    val id: Long,
+    val roomId: String,
+    val name: String,
+    var image: String?,
+    val chat: List<Chat>
+)
+
+data class Chat(
+    val id: Long,
+    val writerId: Long,
+    val writer: String,
+    val message: String,
+    val date: LocalDateTime
 )

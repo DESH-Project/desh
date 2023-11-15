@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -41,17 +41,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
-import com.demo.desh.model.ChatRoomPreviewInfo
+import com.demo.desh.model.ChatInfo
 import com.demo.desh.ui.CommonScaffoldForm
+import com.demo.desh.viewModel.ChatViewModel
 import com.demo.desh.viewModel.UserViewModel
 
 @Composable
-fun ChatListScreen(userViewModel: UserViewModel) {
+fun ChatListScreen(
+    userId: Long,
+    userViewModel: UserViewModel,
+    chatViewModel: ChatViewModel
+) {
+
+    LaunchedEffect(Unit) {
+        chatViewModel.getChatroomList(userId)
+    }
+
     /* STATES */
-    val open by userViewModel.open.observeAsState(initial = false)
+    val uOpen by userViewModel.open.observeAsState(initial = false)
+    val cOpen by chatViewModel.open.observeAsState(initial = false)
+    val chatRoomList by chatViewModel.chatInfo.observeAsState()
+
+    /* HANDLERS */
+    val onChatroomClick = { chatroomId: Long -> chatViewModel.getChatDetail(chatroomId) }
 
     CommonScaffoldForm(
-        pbarOpen = open,
+        pbarOpen = uOpen || cOpen,
         topBarContent = { /*TODO*/ }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
@@ -66,7 +81,8 @@ fun ChatListScreen(userViewModel: UserViewModel) {
             )
 
             ChatRoomHolder(
-                chatRoomList = ChatRoomPreviewInfo.testData,
+                chatInfoList = chatRoomList ?: listOf(),
+                onChatroomClick = onChatroomClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .constrainAs(chatRoomHolderRef) {
@@ -74,6 +90,7 @@ fun ChatListScreen(userViewModel: UserViewModel) {
                         centerHorizontallyTo(parent)
                     }
             )
+
 
             // 마지막 여백
             Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
@@ -108,30 +125,48 @@ fun ChatTitleBar(modifier: Modifier = Modifier) {
 
 @Composable
 fun ChatRoomHolder(
-    chatRoomList: List<ChatRoomPreviewInfo>,
+    chatInfoList: List<ChatInfo>,
+    onChatroomClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxWidth()
     ) {
+        if (chatInfoList.isEmpty()) {
+            Text(
+                text = "아직 개설된 대화방이 없어요..",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.LightGray
+            )
+        }
+
         LazyColumn {
-            items(chatRoomList) {
+            items(chatInfoList) {
+                val chatroom = it.chatroom
+
+                val cid = chatroom.id
+                val cname = chatroom.name
+                val cimage = chatroom.image
+                val lastChat = chatroom.chat.last()
+
                 ChatRoomMaker(
-                    senderName = it.senderName,
-                    senderImage = it.senderImage,
-                    chatPreview = it.chatPreview,
-                    badgeCount = it.badgeCount,
-                    onChatRoomClick = { }
+                    chatroomName = cname,
+                    senderName = lastChat.writer,
+                    senderImage = cimage ?: "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/d3dbe6e2-6513-44a7-a261-c04ff6328bd1.png",
+                    chatPreview = lastChat.message,
+                    badgeCount = 1,
+                    onChatRoomClick = { onChatroomClick(cid) }
                 )
 
-                val mod = Modifier
+                val divMod = Modifier
                     .background(color = Color.Gray)
                     .fillMaxWidth()
                     .alpha(0.2f)
                 
                 Spacer(modifier = Modifier.padding(vertical = 2.dp))
-                Divider(modifier = mod, thickness = Dp.Hairline, startIndent = 8.dp)
+                Divider(modifier = divMod, thickness = Dp.Hairline, startIndent = 8.dp)
                 Spacer(modifier = Modifier.padding(vertical = 2.dp))
             }
         }
@@ -140,6 +175,7 @@ fun ChatRoomHolder(
 
 @Composable
 fun ChatRoomMaker(
+    chatroomName: String,
     senderName: String,
     senderImage: String,
     chatPreview: String,
@@ -147,12 +183,13 @@ fun ChatRoomMaker(
     onChatRoomClick: () -> Unit
 ) {
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-            val (profileCardRef, senderNameTextRef, chatPreviewTextRef, badgeCountRef) = createRefs()
+            val (profileCardRef, chatroomNameRef, senderNameTextRef, chatPreviewTextRef, badgeCountRef) = createRefs()
 
             Card(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(shape = CircleShape)
+                    .clickable { onChatRoomClick() }
                     .constrainAs(profileCardRef) {
                         start.linkTo(anchor = parent.start, margin = 12.dp)
                         centerVerticallyTo(parent)
@@ -166,20 +203,32 @@ fun ChatRoomMaker(
             }
 
             Text(
-                text = senderName,
+                text = chatroomName,
                 fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray,
+                modifier = Modifier
+                    .constrainAs(chatroomNameRef) {
+                        start.linkTo(anchor = profileCardRef.end, margin = 12.dp)
+                        bottom.linkTo(anchor = senderNameTextRef.top)
+                    }
+            )
+
+            Text(
+                text = senderName,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 modifier = Modifier
                     .constrainAs(senderNameTextRef) {
-                        bottom.linkTo(anchor = chatPreviewTextRef.top)
                         start.linkTo(anchor = profileCardRef.end, margin = 12.dp)
+                        bottom.linkTo(anchor = chatPreviewTextRef.top)
                     }
             )
 
             Text(
                 text = chatPreview,
-                fontSize = 14.sp,
+                fontSize = 12.sp,
                 color = Color.LightGray,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
