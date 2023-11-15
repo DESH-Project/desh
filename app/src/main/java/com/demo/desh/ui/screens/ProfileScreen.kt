@@ -40,47 +40,11 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import com.demo.desh.model.RealtyPreview
-import com.demo.desh.model.RealtyPreviewInfoForReg
-import com.demo.desh.model.RealtyPreviewInfoForStar
 import com.demo.desh.model.User
 import com.demo.desh.ui.CommonScaffoldForm
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.viewModel.UserViewModel
-import java.util.logging.Logger
 
-val log: Logger = Logger.getLogger("ProfileScreen")
-
-@JvmName("forReg")
-fun UserViewModel.makeDummy(dums: List<RealtyPreviewInfoForReg>) : List<RealtyPreview> =
-    dums.map {
-        val res = RealtyPreview(
-            id = it.id,
-            address = it.name,
-            deposit = 10000L,
-            monthly = it.monthlyRental,
-            previewImage = it.previewImage
-        )
-
-        log.warning(res.toString())
-
-        res
-    }
-
-@JvmName("forStar")
-fun UserViewModel.makeDummy(dums: List<RealtyPreviewInfoForStar>) : List<RealtyPreview> =
-    dums.map {
-        val res = RealtyPreview(
-            id = it.id,
-            address = it.address,
-            deposit = it.deposit,
-            monthly = it.monthlyRental,
-            previewImage = it.images.getOrNull(0) ?: ""
-        )
-
-        log.warning(res.toString())
-
-        res
-    }
 
 @Composable
 fun ProfileScreen(
@@ -93,11 +57,10 @@ fun ProfileScreen(
     }
 
     /* STATES */
-    val open by userViewModel.open.observeAsState(initial = false)
     val user by userViewModel.targetUser.observeAsState()
-    // val userRegStore by userViewModel.userRegStore.observeAsState()
-    // val userPickedStore by userViewModel.userPickedStore.observeAsState()
-    val userRealtyPreview by userViewModel.userRealtyPreview.observeAsState()
+    val open by userViewModel.open.observeAsState(initial = false)
+    val userRegStore by userViewModel.userRegStore.observeAsState(initial = listOf())
+    val userPickedStore by userViewModel.userPickedStore.observeAsState(initial = listOf())
 
     var btnSelected by rememberSaveable { mutableStateOf(true) }
 
@@ -140,7 +103,7 @@ fun ProfileScreen(
             )
 
             PostAndLikeContent(
-                userRealtyPreview = userRealtyPreview,
+                userRealtyPreview = if (btnSelected) userRegStore else userPickedStore,
                 modifier = Modifier
                     .constrainAs(postAndLikeContentRef) {
                         centerHorizontallyTo(parent)
@@ -157,10 +120,10 @@ fun ProfileScreen(
 
 @Composable
 fun PostAndLikeContent(
-    userRealtyPreview: List<RealtyPreview>?,
+    userRealtyPreview: List<RealtyPreview>,
     modifier: Modifier = Modifier
 ) {
-    if (userRealtyPreview.isNullOrEmpty()) {
+    if (userRealtyPreview.isEmpty()) {
         Box(modifier.fillMaxSize()) {
             Text(
                 text = "표시할 콘텐츠가 없습니다.",

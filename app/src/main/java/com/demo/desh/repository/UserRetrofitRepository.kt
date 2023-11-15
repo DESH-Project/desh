@@ -2,12 +2,10 @@ package com.demo.desh.repository
 
 import android.util.Log
 import com.demo.desh.access.UserRetrofitDao
-import com.demo.desh.model.District
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
-import com.demo.desh.model.RealtyPreviewInfoForReg
-import com.demo.desh.model.RealtyPreviewInfoForStar
-import com.demo.desh.model.Recommend
+import com.demo.desh.model.RealtyPreview
+import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
@@ -31,19 +29,25 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .also { logging("login", it) }
     }
 
-    suspend fun getUserInfo(userId: Long) : Response<ServerResponseObj<User>> = withContext(Dispatchers.IO) {
-        userRetrofitDao
+    suspend fun getUserInfo(userId: Long) : Response<ServerResponseObj<User>> {
+        return userRetrofitDao
             .getUserInfo(userId)
             .also { logging("getUserInfo", it) }
     }
 
-    suspend fun getUserPickedStoreList(userId: Long) : Response<ServerResponse<RealtyPreviewInfoForStar>> {
+    suspend fun getNearbyStoreList(encodedDistrictName: String): Response<ServerResponse<RealtyPreview>> {
+        return userRetrofitDao
+            .getStoreList(encodedDistrictName)
+            .also { logging("getNearbyStoreList", it) }
+    }
+
+    suspend fun getUserPickedStoreList(userId: Long) : Response<ServerResponse<RealtyPreview>> {
         return userRetrofitDao
             .getPickedStoreList(userId)
             .also { logging("getUserPickedStoreList", it) }
     }
 
-    suspend fun getUserRegisterStoreList(userId: Long) : Response<ServerResponse<RealtyPreviewInfoForReg>> {
+    suspend fun getUserRegisterStoreList(userId: Long) : Response<ServerResponse<RealtyPreview>> {
         return userRetrofitDao
             .getRegisterStoreList(userId)
             .also { logging("getUserRegisterStoreList", it) }
@@ -63,22 +67,16 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .also { logging("getServiceList", it) }
     }
 
-    suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>> = withContext(Dispatchers.IO) {
+    suspend fun getRecommendationAllInfo(): Response<ServerResponse<RecommendDistrict>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getRecommendationAllInfo()
             .also { logging("getRecommendationAllInfo", it) }
     }
 
-    suspend fun getRecommendationInfo(encodedServiceName: String): Response<ServerResponse<Recommend>> = withContext(Dispatchers.IO) {
+    suspend fun getRecommendationInfo(encodedServiceName: String): Response<ServerResponse<RecommendDistrict>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getRecommendationInfo(encodedServiceName)
             .also { logging("getRecommendationInfo", it) }
-    }
-
-    suspend fun getDistrictInfo(encodedDistrictName: String): Response<ServerResponse<District>> = withContext(Dispatchers.IO) {
-        userRetrofitDao
-            .getStoreList(encodedDistrictName)
-            .also { logging("getDistrictInfo", it) }
     }
 
     suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<ServerResponse<Realty>> = withContext(Dispatchers.IO) {

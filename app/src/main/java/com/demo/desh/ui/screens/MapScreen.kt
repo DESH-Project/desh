@@ -1,8 +1,7 @@
 package com.demo.desh.ui.screens
 
-import androidx.compose.foundation.BorderStroke
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,115 +9,92 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.Button
+import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
-import com.demo.desh.model.District
-import com.demo.desh.model.Recommend
-import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.RealtyPreview
+import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.User
-import com.demo.desh.ui.CustomFullDivideLine
-import com.demo.desh.ui.CustomIconMenu
-import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.UserViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
 import com.kakao.vectormap.MapView
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
+    userId: Long,
     userViewModel: UserViewModel,
     goToRealtyDetailScreen: (Long) -> Unit,
     goToProfileScreen: (Long) -> Unit
 ) {
     LaunchedEffect(Unit) {
         userViewModel.fetchServiceList()
+        userViewModel.getUserInfo()
+        userViewModel.loadRecommendDistrict()
     }
-
-    val user = userViewModel.user.value!!
 
     /* STATES */
-    val open by userViewModel.open.observeAsState(initial = false)
-    val serviceList by userViewModel.serviceList.observeAsState()
-    val recommendInfo by userViewModel.recommendInfo.observeAsState()
-    val districtInfo by userViewModel.districtInfo.observeAsState()
-    val selectedServiceName by userViewModel.selectedServiceName.observeAsState()
+    val user by userViewModel.targetUser.observeAsState()
+    val serviceList by userViewModel.serviceList.observeAsState(initial = mapOf())
+    val recommendDistrictList by userViewModel.recommendDistrictList.observeAsState(initial = listOf())
+    val nearbyStoreList by userViewModel.nearbyStoreList.observeAsState(initial = listOf())
+
+    var selectedServiceName by rememberSaveable { mutableStateOf("전체") }
 
     /* HANDLERS */
-    val onServiceItemClick = { serviceName: String -> userViewModel.fetchMapView(serviceName) }
-    val onDistrictItemClick = { realtyId: Long -> goToRealtyDetailScreen(realtyId) }
-    val onDistrictButtonClick = { districtName: String -> userViewModel.fetchDistrictInfoList(districtName) }
-    val goToProfileScreenWithUser = { userId: Long -> goToProfileScreen(userId) }
-
-    if (open) {
-        LoadingDialog(progressIndicatorSize = 80.dp, progressIndicatorColor = Color.Gray)
+    val onServiceItemClick = { serviceName: String ->
+        userViewModel.loadRecommendDistrict(serviceName)
+        selectedServiceName = serviceName
     }
 
-    else {
+    val onDistrictButtonClick = { districtName: String -> userViewModel.fetchNearbyStores(districtName) }
+    val onStoreButtonClick = { storeId: Long -> goToRealtyDetailScreen(storeId) }
+
+    user?.let {
         BottomSheetScaffold(
-            topBar = {
-                TopMapBar(
-                    serviceList = serviceList?.data ?: mapOf(),
-                    user = user,
-                    onServiceItemClick = onServiceItemClick,
-                    goToProfileScreenWithUser = goToProfileScreenWithUser
-                )
-            },
+            scaffoldState = rememberBottomSheetScaffoldState(),
 
             sheetContent = {
                 DrawerContent(
-                    user = user,
-                    recommendInfo = recommendInfo,
-                    districtInfo = districtInfo,
+                    user = user!!,
+                    serviceList = serviceList,
                     selectedServiceName = selectedServiceName,
+                    onServiceItemClick = onServiceItemClick,
+                    recommendDistrictList = recommendDistrictList,
                     onDistrictButtonClick = onDistrictButtonClick,
-                    onDistrictItemClick = onDistrictItemClick
+                    nearbyStoreList = nearbyStoreList,
+                    onStoreButtonClick = onStoreButtonClick
                 )
             },
 
             drawerGesturesEnabled = true,
             drawerBackgroundColor = DefaultBackgroundColor,
-            drawerElevation = 0.dp,
 
             content = {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -126,7 +102,7 @@ fun MapScreen(
                         AndroidView(
                             factory = { context -> MapViewManager.createMapView(context) },
                             modifier = Modifier.fillMaxSize(),
-                            update = { mapView: MapView -> MapViewManager.labelingOnMapView(mapView, recommendInfo) }
+                            update = { mapView: MapView -> MapViewManager.labelingOnMapView(mapView, recommendDistrictList) }
                         )
                     }
                 }
@@ -136,119 +112,148 @@ fun MapScreen(
 }
 
 @Composable
-fun TopMapBar(
-    serviceList: Map<String, List<String>>,
+fun DrawerContent(
     user: User,
+    serviceList: Map<String, List<String>>,
+    selectedServiceName: String,
     onServiceItemClick: (String) -> Unit,
-    goToProfileScreenWithUser: (Long) -> Unit
+    recommendDistrictList: List<RecommendDistrict>,
+    onDistrictButtonClick: (String) -> Unit,
+    nearbyStoreList: List<RealtyPreview>,
+    onStoreButtonClick: (Long) -> Unit
 ) {
-    var showSheet by rememberSaveable { mutableStateOf(false) }
-    val onSheetClose = { showSheet = false }
+    Box(
+        modifier = Modifier
+            .background(DefaultBackgroundColor)
+            .fillMaxSize()
+    ) {
+        ConstraintLayout {
+            val (userIntroRef, serviceListButtonsRef, districtCardRef, nearbyStoreRef) = createRefs()
 
-    if (showSheet) {
-        BottomSheet(onDismiss = { showSheet = false }) {
-            BottomSheetContent(serviceList, onServiceItemClick, onSheetClose)
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.align(Alignment.CenterStart),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { showSheet = true }) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = Color.DarkGray
-                )
-            }
-
-            Text(
-                text = "${serviceList.size}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = HighlightColor
+            UserIntroText(
+                user = user,
+                selectedServiceName = selectedServiceName,
+                modifier = Modifier
+                    .constrainAs(userIntroRef) {
+                        top.linkTo(anchor = parent.top, margin = 24.dp)
+                        start.linkTo(anchor = parent.start, margin = 12.dp)
+                    }
             )
 
-            Text(
-                text = "개의 업종을 확인해보세요.",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = Color.DarkGray
-            )
-        }
+            Spacer(modifier = Modifier.padding(16.dp))
 
-        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
-            CustomIconMenu(
-                vector = Icons.Default.AccountCircle,
-                onIconClick = { goToProfileScreenWithUser(user.id!!) },
-                tint = Color.DarkGray
+            ServiceListButtons(
+                serviceList = serviceList,
+                onServiceItemClick = onServiceItemClick,
+                modifier = Modifier
+                    .constrainAs(serviceListButtonsRef) {
+                        top.linkTo(anchor = userIntroRef.bottom, margin = 36.dp)
+                        start.linkTo(anchor = parent.start, margin = 12.dp)
+                    }
+            )
+
+            Spacer(modifier = Modifier.padding(16.dp))
+
+            RecommendDistrictCards(
+                districtList = recommendDistrictList,
+                onDistrictButtonClick = onDistrictButtonClick,
+                modifier = Modifier
+                    .constrainAs(districtCardRef) {
+                        top.linkTo(anchor = serviceListButtonsRef.bottom, margin = 36.dp)
+                        start.linkTo(anchor = parent.start, margin = 12.dp)
+                    }
+            )
+
+            Spacer(modifier = Modifier.padding(16.dp))
+
+            NearbyStoreCards(
+                nearbyStoreList = nearbyStoreList,
+                onStoreButtonClick = onStoreButtonClick,
+                modifier = Modifier
+                    .constrainAs(nearbyStoreRef) {
+                        top.linkTo(anchor = districtCardRef.bottom, margin = 26.dp)
+                        start.linkTo(anchor = parent.start, margin = 12.dp)
+                    }
             )
         }
     }
 }
 
 @Composable
-fun BottomSheetContent(
+fun UserIntroText(
+    user: User,
+    selectedServiceName: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Row {
+            Text(
+                text = user.nickname,
+                color = HighlightColor,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            Text(
+                text = "님",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+        }
+
+        Row {
+            Text(
+                text = selectedServiceName,
+                color = HighlightColor,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+
+            Text(
+                text = "에 대한 추천 상권 정보를 가져왔어요.",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun ServiceListButtons(
     serviceList: Map<String, List<String>>,
     onServiceItemClick: (String) -> Unit,
-    onSheetClose: () -> Unit
+    modifier: Modifier = Modifier
 ) {
-    var subButtons by rememberSaveable { mutableStateOf<List<String>>(listOf()) }
-    val offset = 3
+    val keys = serviceList.keys
 
-    val onCategoryClick = { key: String ->
-        subButtons = serviceList[key] ?: listOf()
+    var subBtns by remember { mutableStateOf(listOf<String>()) }
+    val onKeySelect = { key: String ->
+        val subs = serviceList[key]
+        Log.e("subs", subs.toString())
+
+        if (!subs.isNullOrEmpty()) {
+            subBtns = subs
+        }
     }
 
-    Column(
-        modifier = Modifier
-            .padding(24.dp)
-    ) {
-        Text(
-            text = "카테고리를 선택해주세요",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.padding(bottom = 24.dp))
-
-        val list = serviceList.keys.toList()
-
-        for (i in list.indices step offset) {
-            Row {
-                var j = i
-
-                while (j < i + 3 && j < list.size) {
-                    TextButton(
-                        onClick = { onCategoryClick(list[j]) },
-                        modifier = Modifier
-                            .height(70.dp)
-                            .padding(4.dp)
-                            .border(BorderStroke(1.dp, Color.Black), shape = CircleShape)
-                            .background(Color.Green)
-                    ) {
-                        Text(
-                            text = list[j],
-                            color = Color.DarkGray,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
-                        )
-                    }
-
-                    j++
+    Column(modifier = modifier) {
+        Text(text = "다른 상권도 찾아보세요!", color = Color.LightGray, fontSize = 12.sp)
+        
+        LazyRow {
+            items(keys.toList()) { key ->
+                Button(onClick = { onKeySelect(key) }) {
+                    Text(text = key)
                 }
+
+                Spacer(modifier = Modifier.padding(4.dp))
             }
         }
 
-        LazyColumn {
-            items(subButtons) { item ->
-                TextButton(onClick = {
-                    onServiceItemClick(item)
-                    onSheetClose()
-                }) {
+        LazyRow {
+            items(subBtns) { item ->
+                Button(onClick = { onServiceItemClick(item) }) {
                     Text(text = item)
                 }
             }
@@ -256,221 +261,59 @@ fun BottomSheetContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheet(
-    onDismiss: () -> Unit,
-    items: @Composable () -> Unit
-) {
-    val modalBottomSheetState = rememberModalBottomSheetState()
-
-    ModalBottomSheet(
-        containerColor = DefaultBackgroundColor,
-        onDismissRequest = onDismiss,
-        sheetState = modalBottomSheetState,
-        dragHandle = { BottomSheetDefaults.DragHandle() },
-    ) {
-        items()
-    }
-}
-
-@Composable
-fun DrawerContent(
-    user: User,
-    recommendInfo: ServerResponse<Recommend>?,
-    districtInfo: ServerResponse<District>?,
-    selectedServiceName: String?,
+fun RecommendDistrictCards(
+    districtList: List<RecommendDistrict>,
     onDistrictButtonClick: (String) -> Unit,
-    onDistrictItemClick: (Long) -> Unit
+    modifier: Modifier = Modifier
 ) {
-    /* Custom Colors */
-    val phc = Color(0xAA000000)   // Place Holder Color
-
-    /* Custom Size */
-    // Text
-    val dts = 16.sp  // Default Text Size
-    val lts = 20.sp  // Large Text Size
-
-    // Padding
-    val sps = 8.dp   // Small Padding Size
-    val dps = 16.dp  // Default Padding Size
-
-    Box(modifier = Modifier.background(DefaultBackgroundColor)) {
-        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (remainsMarginRef) = createRefs()
-
-            if (recommendInfo != null) {
+    LazyRow(modifier = modifier) {
+        items(districtList) {
+            Card(modifier = Modifier.clickable { onDistrictButtonClick(it.district) }) {
                 Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Row(modifier = Modifier.padding(dps)) {
-                        Text(
-                            text = "\'${user.nickname}\'",
-                            color = HighlightColor,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = lts
-                        )
+                    Text(text = it.district)
+                    Text(text = it.service)
+                    Text(text = it.predict.toString())
+                    Text(text = "(${it.lat}, ${it.lng})")
+                }
+            }
 
-                        Text(
-                            text = "님을 위한 추천 상권!",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = lts
-                        )
+            Spacer(modifier = Modifier.padding(8.dp))
+        }
+    }
+}
+
+@Composable
+fun NearbyStoreCards(
+    nearbyStoreList: List<RealtyPreview>,
+    onStoreButtonClick: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        if (nearbyStoreList.isEmpty()) {
+            Text(
+                text = "아직 등록된 상가가 없어요",
+                fontSize = 20.sp,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        LazyRow {
+            items(nearbyStoreList) {
+                Card(modifier = Modifier.clickable { onStoreButtonClick(it.id) }) {
+                    Column {
+                        AsyncImage(model = it.previewImage.first(), contentDescription = null)
+                        Text(text = "${it.deposit}/${it.monthlyRental}")
+                        Text(text = it.address)
+                        Text(text = it.star.toString())
                     }
-
-                    RecommendInfoText(
-                        selectedServiceName = selectedServiceName,
-                        recommendInfoSize = recommendInfo.size,
-                        fontSize = dts,
-                        textColor = Color.White,
-                        highlightTextColor = HighlightColor,
-                        paddingSize = dps
-                    )
-
-                    CreateRecommendPager(recommendInfo, dts, onDistrictButtonClick)
-                }
-
-                CustomFullDivideLine()
-            }
-
-            if (districtInfo != null) {
-                Spacer(modifier = Modifier.padding(dps))
-
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    CreateDistrictPager(districtInfo, onDistrictItemClick, phc)
                 }
             }
-
-            // 마지막 여백
-            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                bottom.linkTo(anchor = parent.bottom, margin = 60.dp)
-            })
         }
     }
+
 }
-
-@Composable
-fun RecommendInfoText(
-    selectedServiceName: String?,
-    recommendInfoSize: Int,
-    fontSize: TextUnit,
-    textColor: Color,
-    highlightTextColor: Color,
-    paddingSize: Dp
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(paddingSize),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        Text(
-            text = "\'${selectedServiceName}\'",
-            fontWeight = FontWeight.Bold,
-            fontSize = fontSize,
-            color = highlightTextColor
-        )
-
-        Row {
-            Text(
-                text = "$recommendInfoSize",
-                fontWeight = FontWeight.Bold,
-                fontSize = fontSize,
-                color = highlightTextColor
-            )
-
-            Text(
-                text = "개의 상권 검색 결과",
-                fontWeight = FontWeight.Bold,
-                fontSize = fontSize,
-                color = textColor
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun CreateRecommendPager(
-    recommendInfo: ServerResponse<Recommend>,
-    textSize: TextUnit,
-    onDistrictButtonClick: (String) -> Unit
-) {
-    val count = recommendInfo.size
-    val list = recommendInfo.data
-
-    HorizontalPager(
-        count = count,
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .height(48.dp)
-    ) { page ->
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.clickable { onDistrictButtonClick(list[page].district) }
-        ) {
-            val item = list[page]
-
-            Text(
-                text = item.district,
-                color = Color.White,
-                fontSize = textSize,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = item.predict.toString(),
-                color = Color.White,
-                fontSize = textSize,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun CreateDistrictPager(
-    districtInfo: ServerResponse<District>,
-    onDistrictItemClick: (Long) -> Unit,
-    placeHolderColor : Color
-) {
-    val count = districtInfo.size
-    val list = districtInfo.data
-
-    HorizontalPager(
-        count = count,
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-    ) { page ->
-        val item = list[page]
-
-        Column(
-            modifier = Modifier.clickable { onDistrictItemClick(item.id) }
-        ) {
-            AsyncImage(
-                model = item.image,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                placeholder = ColorPainter(placeHolderColor),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Column {
-                Text(text = "주소: ${item.address}")
-                Text(text = "시세: ${item.price}")
-            }
-        }
-    }
-}
-

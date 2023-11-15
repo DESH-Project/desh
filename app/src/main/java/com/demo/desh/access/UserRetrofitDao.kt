@@ -1,11 +1,9 @@
 package com.demo.desh.access
 
-import com.demo.desh.model.District
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
-import com.demo.desh.model.RealtyPreviewInfoForReg
-import com.demo.desh.model.RealtyPreviewInfoForStar
-import com.demo.desh.model.Recommend
+import com.demo.desh.model.RealtyPreview
+import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
@@ -29,24 +27,17 @@ interface UserRetrofitDao {
     @POST("realty")
     suspend fun sendRealtyInfo(@Body realty: RealtyCreationReq): Response<Long>
 
-    /* 조회 가능한 허용된 서비스 업종 리스트 */
+    /* 조회 가능한 서비스 업종 리스트 */
     @GET("service")
     suspend fun getServiceList(): Response<ServerResponseObj<Map<String, List<String>>>>
 
     /* 전체 상권 추천 정보 */
     @GET("recommend-all")
-    suspend fun getRecommendationAllInfo(): Response<ServerResponse<Recommend>>
+    suspend fun getRecommendationAllInfo(): Response<ServerResponse<RecommendDistrict>>
 
-    /* 상권 추천 정보 */
+    /* 업종에 따른 상권 추천 정보 */
     @GET("recommend")
-    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<ServerResponse<Recommend>>
-
-    /* 상권에 따른 상가 리스트 조회 */
-    @GET("stores")
-    suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<ServerResponse<District>>
-
-    @GET("store")
-    suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<ServerResponse<Realty>>
+    suspend fun getRecommendationInfo(@Query("service") encodedServiceName: String): Response<ServerResponse<RecommendDistrict>>
 
     /* 초기 이미지 */
     @GET("intro/image")
@@ -59,11 +50,19 @@ interface UserRetrofitDao {
         @Query("user-id") realtyId: Long
     ) : Response<ServerResponse<Int>>
 
-    /* 유저가 찜한 상가 리스트 조회 */
-    @GET("{uid}/dib")
-    suspend fun getPickedStoreList(@Path("uid") userId: Long) : Response<ServerResponse<RealtyPreviewInfoForStar>>
+    /* 상가 상세정보 조회 */
+    @GET("store")
+    suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<ServerResponse<Realty>>
 
-    /* 유저가 등록한 상가 리스트 조회 */
+    /* 상권에 따른 상가 미리보기 리스트 조회 */
+    @GET("stores")
+    suspend fun getStoreList(@Query("district") encodedDistrictName: String): Response<ServerResponse<RealtyPreview>>
+
+    /* 유저가 찜한 상가 미리보기 리스트 조회 */
+    @GET("{uid}/dib")
+    suspend fun getPickedStoreList(@Path("uid") userId: Long) : Response<ServerResponse<RealtyPreview>>
+
+    /* 유저가 등록한 상가 미리보기 리스트 조회 */
     @GET("{uid}/realty")
-    suspend fun getRegisterStoreList(@Path("uid") userId: Long) : Response<ServerResponse<RealtyPreviewInfoForReg>>
+    suspend fun getRegisterStoreList(@Path("uid") userId: Long) : Response<ServerResponse<RealtyPreview>>
 }

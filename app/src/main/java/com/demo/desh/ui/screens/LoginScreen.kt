@@ -49,7 +49,7 @@ import com.google.accompanist.pager.rememberPagerState
 @Composable
 fun LoginScreen(
     userViewModel: UserViewModel,
-    goToMapScreen: () -> Unit
+    goToMapScreen: (Long) -> Unit
 ) {
     LaunchedEffect(Unit) {
         userViewModel.loadPreviewImages()
@@ -67,7 +67,7 @@ fun LoginScreen(
     val onKakaoLoginButtonClick = {
         val goToMapScreenWithUser = { user: User ->
             userViewModel.fetchUser(user)
-            goToMapScreen()
+            goToMapScreen(user.id!!)
         }
 
         KakaoLogin.login(context, goToMapScreenWithUser)

@@ -14,4 +14,4 @@ val Black = Color(0xFF000000)
 
 /* App Custom Colors */
 val DefaultBackgroundColor = Color(0xFF343434)
-val HighlightColor = Color(0xFFFF6A68)
+val HighlightColor = Color(0xFFEB6765)

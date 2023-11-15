@@ -1,6 +1,5 @@
 package com.demo.desh.model
 
-import java.io.Serializable
 import java.time.LocalDateTime
 
 data class ServerResponse<out T> (
@@ -13,7 +12,7 @@ data class ServerResponseObj<out T> (
     val data: T,
 )
 
-data class Recommend(
+data class RecommendDistrict(
     val lat: Double,
     val lng: Double,
     val service: String,
@@ -27,7 +26,7 @@ data class User(
     var email : String,
     var profileImageUrl : String,
     var description: String = ""
-) : Serializable
+)
 
 data class RealtyCreationReq(
     val name: String,
@@ -36,13 +35,6 @@ data class RealtyCreationReq(
     val pyung: Long,
     val squareMeter: Double,
     val userId: Long
-)
-
-data class District(
-    val id: Long,
-    val address: String,
-    val image: String,
-    val price: Double
 )
 
 data class Realty(
@@ -57,27 +49,13 @@ data class Realty(
     val userId: Long
 )
 
-data class RealtyPreviewInfoForStar(
-    val id: Long = 1L,
-    val deposit: Long = 10000L,
-    val monthlyRental: Int = 100,
-    val images: List<String> = listOf(""),
-    val address: String = "",
-)
-
-data class RealtyPreviewInfoForReg(
-    val id: Long = 1L,
-    val name: String = "",
-    val monthlyRental: Int = 1,
-    val previewImage: String = ""
-)
-
 data class RealtyPreview(
     val id: Long,
-    val address: String,
     val deposit: Long,
-    val monthly: Int,
+    val monthlyRental: Int,
     val previewImage: String,
+    val address: String,
+    val star: Long
 )
 
 /* Chat Dto */

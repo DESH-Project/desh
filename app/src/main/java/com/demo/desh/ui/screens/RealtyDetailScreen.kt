@@ -68,13 +68,12 @@ import com.google.accompanist.pager.rememberPagerState
 
 @Composable
 fun RealtyDetailScreen(
+    userId: Long,
     realtyId: Long,
     userViewModel: UserViewModel,
     goToProfileScreen: () -> Unit,
     goToChatListScreen: (Long) -> Unit
 ) {
-    val user = userViewModel.user.value
-
     /* STATES */
     val open by userViewModel.open.observeAsState(initial = false)
 
@@ -85,7 +84,7 @@ fun RealtyDetailScreen(
         topBarContent = {
             TopBarContent(
                 goToProfileScreen = goToProfileScreen,
-                goToChatListScreen = { goToChatListScreen(user?.id ?: 1L) },
+                goToChatListScreen = { goToChatListScreen(userId) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
