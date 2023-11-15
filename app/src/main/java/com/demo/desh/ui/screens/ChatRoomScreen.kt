@@ -30,8 +30,6 @@ import com.demo.desh.viewModel.ChatViewModel
 import com.demo.desh.viewModel.UserViewModel
 import java.time.LocalDate
 
-// ChatViewModel 연동 -> Socket 연동
-
 @Composable
 fun ChatRoomScreen(
     chatRoomId: Long,
@@ -96,6 +94,7 @@ fun ChatMsgBox(
         )
     }
 }
+
 @Composable
 fun SendMsgForm(txt: String, onValueChange: (String) -> Unit) {
     Box(

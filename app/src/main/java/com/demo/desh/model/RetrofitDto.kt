@@ -20,10 +20,10 @@ data class RecommendDistrict(
 )
 
 data class User(
-    var id : Long? = null,
-    var nickname : String,
-    var email : String,
-    var profileImageUrl : String,
+    var id: Long? = null,
+    var nickname: String,
+    var email: String,
+    var profileImageUrl: String,
     var description: String = ""
 )
 

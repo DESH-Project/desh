@@ -36,6 +36,7 @@ data class LoginPreviewInfo(
 }
 
 data class BuildingInfo(
+    val buildingId: Long,
     val name: String,
     val price: Int,
     val address: String,
@@ -75,6 +76,7 @@ val buildingPreviewDummy = listOf(
 )
 
 val buildingInfo = BuildingInfo(
+    buildingId = 1L,
     name = "오도로 빌딩",
     price = 210000000,
     address = "서울시 노원구 상계 1동 345-56",

@@ -83,7 +83,7 @@ fun Root(
 
         composable(route = Screen.Map.route + "/{$userId}") { backStackEntry ->
             backStackEntry.arguments?.getString(userId)?.let {
-                val goToRealtyDetailScreen = { realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$realtyId") }
+                val goToRealtyDetailScreen = { userId: Long, realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$userId/$realtyId") }
                 val goToProfileScreen = { userId: Long -> navController.navigate(Screen.Profile.route + "/$userId") }
                 val goToChatListScreen = { userId: Long -> navController.navigate(Screen.ChatList.route + "/$userId") }
 
@@ -104,13 +104,15 @@ fun Root(
         
         composable(route = "${Screen.Profile.route}/{${userId}}") { backStackEntry ->
             backStackEntry.arguments?.getString(userId)?.let {
-                ProfileScreen(it.toLong(), userViewModel)
+                val goToProfileScreen = { navController.navigate(Screen.Profile.route) }
+                val goToChatListScreen = { userId: Long -> navController.navigate(Screen.ChatList.route + "/$userId") }
+                ProfileScreen(it.toLong(), userViewModel, chatViewModel, goToProfileScreen, goToChatListScreen)
             }
         }
 
         composable(route = "${Screen.ChatList.route}/{${userId}}") { backStackEntry ->
-            val goToChatroom = { chatRoomId: Long -> navController.navigate(Screen.ChatRoom.route + "/$chatRoomId")}
             backStackEntry.arguments?.getString(userId)?.let {
+                val goToChatroom = { chatRoomId: Long -> navController.navigate(Screen.ChatRoom.route + "/$chatRoomId")}
                 ChatListScreen(it.toLong(), goToChatroom, userViewModel, chatViewModel)
             }
         }

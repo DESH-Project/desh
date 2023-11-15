@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +71,10 @@ fun RealtyDetailScreen(
     goToProfileScreen: () -> Unit,
     goToChatListScreen: (Long) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+
+    }
+
     /* STATES */
     val open by userViewModel.open.observeAsState(initial = false)
 
@@ -83,44 +90,55 @@ fun RealtyDetailScreen(
             )
         }
     ) {
-        ConstraintLayout {
-            val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
+        Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
 
-            // 건물 이미지 Pager & Indicator
-            BuildingImagePager(
-                pageItems = buildingInfo.images,
-                modifier = Modifier
-                    .constrainAs(buildingImagePagerRef) {
-                        top.linkTo(parent.top)
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+
+            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
+
+                // 건물 이미지 Pager & Indicator
+                BuildingImagePager(
+                    pageItems = buildingInfo.images,
+                    modifier = Modifier
+                        .constrainAs(buildingImagePagerRef) {
+                            top.linkTo(parent.top)
+                            centerHorizontallyTo(parent)
+                            width = Dimension.fillToConstraints
+                        }
+                )
+
+                // 건물 상세 정보
+                BuildingInfoUi(
+                    buildingInfo = buildingInfo,
+                    modifier = Modifier
+                        .constrainAs(buildingInfoUiRef) {
+                            top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
+                            linkTo(start = parent.start, end = parent.end)
+                            width = Dimension.fillToConstraints
+                        }
+                )
+
+                NearbyBuildingPreviewUi(
+                    nearbyBuildingInfo = buildingPreviewDummy,
+                    modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
+                        top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
                         centerHorizontallyTo(parent)
                         width = Dimension.fillToConstraints
                     }
-            )
+                )
 
-            // 건물 상세 정보
-            BuildingInfoUi(
-                buildingInfo = buildingInfo,
-                modifier = Modifier
-                    .constrainAs(buildingInfoUiRef) {
-                        top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
-                        linkTo(start = parent.start, end = parent.end)
-                        width = Dimension.fillToConstraints
-                    }
-            )
-
-            NearbyBuildingPreviewUi(
-                nearbyBuildingInfo = buildingPreviewDummy,
-                modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
-                    top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
-                    centerHorizontallyTo(parent)
-                    width = Dimension.fillToConstraints
-                }
-            )
-
-            // 마지막 여백
-            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
-            })
+                // 마지막 여백
+                Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                    top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
+                })
+            }
         }
     }
 }
@@ -136,7 +154,7 @@ fun BuildingImagePager(
 
     Box(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .height(356.dp)
     ) {
         HorizontalPager(
@@ -176,6 +194,14 @@ fun BuildingInfoUi(
 ) {
     var starButtonState by rememberSaveable { mutableStateOf(false) }
 
+    val onStarBtnClick = { buildingId: Long ->
+        starButtonState = !starButtonState
+
+        // room 저장
+
+        // 서버 전송
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -195,7 +221,7 @@ fun BuildingInfoUi(
                 color = Color.White,
             )
 
-            IconButton(onClick = { starButtonState = !starButtonState }) {
+            IconButton(onClick = { onStarBtnClick(buildingInfo.buildingId) }) {
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,

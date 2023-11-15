@@ -52,7 +52,7 @@ import com.kakao.vectormap.MapView
 fun MapScreen(
     userId: Long,
     userViewModel: UserViewModel,
-    goToRealtyDetailScreen: (Long) -> Unit,
+    goToRealtyDetailScreen: (Long, Long) -> Unit,
     goToProfileScreen: (Long) -> Unit,
     goToChatListScreen: (Long) -> Unit
 ) {
@@ -77,7 +77,7 @@ fun MapScreen(
     }
 
     val onDistrictButtonClick = { districtName: String -> userViewModel.fetchNearbyStores(districtName) }
-    val onStoreButtonClick = { storeId: Long -> goToRealtyDetailScreen(storeId) }
+    val onStoreButtonClick = { storeId: Long -> goToRealtyDetailScreen(userId, storeId) }
 
     user?.let {
         BottomSheetScaffold(
@@ -87,6 +87,7 @@ fun MapScreen(
                 TopBarContent(
                     goToProfileScreen = { goToProfileScreen(userId) },
                     goToChatListScreen = { goToChatListScreen(userId) },
+                    goToRealtyDetailScreen = { goToRealtyDetailScreen(userId, 1L) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(DefaultBackgroundColor)

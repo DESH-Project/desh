@@ -12,17 +12,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -30,7 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
@@ -51,7 +45,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.demo.desh.model.DropdownItem
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 
 @Composable
@@ -67,6 +60,7 @@ fun CommonScaffoldForm(
         bottomBar = bottomBarContent ?: { },
         backgroundColor = DefaultBackgroundColor,
         contentColor = Color.White,
+        modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -83,32 +77,29 @@ fun CommonScaffoldForm(
 fun TopBarContent(
     goToProfileScreen: () -> Unit,
     goToChatListScreen: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    goToRealtyDetailScreen: () -> Unit = { }
 ) {
-    var isDropDownExpanded by remember { mutableStateOf(false) }
-    val onDropdownExpand = { isDropDownExpanded = true }
-    val onDropdownClose = { isDropDownExpanded = false }
-
-    val dropdownItems = listOf(
-        DropdownItem("공유하기", Color.Black),
-        DropdownItem("신고하기", Color.Red)
-    )
-
     Row(
-        modifier = modifier
-            .padding(top = 4.dp)
-            .background(DefaultBackgroundColor),
         horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .background(DefaultBackgroundColor)
+            .padding(5.dp)
     ) {
+        Spacer(modifier = Modifier.padding(start = 5.dp))
+
         Text(
             text = "GOODPLACE",
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.ExtraBold,
             fontSize = 26.sp,
             color = Color.White
         )
 
-        Row {
+        Row(
+            modifier = Modifier.padding(start = 30.dp, end = 5.dp),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
             CustomIconMenu(
                 vector = Icons.Default.Email,
                 onIconClick = goToChatListScreen
@@ -119,11 +110,9 @@ fun TopBarContent(
                 onIconClick = goToProfileScreen
             )
 
-            CustomDropdownMenu(
-                isDropDownExpanded = isDropDownExpanded,
-                onDropdownExpand = onDropdownExpand,
-                onDropdownClose = onDropdownClose,
-                items = dropdownItems,
+            CustomIconMenu(
+                vector = Icons.Default.Warning,
+                onIconClick = goToRealtyDetailScreen
             )
         }
     }
@@ -141,51 +130,48 @@ fun CustomIconMenu(
             contentDescription = null,
             tint = tint,
             modifier = Modifier
-                .size(35.dp)
-                .background(color = Color(0x20C7C1C1), shape = CircleShape)
+                .size(25.dp)
+                .background(color = DefaultBackgroundColor, shape = CircleShape)
         )
     }
 }
 
 @Composable
-fun CustomDropdownMenu(
-    isDropDownExpanded: Boolean,
-    onDropdownExpand: () -> Unit,
-    onDropdownClose: () -> Unit,
-    items: List<DropdownItem>,
+fun UserProfile(
+    userNickname: String,
+    profileImageUrl: String,
+    userDescription: String?,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IconButton(onClick = onDropdownExpand) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = null,
-                tint = Color.White,
-            )
-        }
+        AsyncImage(
+            model = profileImageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .clip(CircleShape)
+                .size(120.dp)
+        )
 
-        DropdownMenu(
-            expanded = isDropDownExpanded,
-            onDismissRequest = onDropdownClose,
-            modifier = Modifier.wrapContentSize()
+        Box(
+            contentAlignment = Alignment.Center
         ) {
-            items.forEachIndexed { idx, item ->
-                DropdownMenuItem(onClick = { }) {
-                    Text(
-                        text = item.text,
-                        color = item.textColor,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
+            Text(
+                text = userNickname,
+                fontSize = 24.sp,
+                color = Color.White
+            )
 
-                if (items.size - 1 > idx) {
-                    Divider(color = Color.White)
-                }
-            }
+            Text(
+                text = userDescription ?: "유저 소개가 없습니다.",
+                fontSize = 13.sp,
+                color = Color.LightGray,
+                modifier = Modifier.padding(top = 62.dp)
+            )
         }
     }
 }
@@ -196,15 +182,13 @@ fun UserProfileCard(
     userImage: String,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
     ) {
         Card(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(shape = RoundedCornerShape(50.dp))
-                .align(Alignment.CenterStart)
+            shape = RoundedCornerShape(18.dp),
+            modifier = Modifier.size(48.dp)
         ) {
             AsyncImage(
                 model = userImage,
@@ -213,13 +197,13 @@ fun UserProfileCard(
             )
         }
 
-        Spacer(modifier = Modifier.padding(start = 8.dp))
+        Spacer(modifier = Modifier.padding(start = 10.dp))
 
         Text(
             text = userNickname,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            modifier = Modifier.align(Alignment.TopCenter)
+            fontSize = 18.sp,
+            color = Color.LightGray
         )
     }
 }
