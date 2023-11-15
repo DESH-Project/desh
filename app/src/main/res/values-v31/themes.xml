@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Splash Screen Theme. -->
+<resources>
+
     <style name="Theme.AppSplash" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">@color/black</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
         <item name="windowSplashScreenAnimationDuration">1500</item>
         <item name="postSplashScreenTheme">@style/Theme.AppCompat.NoActionBar</item>
-
         <!-- Status bar and Nav bar configs -->
-        <item name="android:statusBarColor" >@color/black</item>
+        <item name="android:statusBarColor">@color/black</item>
         <item name="android:navigationBarColor">@color/black</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>

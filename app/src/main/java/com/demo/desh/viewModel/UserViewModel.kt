@@ -4,20 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demo.desh.access.UserRetrofitRepository
-import com.demo.desh.model.District
-import com.demo.desh.model.IntroStore
+import com.demo.desh.repository.UserRetrofitRepository
 import com.demo.desh.model.Realty
-import com.demo.desh.model.Recommend
+import com.demo.desh.model.RealtyPreview
+import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.ServerResponse
-import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.net.URLEncoder
-import java.util.UUID
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
@@ -28,46 +28,97 @@ class UserViewModel @Inject constructor(
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
-    private val _previewStore = MutableLiveData<List<IntroStore>>()
-    val previewStore : LiveData<List<IntroStore>> get() = _previewStore
+    private var _open = MutableLiveData(false)
+    val open : LiveData<Boolean> get() = _open
 
-    fun loadPreviewStore() {
-        viewModelScope.launch {
-            val result = userRetrofitRepository.getIntroStore()
 
-            if (result.isSuccessful) {
-                _previewStore.value = result.body()?.data
-            }
-        }
-    }
-
+    /* 로그인 화면 미리보기 이미지 */
     private val _previewImages = MutableLiveData<List<String>>()
     val previewImages : LiveData<List<String>> get() = _previewImages
 
     fun loadPreviewImages() {
-        viewModelScope.launch {
-            val result = userRetrofitRepository.getIntroImage()
+        _open.value = true
 
-            if (result.isSuccessful) {
-                val images = result.body()?.data
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getIntroImage() }.await()
+
+            if (def.isSuccessful) {
+                val images = def.body()?.data
                 _previewImages.value = images
+                _open.value = false
             }
         }
     }
 
     /* 카카오 소셜 로그인 & 서버 전송 */
-    private val _user : MutableLiveData<User?> = MutableLiveData(null)
-    val user : LiveData<User?> get() = _user
+    private val _user : MutableLiveData<User> = MutableLiveData()
+    val user : LiveData<User> get() = _user
 
-    fun fetchUser(user: User?) {
-        viewModelScope.launch {
-            if (user != null) {
-                val res = userRetrofitRepository.login(user)
-                if (res.isSuccessful) {
-                    user.id = res.body()
-                }
+    fun fetchUser(user: User) {
+        _open.value = true
 
+        runBlocking {
+            val res = async(Dispatchers.IO) {
+                delay(1500)
+                userRetrofitRepository.login(user)
+            }.await()
+
+            if (res.isSuccessful) {
+                user.id = res.body()
                 _user.value = user
+                _open.value = false
+            }
+        }
+    }
+
+    /* 유저 상세정보 조회 */
+    private val _targetUser : MutableLiveData<User> = MutableLiveData()
+    val targetUser : LiveData<User> get() = _targetUser
+
+    fun getUserInfo(userId: Long = 1L) =
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getUserInfo(userId) }.await()
+
+            if (def.isSuccessful) {
+                val result = def.body()!!.data
+                _targetUser.value = result
+            }
+        }
+
+    /* 유저가 찜한 상가 목록 리스트 가져오기 */
+    private var _userPickedStore = MutableLiveData<List<RealtyPreview>>()
+    val userPickedStore : LiveData<List<RealtyPreview>> get() = _userPickedStore
+
+    fun getUserPickedStore(userId: Long) {
+        _open.value = true
+
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getUserPickedStoreList(userId) }.await()
+
+            if (def.isSuccessful) {
+                val res = def.body()!!.data
+                _userPickedStore.value = res
+
+                _open.value = false
+            }
+        }
+    }
+
+    /* 유저가 등록한 상가 목록 리스트 가져오기 */
+    private var _userRegStore = MutableLiveData<List<RealtyPreview>>()
+    val userRegStore : LiveData<List<RealtyPreview>> get() = _userRegStore
+
+    fun getUserRegStore(userId: Long) {
+        _open.value = true
+
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getUserRegisterStoreList(userId) }.await()
+
+            if (def.isSuccessful) {
+                val res = def.body()!!.data
+                _userRegStore.value = res
+
+                _open.value = false
             }
         }
     }
@@ -86,30 +137,27 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    /* 서비스 업종에 따른 추천 상권 목록 가져오기 */
+    private var _recommendDistrictList = MutableLiveData<List<RecommendDistrict>>()
+    val recommendDistrictList: LiveData<List<RecommendDistrict>> get() = _recommendDistrictList
 
-
-    private val _recommendInfo = MutableLiveData<ServerResponse<Recommend>>()
-    val recommendInfo: LiveData<ServerResponse<Recommend>> get() = _recommendInfo
-    private val _selectedServiceName = MutableLiveData<String>(DEFAULT_SERVICE_NAME)
-    val selectedServiceName : LiveData<String> get() = _selectedServiceName
-
-    fun fetchMapView(serviceName: String = DEFAULT_SERVICE_NAME) {
+    fun loadRecommendDistrict(serviceName: String = DEFAULT_SERVICE_NAME) {
         viewModelScope.launch {
-            _selectedServiceName.value = serviceName
-
-            val res =
+            val def = async(Dispatchers.IO) {
                 if (serviceName == DEFAULT_SERVICE_NAME) userRetrofitRepository.getRecommendationAllInfo()
                 else userRetrofitRepository.getRecommendationInfo(URLEncoder.encode(serviceName, DEFAULT_ENCODE_TYPE))
+            }.await()
 
-            if (res.isSuccessful) {
-                val body = res.body()!!
-                _recommendInfo.value = body
+            if (def.isSuccessful) {
+                val body = def.body()!!
+                _recommendDistrictList.value = body.data
             }
         }
     }
 
-    private val _serviceList = MutableLiveData<ServerResponseObj<Map<String, List<String>>>>()
-    val serviceList: LiveData<ServerResponseObj<Map<String, List<String>>>> get() = _serviceList
+    /* 서비스(업종) 리스트 가져오기 */
+    private val _serviceList = MutableLiveData<Map<String, List<String>>>()
+    val serviceList: LiveData<Map<String, List<String>>> get() = _serviceList
 
     fun fetchServiceList() {
         viewModelScope.launch {
@@ -117,27 +165,30 @@ class UserViewModel @Inject constructor(
 
             if (res.isSuccessful) {
                 val body = res.body()!!
-                _serviceList.value = body
+                _serviceList.value = body.data
             }
         }
     }
 
-    private val _districtInfo = MutableLiveData<ServerResponse<District>>()
-    val districtInfo: LiveData<ServerResponse<District>> get() = _districtInfo
+    /* 상권 인근 상가 리스트 가져오기 */
+    private var _nearbyStoreList = MutableLiveData<List<RealtyPreview>>()
+    val nearbyStoreList : LiveData<List<RealtyPreview>> get() = _nearbyStoreList
 
-    fun fetchDistrictInfoList(districtName: String) {
+    fun fetchNearbyStores(districtName: String) {
         viewModelScope.launch {
-            val encodedDistrictName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
-            val res = userRetrofitRepository.getDistrictInfo(encodedDistrictName)
+            val def = async(Dispatchers.IO) {
+                val encodedName = URLEncoder.encode(districtName, DEFAULT_ENCODE_TYPE)
+                userRetrofitRepository.getNearbyStoreList(encodedName)
+            }.await()
 
-            if (res.isSuccessful) {
-                val body = res.body()!!
-                if (body.size == 0) _districtInfo.value = randomDistrictSampleList()
-                else _districtInfo.value = body
+            if (def.isSuccessful) {
+                val res = def.body()!!
+                _nearbyStoreList.value = res.data
             }
         }
     }
 
+    /* 상가 디테일 정보 가져오기 */
     private val _realtyDetail = MutableLiveData<ServerResponse<Realty>>()
     val realtyDetail: LiveData<ServerResponse<Realty>> get() = _realtyDetail
 
@@ -149,50 +200,6 @@ class UserViewModel @Inject constructor(
                 val body = res.body()!!
                 _realtyDetail.value = body
             }
-
-            else {
-                val sampleRealtyInfo = Realty(
-                    id = realtyId,
-                    name = "건물 이름입니다.",
-                    price = 12.7,
-                    address = "서울시 노원구 상계 1동",
-                    pyung = 1234,
-                    squareMeter = 33.3,
-                    image = "https://artfolio-bucket.s3.ap-northeast-2.amazonaws.com/static/artPiece/1/%EC%A7%84%EC%A3%BC+%EA%B7%80%EA%B1%B8%EC%9D%B4%EB%A5%BC+%ED%95%9C+%EC%86%8C%EB%85%802.png",
-                    nearby = "근처 상권입니다.",
-                    userId = userId
-                )
-
-                val sample = ServerResponse(1, listOf(sampleRealtyInfo))
-
-                _realtyDetail.value = sample
-            }
         }
-    }
-
-    private fun randomDistrictSampleList() : ServerResponse<District> {
-        val random = Random.Default
-        val size = random.nextInt(20, 30)
-        val list = mutableListOf<District>()
-
-        val randomPhotoUrl = listOf(
-            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/copernico-p_kICQCOM4s-unsplash.jpg",
-            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/damir-kopezhanov-luseu9GtYzM-unsplash.jpg",
-            "https://ddakdae-s3-bucket.s3.ap-northeast-2.amazonaws.com/flow_photo/jose-losada-DyFjxmHt3Es-unsplash.jpg"
-        )
-
-        for (i in 0 until size) {
-            val pick = random.nextInt(0, randomPhotoUrl.size)
-            val district = District(
-                id = (i + 1).toLong(),
-                address = UUID.randomUUID().toString(),
-                image = randomPhotoUrl[pick],
-                price = random.nextDouble(1.0, 1000.0)
-            )
-
-            list.add(district)
-        }
-
-        return ServerResponse(size, list)
     }
 }

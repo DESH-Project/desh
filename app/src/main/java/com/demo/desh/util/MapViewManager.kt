@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.demo.desh.R
-import com.demo.desh.model.Recommend
-import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.RecommendDistrict
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
@@ -23,7 +22,7 @@ import com.kakao.vectormap.shape.PolygonStylesSet
 import java.lang.Exception
 
 object MapViewManager {
-    fun labelingOnMapView(mapView: MapView, recommendInfo: ServerResponse<Recommend>?) {
+    fun labelingOnMapView(mapView: MapView, recommendDistrictList: List<RecommendDistrict>) {
         mapView.removeAllViews()
 
         mapView.start(
@@ -53,7 +52,7 @@ object MapViewManager {
                     val labelManager = kakaoMap.labelManager
                     val layer = labelManager?.layer
                     val styles =
-                        labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.chamomile)))
+                        labelManager?.addLabelStyles(LabelStyles.from(LabelStyle.from(R.drawable.ic_launcher_background)))
 
                     val dimScreenLayer = kakaoMap.dimScreenManager?.dimScreenLayer
                     dimScreenLayer?.apply {
@@ -62,7 +61,7 @@ object MapViewManager {
                     }
 
 
-                    recommendInfo?.data?.forEachIndexed { _, item ->
+                    recommendDistrictList.forEachIndexed { _, item ->
                         val options = LabelOptions.from(LatLng.from(item.lat, item.lng))
                             .setStyles(styles)
                             .setClickable(true)

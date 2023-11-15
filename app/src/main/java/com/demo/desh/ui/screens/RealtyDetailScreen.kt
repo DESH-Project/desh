@@ -14,23 +14,23 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -48,11 +48,15 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
+import com.demo.desh.model.BuildingInfo
+import com.demo.desh.model.BuildingPreviewInfo
 import com.demo.desh.model.DropdownItem
+import com.demo.desh.model.buildingInfo
+import com.demo.desh.model.buildingPreviewDummy
+import com.demo.desh.ui.CommonScaffoldForm
 import com.demo.desh.ui.CustomDropdownMenu
 import com.demo.desh.ui.CustomIconMenu
 import com.demo.desh.ui.UserProfileCard
-import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.viewModel.UserViewModel
@@ -61,139 +65,84 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 
-data class BuildingInfo(
-    val name: String,
-    val price: Int,
-    val address: String,
-    val pyung: Double,
-    val squareMeter: Double,
-    val images: List<String>,
-    val ownerNickname: String,
-    val ownerProfileImage: String,
-    val star: Int
-)
-
-data class BuildingPreviewInfo(
-    val name: String,
-    val price: Int,
-    val previewImage: String
-)
 
 @Composable
 fun RealtyDetailScreen(
+    userId: Long,
     realtyId: Long,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    goToProfileScreen: () -> Unit,
+    goToChatListScreen: (Long) -> Unit
 ) {
-    val user = userViewModel.user.value
-
     /* STATES */
-    val scrollState = rememberScrollState()
+    val open by userViewModel.open.observeAsState(initial = false)
 
-    /* DUMMY */
-    val buildingInfo = BuildingInfo(
-        name = "오도로 빌딩",
-        price = 210000000,
-        address = "서울시 노원구 상계 1동 345-56",
-        pyung = 33.33,
-        squareMeter = 33.33 * 3.3,
-        images = listOf(
-            "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/87114f2a-3c05-4c12-82d2-1d996f6a51d2.png",
-            "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/21e33cf3-b1dc-439d-af3a-0bd5d728a581.png",
-            "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/d3dbe6e2-6513-44a7-a261-c04ff6328bd1.png",
-        ),
-        ownerNickname = "h970126",
-        ownerProfileImage = "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/87114f2a-3c05-4c12-82d2-1d996f6a51d2.png",
-        star = 16
-    )
+    /* HANDLERS */
 
-    Scaffold(
-        topBar = { TopBarContent(modifier = Modifier.fillMaxWidth()) },
-        backgroundColor = DefaultBackgroundColor,
-        contentColor = Color.White,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .verticalScroll(state = scrollState)
-        ) {
-            /*
-            if (buildingInfo == null) {
-                CircularProgressIndicator()
-            }
-            */
+    CommonScaffoldForm(
+        pbarOpen = open,
+        topBarContent = {
+            TopBarContent(
+                goToProfileScreen = goToProfileScreen,
+                goToChatListScreen = { goToChatListScreen(userId) },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    ) {
+        ConstraintLayout {
+            val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
 
-            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
-
-                // 건물 이미지 Pager & Indicator
-                BuildingImagePager(
-                    pageItems = buildingInfo.images,
-                    modifier = Modifier
-                        .constrainAs(buildingImagePagerRef) {
-                            top.linkTo(parent.top)
-                            centerHorizontallyTo(parent)
-                            width = Dimension.fillToConstraints
-                        }
-                )
-
-                // 건물 상세 정보
-                BuildingInfoUi(
-                    buildingInfo = buildingInfo,
-                    modifier = Modifier
-                        .constrainAs(buildingInfoUiRef) {
-                            top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
-                            linkTo(start = parent.start, end = parent.end)
-                            width = Dimension.fillToConstraints
-                        }
-                )
-
-                // 인근 상가 정보 목록
-                val dummies = listOf(
-                    BuildingPreviewInfo(
-                        name = "다니엘관",
-                        previewImage = "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/87114f2a-3c05-4c12-82d2-1d996f6a51d2.png",
-                        price = 100000
-                    ),
-
-                    BuildingPreviewInfo(
-                        name = "사무엘관",
-                        previewImage = "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/21e33cf3-b1dc-439d-af3a-0bd5d728a581.png",
-                        price = 150000
-                    ),
-
-                    BuildingPreviewInfo(
-                        name = "요한관",
-                        previewImage = "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/d3dbe6e2-6513-44a7-a261-c04ff6328bd1.png",
-                        price = 200000
-                    ),
-                )
-
-                NearbyBuildingPreviewUi(
-                    nearbyBuildingInfo = dummies,
-                    modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
-                        top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
+            // 건물 이미지 Pager & Indicator
+            BuildingImagePager(
+                pageItems = buildingInfo.images,
+                modifier = Modifier
+                    .constrainAs(buildingImagePagerRef) {
+                        top.linkTo(parent.top)
                         centerHorizontallyTo(parent)
                         width = Dimension.fillToConstraints
                     }
-                )
+            )
 
-                // 마지막 여백
-                Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                    top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
-                })
-            }
+            // 건물 상세 정보
+            BuildingInfoUi(
+                buildingInfo = buildingInfo,
+                modifier = Modifier
+                    .constrainAs(buildingInfoUiRef) {
+                        top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
+                        linkTo(start = parent.start, end = parent.end)
+                        width = Dimension.fillToConstraints
+                    }
+            )
+
+            NearbyBuildingPreviewUi(
+                nearbyBuildingInfo = buildingPreviewDummy,
+                modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
+                    top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
+                    centerHorizontallyTo(parent)
+                    width = Dimension.fillToConstraints
+                }
+            )
+
+            // 마지막 여백
+            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
+            })
         }
     }
 }
 
 @Composable
-fun TopBarContent(modifier: Modifier = Modifier) {
+fun TopBarContent(
+    goToProfileScreen: () -> Unit,
+    goToChatListScreen: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var isDropDownExpanded by remember { mutableStateOf(false) }
     val onDropdownExpand = { isDropDownExpanded = true }
     val onDropdownClose = { isDropDownExpanded = false }
 
     val dropdownItems = listOf(
-        DropdownItem("공유하기", Color.White),
+        DropdownItem("공유하기", Color.Black),
         DropdownItem("신고하기", Color.Red)
     )
 
@@ -210,18 +159,21 @@ fun TopBarContent(modifier: Modifier = Modifier) {
         )
 
         Row {
+            CustomIconMenu(
+                vector = Icons.Default.Email,
+                onIconClick = goToChatListScreen
+            )
+
+            CustomIconMenu(
+                vector = Icons.Default.AccountCircle,
+                onIconClick = goToProfileScreen
+            )
+
             CustomDropdownMenu(
                 isDropDownExpanded = isDropDownExpanded,
                 onDropdownExpand = onDropdownExpand,
                 onDropdownClose = onDropdownClose,
                 items = dropdownItems,
-            )
-
-            Spacer(modifier = Modifier.padding(start = 2.dp, end = 2.dp))
-
-            CustomIconMenu(
-                vector = Icons.Default.AccountCircle,
-                onIconClick = { }
             )
         }
     }
@@ -327,9 +279,11 @@ fun BuildingInfoUi(
         Divider(modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp), color = Color.Gray)
 
         // Line 4 (건물 정보)
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
             BuildingInfoMaker(imageVector = Icons.Default.LocationOn, text = buildingInfo.address)
             BuildingInfoMaker(imageVector = Icons.Default.Info, text = "3000 / 200")
             BuildingInfoMaker(imageVector = Icons.Default.Home, text = "${buildingInfo.pyung}평(${String.format("%.2f", buildingInfo.squareMeter)})")
