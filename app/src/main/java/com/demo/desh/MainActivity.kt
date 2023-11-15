@@ -82,18 +82,18 @@ fun Root(
         }
 
         composable(route = Screen.Map.route + "/{$userId}") { backStackEntry ->
-            val uid = backStackEntry.arguments?.getString(userId)
-
-            if (uid != null) {
+            backStackEntry.arguments?.getString(userId)?.let {
                 val goToRealtyDetailScreen = { realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$realtyId") }
                 val goToProfileScreen = { userId: Long -> navController.navigate(Screen.Profile.route + "/$userId") }
-                MapScreen(uid.toLong(), userViewModel, goToRealtyDetailScreen, goToProfileScreen)
+                val goToChatListScreen = { userId: Long -> navController.navigate(Screen.ChatList.route + "/$userId") }
+
+                MapScreen(it.toLong(), userViewModel, goToRealtyDetailScreen, goToProfileScreen, goToChatListScreen)
             }
         }
 
         composable(route = Screen.RealtyDetail.route + "/{$userId}" + "/{$realtyId}") { backStackEntry ->
-            val uid = backStackEntry.arguments?.getString("userId")
-            val rid = backStackEntry.arguments?.getString("realtyId")
+            val uid = backStackEntry.arguments?.getString(userId)
+            val rid = backStackEntry.arguments?.getString(realtyId)
 
             if (uid != null && rid != null) {
                 val goToProfileScreen = { navController.navigate(Screen.Profile.route) }
@@ -109,14 +109,15 @@ fun Root(
         }
 
         composable(route = "${Screen.ChatList.route}/{${userId}}") { backStackEntry ->
+            val goToChatroom = { chatRoomId: Long -> navController.navigate(Screen.ChatRoom.route + "/$chatRoomId")}
             backStackEntry.arguments?.getString(userId)?.let {
-                ChatListScreen(it.toLong(), userViewModel, chatViewModel)
+                ChatListScreen(it.toLong(), goToChatroom, userViewModel, chatViewModel)
             }
         }
 
         composable(route = "${Screen.ChatRoom.route}/{${chatRoomId}}") { backStackEntry ->
             backStackEntry.arguments?.getString(chatRoomId)?.let {
-                ChatRoomScreen(it.toLong())
+                ChatRoomScreen(it.toLong(), userViewModel, chatViewModel)
             }
         }
 

@@ -1,6 +1,5 @@
 package com.demo.desh.model
 
-import java.time.LocalDateTime
 
 data class ServerResponse<out T> (
     val size: Int,
@@ -58,24 +57,3 @@ data class RealtyPreview(
     val star: Long
 )
 
-/* Chat Dto */
-data class ChatInfo(
-    val id: Long,
-    val chatroom: ChatData
-)
-
-data class ChatData(
-    val id: Long,
-    val roomId: String,
-    val name: String,
-    var image: String?,
-    val chat: List<Chat>
-)
-
-data class Chat(
-    val id: Long,
-    val writerId: Long,
-    val writer: String,
-    val message: String,
-    val date: LocalDateTime
-)

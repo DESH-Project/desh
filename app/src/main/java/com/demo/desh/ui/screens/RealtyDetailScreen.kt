@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -22,8 +21,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
@@ -32,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,12 +46,10 @@ import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import com.demo.desh.model.BuildingInfo
 import com.demo.desh.model.BuildingPreviewInfo
-import com.demo.desh.model.DropdownItem
 import com.demo.desh.model.buildingInfo
 import com.demo.desh.model.buildingPreviewDummy
 import com.demo.desh.ui.CommonScaffoldForm
-import com.demo.desh.ui.CustomDropdownMenu
-import com.demo.desh.ui.CustomIconMenu
+import com.demo.desh.ui.TopBarContent
 import com.demo.desh.ui.UserProfileCard
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
@@ -127,54 +121,6 @@ fun RealtyDetailScreen(
             Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
                 top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
             })
-        }
-    }
-}
-
-@Composable
-fun TopBarContent(
-    goToProfileScreen: () -> Unit,
-    goToChatListScreen: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var isDropDownExpanded by remember { mutableStateOf(false) }
-    val onDropdownExpand = { isDropDownExpanded = true }
-    val onDropdownClose = { isDropDownExpanded = false }
-
-    val dropdownItems = listOf(
-        DropdownItem("공유하기", Color.Black),
-        DropdownItem("신고하기", Color.Red)
-    )
-
-    Row(
-        modifier = modifier.padding(top = 4.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "GOODPLACE",
-            fontWeight = FontWeight.Bold,
-            fontSize = 26.sp,
-            color = Color.White
-        )
-
-        Row {
-            CustomIconMenu(
-                vector = Icons.Default.Email,
-                onIconClick = goToChatListScreen
-            )
-
-            CustomIconMenu(
-                vector = Icons.Default.AccountCircle,
-                onIconClick = goToProfileScreen
-            )
-
-            CustomDropdownMenu(
-                isDropDownExpanded = isDropDownExpanded,
-                onDropdownExpand = onDropdownExpand,
-                onDropdownClose = onDropdownClose,
-                items = dropdownItems,
-            )
         }
     }
 }

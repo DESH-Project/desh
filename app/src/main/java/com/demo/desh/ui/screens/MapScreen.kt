@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -39,6 +40,7 @@ import coil.compose.AsyncImage
 import com.demo.desh.model.RealtyPreview
 import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.User
+import com.demo.desh.ui.TopBarContent
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.util.MapViewManager
@@ -51,7 +53,8 @@ fun MapScreen(
     userId: Long,
     userViewModel: UserViewModel,
     goToRealtyDetailScreen: (Long) -> Unit,
-    goToProfileScreen: (Long) -> Unit
+    goToProfileScreen: (Long) -> Unit,
+    goToChatListScreen: (Long) -> Unit
 ) {
     LaunchedEffect(Unit) {
         userViewModel.fetchServiceList()
@@ -79,6 +82,16 @@ fun MapScreen(
     user?.let {
         BottomSheetScaffold(
             scaffoldState = rememberBottomSheetScaffoldState(),
+
+            topBar = {
+                TopBarContent(
+                    goToProfileScreen = { goToProfileScreen(userId) },
+                    goToChatListScreen = { goToChatListScreen(userId) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(DefaultBackgroundColor)
+                )
+            },
 
             sheetContent = {
                 DrawerContent(
