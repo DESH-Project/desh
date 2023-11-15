@@ -2,6 +2,9 @@
 
 ---
 
+## Project
+- [프로젝트 소개](document/intro.pdf)
+
 ## Contributors
 - 황승수
 - 박은향
