@@ -7,6 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,9 +25,9 @@ data class BottomBarItem(
 object NavBarItems {
     val BarItems = listOf(
         BottomBarItem(
-            title = "Map",
-            icon = Icons.Filled.LocationOn,
-            route = Screen.Map.route
+            title = "Home",
+            icon = Icons.Filled.Home,
+            route = Screen.Home.route
         ),
 
         BottomBarItem(

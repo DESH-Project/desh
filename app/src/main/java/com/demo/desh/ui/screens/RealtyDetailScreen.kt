@@ -47,10 +47,11 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
-import com.demo.desh.model.BuildingInfo
 import com.demo.desh.model.BuildingPreviewInfo
-import com.demo.desh.model.buildingInfo
+import com.demo.desh.model.Realty
+import com.demo.desh.model.User
 import com.demo.desh.model.buildingPreviewDummy
+import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.UserProfileCard
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
@@ -65,65 +66,69 @@ fun RealtyDetailScreen(
     userId: Long,
     realtyId: Long,
     userViewModel: UserViewModel,
-    goToProfileScreen: () -> Unit,
+    goToProfileScreen: (Long) -> Unit,
     goToChatListScreen: (Long) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-
-    }
-
     /* STATES */
     val open by userViewModel.open.observeAsState(initial = false)
+    val realtyDetailInfo by userViewModel.realtyDetail.observeAsState()
+    val ownerInfo by userViewModel.targetUser.observeAsState()
 
-    /* HANDLERS */
+    LaunchedEffect(Unit) {
+        userViewModel.fetchRealtyDetail(realtyId, userId)
+        realtyDetailInfo?.let { userViewModel.getUserInfo(it.ownerId) }
+    }
 
-    Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
+    if (open) LoadingDialog()
+    else {
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
 
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
+                // 건물 이미지 Pager & Indicator
+                BuildingImagePager(
+                    pageItems = realtyDetailInfo?.images ?: listOf(),
+                    modifier = Modifier
+                        .constrainAs(buildingImagePagerRef) {
+                            top.linkTo(parent.top)
+                            centerHorizontallyTo(parent)
+                            width = Dimension.fillToConstraints
+                        }
+                )
 
-            // 건물 이미지 Pager & Indicator
-            BuildingImagePager(
-                pageItems = buildingInfo.images,
-                modifier = Modifier
-                    .constrainAs(buildingImagePagerRef) {
-                        top.linkTo(parent.top)
+                // 건물 상세 정보
+                BuildingInfoUi(
+                    realtyInfo = realtyDetailInfo,
+                    ownerInfo = ownerInfo,
+                    goToProfileScreen = goToProfileScreen,
+                    modifier = Modifier
+                        .constrainAs(buildingInfoUiRef) {
+                            top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
+                            linkTo(start = parent.start, end = parent.end)
+                            width = Dimension.fillToConstraints
+                        }
+                )
+
+                NearbyBuildingPreviewUi(
+                    nearbyBuildingInfo = buildingPreviewDummy,
+                    modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
+                        top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
                         centerHorizontallyTo(parent)
                         width = Dimension.fillToConstraints
                     }
-            )
+                )
 
-            // 건물 상세 정보
-            BuildingInfoUi(
-                buildingInfo = buildingInfo,
-                modifier = Modifier
-                    .constrainAs(buildingInfoUiRef) {
-                        top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
-                        linkTo(start = parent.start, end = parent.end)
-                        width = Dimension.fillToConstraints
-                    }
-            )
-
-            NearbyBuildingPreviewUi(
-                nearbyBuildingInfo = buildingPreviewDummy,
-                modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
-                    top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
-                    centerHorizontallyTo(parent)
-                    width = Dimension.fillToConstraints
-                }
-            )
-
-            // 마지막 여백
-            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
-            })
+                // 마지막 여백
+                Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                    top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
+                })
+            }
         }
     }
 }
@@ -174,7 +179,9 @@ fun BuildingImagePager(
 
 @Composable
 fun BuildingInfoUi(
-    buildingInfo: BuildingInfo,
+    realtyInfo: Realty?,
+    ownerInfo: User?,
+    goToProfileScreen: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var starButtonState by rememberSaveable { mutableStateOf(false) }
@@ -187,73 +194,88 @@ fun BuildingInfoUi(
         // 서버 전송
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(all = 8.dp)
-    ) {
-        // Line 1 (건물 이름, 찜하기 버튼)
-        Row(
-            modifier = Modifier
+    realtyInfo?.let {
+        Column(
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(all = 8.dp)
         ) {
-            Text(
-                text = buildingInfo.name,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
+            // Line 1 (건물 이름, 찜하기 버튼)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = it.name,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+
+                IconButton(onClick = { onStarBtnClick(it.realtyId) }) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = if (starButtonState) Color.White else Color.Gray,
+                    )
+                }
+            }
+
+            // Line 2
+
+
+            // Line 3 (유저 프로필 카드, 문의하기 버튼)
+            ownerInfo?.let {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    UserProfileCard(
+                        userNickname = it.nickname,
+                        userImage = it.profileImageUrl,
+                        onProfileCardClick = { goToProfileScreen(it.userId!!) }
+                    )
+
+                    ChatButton()
+                }
+            }
+
+            Divider(
+                modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp),
+                color = Color.Gray
             )
 
-            IconButton(onClick = { onStarBtnClick(buildingInfo.buildingId) }) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    tint = if (starButtonState) Color.White else Color.Gray,
+            // Line 4 (건물 정보)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            ) {
+                BuildingInfoMaker(
+                    imageVector = Icons.Default.LocationOn,
+                    text = it.address
+                )
+                BuildingInfoMaker(imageVector = Icons.Default.Info, text = "3000 / 200")
+                BuildingInfoMaker(
+                    imageVector = Icons.Default.Home,
+                    text = "${it.pyung}평(${
+                        String.format(
+                            "%.2f",
+                            it.squareMeter
+                        )
+                    })"
                 )
             }
-        }
 
-        // Line 2
-
-
-        // Line 3 (유저 프로필 카드, 문의하기 버튼)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            UserProfileCard(
-                userNickname = buildingInfo.ownerNickname,
-                userImage = buildingInfo.ownerProfileImage,
-            )
-
-            ChatButton()
-        }
-
-        Divider(modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp), color = Color.Gray)
-
-        // Line 4 (건물 정보)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-        ) {
-            BuildingInfoMaker(imageVector = Icons.Default.LocationOn, text = buildingInfo.address)
-            BuildingInfoMaker(imageVector = Icons.Default.Info, text = "3000 / 200")
-            BuildingInfoMaker(imageVector = Icons.Default.Home, text = "${buildingInfo.pyung}평(${String.format("%.2f", buildingInfo.squareMeter)})")
-
-            Text(
-                text = "애뜨왈커피 로스팅 공장에서 운영하는 베이커리 카페로 젊은 감성있는 인테리어와 많은 주차 공간을 확보하고 있습니다..",
-                style = Typography2.bodySmall,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(top = 12.dp)
+            Divider(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                color = Color.Gray
             )
         }
-
-        Divider(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), color = Color.Gray)
     }
 }
 

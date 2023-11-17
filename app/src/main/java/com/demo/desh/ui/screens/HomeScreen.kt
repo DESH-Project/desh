@@ -1,23 +1,29 @@
 package com.demo.desh.ui.screens
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
-import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
+import com.demo.desh.R
 import com.demo.desh.model.RealtyPreview
 import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.User
@@ -44,20 +52,25 @@ import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.util.MapViewManager
 import com.demo.desh.viewModel.RoomViewModel
 import com.demo.desh.viewModel.UserViewModel
+import com.kakao.vectormap.KakaoMap
+import com.kakao.vectormap.KakaoMapReadyCallback
+import com.kakao.vectormap.LatLng
+import com.kakao.vectormap.MapReadyCallback
 import com.kakao.vectormap.MapView
+import com.kakao.vectormap.label.LabelOptions
+import com.kakao.vectormap.label.LabelStyle
+import com.kakao.vectormap.label.LabelStyles
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MapScreen(
+fun HomeScreen(
     userViewModel: UserViewModel,
     roomViewModel: RoomViewModel,
-    goToRealtyDetailScreen: (Long, Long) -> Unit,
+    goToRealtyDetail: (Long) -> Unit,
     goToProfileScreen: (Long) -> Unit,
     goToChatListScreen: (Long) -> Unit
 ) {
     LaunchedEffect(Unit) {
         userViewModel.fetchServiceList()
-        userViewModel.getUserInfo()
         userViewModel.loadRecommendDistrict()
         roomViewModel.findLocalUser()
     }
@@ -65,10 +78,11 @@ fun MapScreen(
     /* STATES */
     val user by roomViewModel.user.observeAsState()
     val serviceList by userViewModel.serviceList.observeAsState(initial = mapOf())
-    val recommendDistrictList by userViewModel.recommendDistrictList.observeAsState(initial = listOf())
+    val recommendDistrictList by userViewModel.recommendDistrictList.observeAsState()
     val nearbyStoreList by userViewModel.nearbyStoreList.observeAsState(initial = listOf())
 
     var selectedServiceName by rememberSaveable { mutableStateOf("전체") }
+    var selectedDistrictLatLng by rememberSaveable { mutableStateOf(LatLng.from(37.394660, 127.111182)) }
 
     /* HANDLERS */
     val onServiceItemClick = { serviceName: String ->
@@ -76,51 +90,42 @@ fun MapScreen(
         selectedServiceName = serviceName
     }
 
+    val onSelectedLatLngChanged = { loc: LatLng -> selectedDistrictLatLng = loc }
+
     user?.let {
         val onDistrictButtonClick = { districtName: String -> userViewModel.fetchNearbyStores(districtName) }
-        val onStoreButtonClick = { storeId: Long -> goToRealtyDetailScreen(user!!.id!!, storeId) }
+        val onStoreButtonClick = { storeId: Long -> goToRealtyDetail(storeId) }
 
-        BottomSheetScaffold(
-            scaffoldState = rememberBottomSheetScaffoldState(),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            RecommendContent(
+                user = user!!,
+                serviceList = serviceList,
+                selectedServiceName = selectedServiceName,
+                onServiceItemClick = onServiceItemClick,
+                onSelectedLatLngChanged = onSelectedLatLngChanged,
+                recommendDistrictList = recommendDistrictList ?: listOf(),
+                onDistrictButtonClick = onDistrictButtonClick,
+                nearbyStoreList = nearbyStoreList,
+                onStoreButtonClick = onStoreButtonClick
+            )
 
-            sheetContent = {
-                DrawerContent(
-                    user = user!!,
-                    serviceList = serviceList,
-                    selectedServiceName = selectedServiceName,
-                    onServiceItemClick = onServiceItemClick,
-                    recommendDistrictList = recommendDistrictList,
-                    onDistrictButtonClick = onDistrictButtonClick,
-                    nearbyStoreList = nearbyStoreList,
-                    onStoreButtonClick = onStoreButtonClick
-                )
-            },
-
-            drawerGesturesEnabled = true,
-            drawerBackgroundColor = DefaultBackgroundColor,
-
-            content = {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Column {
-                        AndroidView(
-                            factory = { context -> MapViewManager.createMapView(context) },
-                            modifier = Modifier.fillMaxSize(),
-                            update = { mapView: MapView -> MapViewManager.labelingOnMapView(mapView, recommendDistrictList) }
-                        )
-                    }
-                }
-            }
-        )
+            MapBox(selectedDistrictLatLng)
+        }
     }
 }
 
 @Composable
-fun DrawerContent(
+fun RecommendContent(
     user: User,
     serviceList: Map<String, List<String>>,
     selectedServiceName: String,
     onServiceItemClick: (String) -> Unit,
-    recommendDistrictList: List<RecommendDistrict>,
+    onSelectedLatLngChanged: (LatLng) -> Unit,
+    recommendDistrictList: List<RecommendDistrict> = listOf(),
     onDistrictButtonClick: (String) -> Unit,
     nearbyStoreList: List<RealtyPreview>,
     onStoreButtonClick: (Long) -> Unit
@@ -160,6 +165,7 @@ fun DrawerContent(
             RecommendDistrictCards(
                 districtList = recommendDistrictList,
                 onDistrictButtonClick = onDistrictButtonClick,
+                onSelectedLatLngChanged = onSelectedLatLngChanged,
                 modifier = Modifier
                     .constrainAs(districtCardRef) {
                         top.linkTo(anchor = serviceListButtonsRef.bottom, margin = 36.dp)
@@ -168,16 +174,6 @@ fun DrawerContent(
             )
 
             Spacer(modifier = Modifier.padding(16.dp))
-
-            NearbyStoreCards(
-                nearbyStoreList = nearbyStoreList,
-                onStoreButtonClick = onStoreButtonClick,
-                modifier = Modifier
-                    .constrainAs(nearbyStoreRef) {
-                        top.linkTo(anchor = districtCardRef.bottom, margin = 26.dp)
-                        start.linkTo(anchor = parent.start, margin = 12.dp)
-                    }
-            )
         }
     }
 }
@@ -256,9 +252,17 @@ fun ServiceListButtons(
 
         LazyRow {
             items(subBtns) { item ->
-                Button(onClick = { onServiceItemClick(item) }) {
-                    Text(text = item)
+                Button(
+                    onClick = { onServiceItemClick(item) },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.Black,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(text = item, color = Color.White)
                 }
+
+                Spacer(modifier = Modifier.padding(4.dp))
             }
         }
     }
@@ -268,11 +272,15 @@ fun ServiceListButtons(
 fun RecommendDistrictCards(
     districtList: List<RecommendDistrict>,
     onDistrictButtonClick: (String) -> Unit,
+    onSelectedLatLngChanged: (LatLng) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyRow(modifier = modifier) {
         items(districtList) {
-            Card(modifier = Modifier.clickable { onDistrictButtonClick(it.district) }) {
+            Card(modifier = Modifier.clickable {
+                onDistrictButtonClick(it.district)
+                onSelectedLatLngChanged(LatLng.from(it.lat, it.lng))
+            }) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
@@ -280,7 +288,6 @@ fun RecommendDistrictCards(
                     Text(text = it.district)
                     Text(text = it.service)
                     Text(text = it.predict.toString())
-                    Text(text = "(${it.lat}, ${it.lng})")
                 }
             }
 
@@ -307,16 +314,32 @@ fun NearbyStoreCards(
 
         LazyRow {
             items(nearbyStoreList) {
-                Card(modifier = Modifier.clickable { onStoreButtonClick(it.id) }) {
+                Card(modifier = Modifier.clickable { onStoreButtonClick(it.realtyId) }) {
                     Column {
                         AsyncImage(model = it.previewImage.first(), contentDescription = null)
                         Text(text = "${it.deposit}/${it.monthlyRental}")
-                        Text(text = it.address)
                         Text(text = it.star.toString())
                     }
                 }
             }
         }
     }
+}
 
+@Composable
+fun MapBox(loc: LatLng) {
+    val context = LocalContext.current
+
+    Card(
+        shape = RoundedCornerShape(25.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(360.dp)
+            .padding(50.dp),
+    ) {
+        AndroidView(
+            factory = { context: Context -> MapViewManager.createMapView(context, loc) },
+            update = { mv: MapView -> MapViewManager.createMapView(context, loc) }
+        )
+    }
 }

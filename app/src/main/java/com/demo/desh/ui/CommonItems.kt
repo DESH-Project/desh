@@ -6,6 +6,7 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,7 +47,7 @@ fun TopBarContent(modifier: Modifier = Modifier) {
             .background(DefaultBackgroundColor)
             .padding(5.dp)
     ) {
-        Spacer(modifier = Modifier.padding(start = 5.dp))
+        Spacer(modifier = Modifier.padding(start = 10.dp, top = 10.dp))
 
         Text(
             text = "GOODPLACE",
@@ -93,7 +94,7 @@ fun UserProfile(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .clip(CircleShape)
-                .size(120.dp)
+                .size(150.dp)
         )
 
         Box(
@@ -119,6 +120,7 @@ fun UserProfile(
 fun UserProfileCard(
     userNickname: String,
     userImage: String,
+    onProfileCardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -127,7 +129,7 @@ fun UserProfileCard(
     ) {
         Card(
             shape = RoundedCornerShape(18.dp),
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(48.dp).clickable { onProfileCardClick() }
         ) {
             AsyncImage(
                 model = userImage,

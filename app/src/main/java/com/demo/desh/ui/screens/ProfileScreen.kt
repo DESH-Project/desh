@@ -1,5 +1,6 @@
 package com.demo.desh.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,12 +8,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -38,10 +37,11 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import com.demo.desh.model.RealtyPreview
-import com.demo.desh.ui.TopBarContent
+import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.UserProfile
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.viewModel.ChatViewModel
+import com.demo.desh.viewModel.RoomViewModel
 import com.demo.desh.viewModel.UserViewModel
 
 
@@ -50,17 +50,20 @@ fun ProfileScreen(
     userId: Long,
     userViewModel: UserViewModel,
     chatViewModel: ChatViewModel,
-    goToProfileScreen: () -> Unit,
-    goToChatListScreen: (Long) -> Unit
+    roomViewModel: RoomViewModel,
+    goToChatListScreen: (Long) -> Unit,
+    goToRealtyDetail: (Long) -> Unit
 ) {
     LaunchedEffect(Unit) {
-        userViewModel.getUserInfo(userId)
         userViewModel.getUserRegStore(userId)
+        userViewModel.getUserPickedStore(userId)
+        roomViewModel.findLocalUser()
     }
 
     /* STATES */
-    val user by userViewModel.targetUser.observeAsState()
-    val open by userViewModel.open.observeAsState(initial = false)
+    val user by roomViewModel.user.observeAsState()
+    val rld by roomViewModel.open.observeAsState(initial = false)
+    val uld by userViewModel.open.observeAsState(initial = false)
     val userRegStore by userViewModel.userRegStore.observeAsState(initial = listOf())
     val userPickedStore by userViewModel.userPickedStore.observeAsState(initial = listOf())
 
@@ -77,7 +80,8 @@ fun ProfileScreen(
         btnSelected = false
     }
 
-    user?.let {
+    if (uld || rld) { LoadingDialog() }
+    else {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (userProfileRef, postAndLikeButtonRef, postAndLikeContentRef, remainsMarginRef) = createRefs()
 
@@ -105,6 +109,7 @@ fun ProfileScreen(
 
             PostAndLikeContent(
                 userRealtyPreview = if (btnSelected) userRegStore else userPickedStore,
+                onRealtyPreviewClick = goToRealtyDetail,
                 modifier = Modifier
                     .constrainAs(postAndLikeContentRef) {
                         centerHorizontallyTo(parent)
@@ -122,6 +127,7 @@ fun ProfileScreen(
 @Composable
 fun PostAndLikeContent(
     userRealtyPreview: List<RealtyPreview>,
+    onRealtyPreviewClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (userRealtyPreview.isEmpty()) {
@@ -141,21 +147,25 @@ fun PostAndLikeContent(
             userScrollEnabled = true,
             modifier = modifier,
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(15.dp),
+            contentPadding = PaddingValues(10.dp),
             content = {
                 items(userRealtyPreview) {
-                    Card(modifier = Modifier
-                        .size(128.dp)
-                        .padding(10.dp)
+                    Card(
+                        modifier = Modifier
+                            .size(128.dp)
+                            .padding(3.dp)
+                            .clickable { onRealtyPreviewClick(it.realtyId) }
                     ) {
                         Column(
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             AsyncImage(model = it.previewImage, contentDescription = null)
+                            /*
                             Text(text = it.address)
                             Text(text = "${it.deposit} / ${it.monthlyRental}")
                             Text(text = it.star.toString())
+                             */
                         }
                     }
                 }
@@ -207,7 +217,7 @@ fun PreviewListButton(
         colors = buttonColors,
         modifier = Modifier
             .height(40.dp)
-            .width(120.dp)
+            .width(140.dp)
             .clip(shape = RoundedCornerShape(42.dp))
     ) {
         Row(

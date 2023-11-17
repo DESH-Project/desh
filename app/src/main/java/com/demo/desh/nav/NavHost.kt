@@ -1,12 +1,15 @@
 package com.demo.desh.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.demo.desh.ui.screens.ChatListScreen
 import com.demo.desh.ui.screens.ChatRoomScreen
-import com.demo.desh.ui.screens.MapScreen
+import com.demo.desh.ui.screens.HomeScreen
 import com.demo.desh.ui.screens.ProfileScreen
 import com.demo.desh.ui.screens.RealtyAddScreen
 import com.demo.desh.ui.screens.RealtyDetailScreen
@@ -16,7 +19,7 @@ import com.demo.desh.viewModel.UserViewModel
 
 sealed class Screen(val route: String) {
     object Profile : Screen("profile")
-    object Map : Screen("map")
+    object Home : Screen("home")
     object RealtyDetail : Screen("realtyDetail")
     object RealtyAdd : Screen("realtyAdd")
     object ChatRoom : Screen("chatRoom")
@@ -30,41 +33,57 @@ fun NavigationHost(
     chatViewModel: ChatViewModel,
     roomViewModel: RoomViewModel
 ) {
-    NavHost(navController = navController, startDestination = Screen.Map.route) {
+    LaunchedEffect(Unit) {
+        roomViewModel.findLocalUser()
+    }
+
+    val user by roomViewModel.user.observeAsState()
+
+    NavHost(navController = navController, startDestination = Screen.Home.route) {
         val realtyId = "realtyId"
         val userId = "userId"
         val chatRoomId = "chatRoomId"
 
-        composable(route = Screen.Map.route) { backStackEntry ->
-            val goToRealtyDetailScreen = { userId: Long, realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$userId/$realtyId") }
-            val goToProfileScreen = { userId: Long -> navController.navigate(Screen.Profile.route + "/$userId") }
-            val goToChatListScreen = { userId: Long -> navController.navigate(Screen.ChatList.route + "/$userId") }
+        val goToProfileScreen = { uid: Long -> navController.navigate(Screen.Profile.route + "/$uid") }
+        val goToChatListScreen = { uid: Long -> navController.navigate(Screen.ChatList.route + "/$uid") }
+        val goToRealtyDetail = { rid: Long -> navController.navigate(Screen.RealtyDetail.route + "/$rid") }
+        val goToChatroom = { cid: Long -> navController.navigate(Screen.ChatRoom.route + "/$cid")}
 
-            MapScreen(userViewModel, roomViewModel, goToRealtyDetailScreen, goToProfileScreen, goToChatListScreen)
+        composable(route = Screen.Home.route) {
+            HomeScreen(userViewModel, roomViewModel, goToRealtyDetail, goToProfileScreen, goToChatListScreen)
         }
 
-        composable(route = Screen.RealtyDetail.route + "/{$userId}" + "/{$realtyId}") { backStackEntry ->
-            val uid = backStackEntry.arguments?.getString(userId)
+        composable(route = Screen.RealtyDetail.route + "/{$realtyId}") { backStackEntry ->
             val rid = backStackEntry.arguments?.getString(realtyId)
 
-            if (uid != null && rid != null) {
-                val goToProfileScreen = { navController.navigate(Screen.Profile.route) }
-                val goToChatListScreen = { userId: Long -> navController.navigate(Screen.ChatList.route + "/$userId") }
-                RealtyDetailScreen(uid.toLong(), rid.toLong(), userViewModel, goToProfileScreen, goToChatListScreen)
+            if (rid != null && user != null) {
+                RealtyDetailScreen(user!!.userId!!, rid.toLong(), userViewModel, goToProfileScreen, goToChatListScreen)
             }
         }
 
-        composable(route = "${Screen.Profile.route}/{${userId}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(userId)?.let {
-                val goToProfileScreen = { navController.navigate(Screen.Profile.route) }
-                val goToChatListScreen = { userId: Long -> navController.navigate(Screen.ChatList.route + "/$userId") }
-                ProfileScreen(it.toLong(), userViewModel, chatViewModel, goToProfileScreen, goToChatListScreen)
+        composable(route = Screen.Profile.route) {
+            user?.userId?.let {
+                ProfileScreen(it, userViewModel, chatViewModel, roomViewModel, goToChatListScreen, goToRealtyDetail)
+            }
+        }
+
+        composable(route = Screen.Profile.route + "/{$userId}") { backStackEntry ->
+            val targetId = backStackEntry.arguments?.getString(userId)?.toLong()
+
+            targetId?.let {
+                ProfileScreen(
+                    it,
+                    userViewModel,
+                    chatViewModel,
+                    roomViewModel,
+                    goToChatListScreen,
+                    goToRealtyDetail
+                )
             }
         }
 
         composable(route = "${Screen.ChatList.route}/{${userId}}") { backStackEntry ->
             backStackEntry.arguments?.getString(userId)?.let {
-                val goToChatroom = { chatRoomId: Long -> navController.navigate(Screen.ChatRoom.route + "/$chatRoomId")}
                 ChatListScreen(it.toLong(), goToChatroom, userViewModel, chatViewModel)
             }
         }

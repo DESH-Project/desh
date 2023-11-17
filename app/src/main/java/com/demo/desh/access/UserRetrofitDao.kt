@@ -52,7 +52,7 @@ interface UserRetrofitDao {
 
     /* 상가 상세정보 조회 */
     @GET("store")
-    suspend fun getRealtyDetail(@Query("store_id") realtyId: Long, @Query("user_id") userId: Long): Response<ServerResponse<Realty>>
+    suspend fun getRealtyDetail(@Query("id") realtyId: Long, @Query("user-id") userId: Long): Response<ServerResponseObj<Realty>>
 
     /* 상권에 따른 상가 미리보기 리스트 조회 */
     @GET("stores")

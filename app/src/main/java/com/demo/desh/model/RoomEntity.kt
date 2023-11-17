@@ -13,7 +13,7 @@ data class RoomUser(
     var description: String = ""
 ) {
     fun toUser() = User(
-        id = uid,
+        userId = uid,
         nickname = nickname,
         email = email,
         profileImageUrl = profileImageUrl,

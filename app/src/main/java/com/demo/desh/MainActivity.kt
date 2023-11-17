@@ -11,12 +11,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.nav.BottomNavigationBar
 import com.demo.desh.nav.NavigationHost
+import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.TopBarContent
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.DeshprojectfeTheme
@@ -58,6 +62,8 @@ fun Root(
     roomViewModel: RoomViewModel
 ) {
     val navController = rememberNavController()
+    val uld by userViewModel.open.observeAsState(initial = false)
+    val cld by chatViewModel.open.observeAsState(initial = false)
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
@@ -70,6 +76,7 @@ fun Root(
 
     ) { innerPadding ->
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()

@@ -70,7 +70,8 @@ fun ChatMsgBox(
 
         UserProfileCard(
             userNickname = userNickname,
-            userImage = userImage
+            userImage = userImage,
+            onProfileCardClick = { }
         )
 
         Text(

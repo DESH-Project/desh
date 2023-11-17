@@ -20,7 +20,7 @@ data class RecommendDistrict(
 )
 
 data class User(
-    var id: Long? = null,
+    var userId: Long? = null,
     var nickname: String,
     var email: String,
     var profileImageUrl: String,
@@ -28,7 +28,7 @@ data class User(
 ) {
     fun toRoomUser() =
         RoomUser(
-            uid = this.id!!,
+            uid = this.userId!!,
             nickname = this.nickname,
             email = this.email,
             profileImageUrl = this.profileImageUrl,
@@ -46,23 +46,22 @@ data class RealtyCreationReq(
 )
 
 data class Realty(
-    val id: Long,
+    val realtyId: Long,
     val name: String,
-    val price: Double,
     val address: String,
-    val pyung: Long,
+    val deposit: Int,
+    val monthlyRental: Int,
+    val pyung: Int,
     val squareMeter: Double,
-    val image: String,
-    val nearby: String,
-    val userId: Long
+    val images: List<String>,
+    val ownerId: Long
 )
 
 data class RealtyPreview(
-    val id: Long,
+    val realtyId: Long,
     val deposit: Long,
     val monthlyRental: Int,
     val previewImage: String,
-    val address: String,
     val star: Long
 )
 
