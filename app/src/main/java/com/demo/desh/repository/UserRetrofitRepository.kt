@@ -1,7 +1,6 @@
 package com.demo.desh.repository
 
 import android.util.Log
-import com.demo.desh.access.RoomAccessDao
 import com.demo.desh.access.UserRetrofitDao
 import com.demo.desh.model.Realty
 import com.demo.desh.model.RealtyCreationReq
@@ -15,10 +14,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
-class UserRetrofitRepository @Inject constructor(
-    private val userRetrofitDao: UserRetrofitDao,
-    private val roomAccessDao: RoomAccessDao
-) {
+class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: UserRetrofitDao) {
     companion object {
         private const val TAG = "UserRetrofitRepository"
 

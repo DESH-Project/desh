@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import com.demo.desh.model.ChatPreview
-import com.demo.desh.ui.CommonScaffoldForm
 import com.demo.desh.viewModel.ChatViewModel
 import com.demo.desh.viewModel.UserViewModel
 
@@ -62,37 +61,32 @@ fun ChatListScreen(
     val cOpen by chatViewModel.open.observeAsState(initial = false)
     val chatPreviewList by chatViewModel.chatPreviewList.observeAsState(initial = listOf())
 
-    CommonScaffoldForm(
-        pbarOpen = uOpen || cOpen,
-        topBarContent = { /*TODO*/ }
-    ) {
-        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (titleBarRef, chatRoomHolderRef, remainsMarginRef) = createRefs()
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val (titleBarRef, chatRoomHolderRef, remainsMarginRef) = createRefs()
 
-            ChatTitleBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(titleBarRef) {
-                        top.linkTo(anchor = parent.top, margin = 48.dp)
-                    }
-            )
+        ChatTitleBar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(titleBarRef) {
+                    top.linkTo(anchor = parent.top, margin = 48.dp)
+                }
+        )
 
-            ChatRoomHolder(
-                chatPreviewList = chatPreviewList,
-                onChatroomClick = goToChatroom,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(chatRoomHolderRef) {
-                        top.linkTo(anchor = titleBarRef.bottom, margin = 24.dp)
-                        centerHorizontallyTo(parent)
-                    }
-            )
+        ChatRoomHolder(
+            chatPreviewList = chatPreviewList,
+            onChatroomClick = goToChatroom,
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(chatRoomHolderRef) {
+                    top.linkTo(anchor = titleBarRef.bottom, margin = 24.dp)
+                    centerHorizontallyTo(parent)
+                }
+        )
 
-            // 마지막 여백
-            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                top.linkTo(anchor = chatRoomHolderRef.bottom, margin = 60.dp)
-            })
-        }
+        // 마지막 여백
+        Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+            top.linkTo(anchor = chatRoomHolderRef.bottom, margin = 60.dp)
+        })
     }
 }
 

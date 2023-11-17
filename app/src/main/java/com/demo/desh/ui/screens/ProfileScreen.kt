@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import com.demo.desh.model.RealtyPreview
-import com.demo.desh.ui.CommonScaffoldForm
 import com.demo.desh.ui.TopBarContent
 import com.demo.desh.ui.UserProfile
 import com.demo.desh.ui.theme.HighlightColor
@@ -78,55 +77,44 @@ fun ProfileScreen(
         btnSelected = false
     }
 
-    CommonScaffoldForm(
-        pbarOpen = open,
-        topBarContent = {
-            TopBarContent(
-                goToProfileScreen = goToProfileScreen,
-                goToChatListScreen = { goToChatListScreen(userId) },
-                modifier = Modifier.fillMaxWidth()
+    user?.let {
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            val (userProfileRef, postAndLikeButtonRef, postAndLikeContentRef, remainsMarginRef) = createRefs()
+
+            UserProfile(
+                userNickname = user!!.nickname,
+                profileImageUrl = user!!.profileImageUrl,
+                userDescription = user!!.description,
+                modifier = Modifier
+                    .constrainAs(userProfileRef) {
+                        centerHorizontallyTo(parent)
+                        top.linkTo(anchor = parent.top, margin = 70.dp)
+                    }
             )
-        }
-    ) {
-        user?.let {
-            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (userProfileRef, postAndLikeButtonRef, postAndLikeContentRef, remainsMarginRef) = createRefs()
 
-                UserProfile(
-                    userNickname = user!!.nickname,
-                    profileImageUrl = user!!.profileImageUrl,
-                    userDescription = user!!.description,
-                    modifier = Modifier
-                        .constrainAs(userProfileRef) {
-                            centerHorizontallyTo(parent)
-                            top.linkTo(anchor = parent.top, margin = 70.dp)
-                        }
-                )
+            PostAndLikeButton(
+                onPostBtnClick = onPostBtnClick,
+                onStarBtnClick = onStarBtnClick,
+                btnSelected = btnSelected,
+                modifier = Modifier
+                    .constrainAs(postAndLikeButtonRef) {
+                        centerHorizontallyTo(parent)
+                        top.linkTo(anchor = userProfileRef.bottom, margin = 24.dp)
+                    },
+            )
 
-                PostAndLikeButton(
-                    onPostBtnClick = onPostBtnClick,
-                    onStarBtnClick = onStarBtnClick,
-                    btnSelected = btnSelected,
-                    modifier = Modifier
-                        .constrainAs(postAndLikeButtonRef) {
-                            centerHorizontallyTo(parent)
-                            top.linkTo(anchor = userProfileRef.bottom, margin = 24.dp)
-                        },
-                )
+            PostAndLikeContent(
+                userRealtyPreview = if (btnSelected) userRegStore else userPickedStore,
+                modifier = Modifier
+                    .constrainAs(postAndLikeContentRef) {
+                        centerHorizontallyTo(parent)
+                        top.linkTo(anchor = postAndLikeButtonRef.bottom, margin = 24.dp)
+                    }
+            )
 
-                PostAndLikeContent(
-                    userRealtyPreview = if (btnSelected) userRegStore else userPickedStore,
-                    modifier = Modifier
-                        .constrainAs(postAndLikeContentRef) {
-                            centerHorizontallyTo(parent)
-                            top.linkTo(anchor = postAndLikeButtonRef.bottom, margin = 24.dp)
-                        }
-                )
-
-                Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                    top.linkTo(anchor = postAndLikeContentRef.bottom, margin = 60.dp)
-                })
-            }
+            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                top.linkTo(anchor = postAndLikeContentRef.bottom, margin = 60.dp)
+            })
         }
     }
 }
@@ -175,8 +163,6 @@ fun PostAndLikeContent(
         )
     }
 }
-
-
 
 @Composable
 fun PostAndLikeButton(

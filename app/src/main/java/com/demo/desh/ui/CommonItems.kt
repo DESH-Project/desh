@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -20,18 +19,9 @@ import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,38 +38,7 @@ import coil.compose.AsyncImage
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 
 @Composable
-fun CommonScaffoldForm(
-    pbarOpen: Boolean,
-    topBarContent: @Composable () -> Unit,
-    bottomBarContent: @Composable() (() -> Unit)? = { },
-    mainContent: @Composable () -> Unit
-) {
-    Scaffold(
-        scaffoldState = rememberScaffoldState(),
-        topBar = topBarContent,
-        bottomBar = bottomBarContent ?: { },
-        backgroundColor = DefaultBackgroundColor,
-        contentColor = Color.White,
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            if (pbarOpen) LoadingDialog(modifier = Modifier.align(Alignment.Center))
-            else mainContent()
-        }
-    }
-}
-
-@Composable
-fun TopBarContent(
-    goToProfileScreen: () -> Unit,
-    goToChatListScreen: () -> Unit,
-    modifier: Modifier = Modifier,
-    goToRealtyDetailScreen: () -> Unit = { }
-) {
+fun TopBarContent(modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
@@ -95,26 +54,6 @@ fun TopBarContent(
             fontSize = 26.sp,
             color = Color.White
         )
-
-        Row(
-            modifier = Modifier.padding(start = 30.dp, end = 5.dp),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            CustomIconMenu(
-                vector = Icons.Default.Email,
-                onIconClick = goToChatListScreen
-            )
-
-            CustomIconMenu(
-                vector = Icons.Default.AccountCircle,
-                onIconClick = goToProfileScreen
-            )
-
-            CustomIconMenu(
-                vector = Icons.Default.Warning,
-                onIconClick = goToRealtyDetailScreen
-            )
-        }
     }
 }
 

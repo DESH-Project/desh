@@ -1,17 +1,12 @@
 package com.demo.desh.util
 
-import android.content.Context
-import androidx.room.Room
-import com.demo.desh.access.AppDatabase
 import com.demo.desh.access.ChatRetrofitDao
-import com.demo.desh.access.RoomAccessDao
 import com.demo.desh.access.UserRetrofitDao
 import com.demo.desh.repository.ChatRetrofitRepository
 import com.demo.desh.repository.UserRetrofitRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -22,26 +17,14 @@ import javax.inject.Singleton
 class AppModules {
     @Singleton
     @Provides
-    fun provideUserRetrofitRepository(userRetrofitDao: UserRetrofitDao, roomAccessDao: RoomAccessDao) : UserRetrofitRepository {
-        return UserRetrofitRepository(userRetrofitDao, roomAccessDao)
+    fun provideUserRetrofitRepository(userRetrofitDao: UserRetrofitDao) : UserRetrofitRepository {
+        return UserRetrofitRepository(userRetrofitDao)
     }
 
     @Singleton
     @Provides
     fun provideChatRetrofitRepository(chatRetrofitDao: ChatRetrofitDao) : ChatRetrofitRepository {
         return ChatRetrofitRepository(chatRetrofitDao)
-    }
-
-    @Singleton
-    @Provides
-    fun provideRetrofit() : Retrofit {
-        val host = "good-place.shop"
-        val domain = "http://$host/"
-
-        return Retrofit.Builder()
-                .baseUrl(domain)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
     }
 
     @Singleton
@@ -58,15 +41,13 @@ class AppModules {
 
     @Singleton
     @Provides
-    fun provideAppDatabase(@ApplicationContext context: Context) : AppDatabase {
-        return Room
-            .databaseBuilder(context, AppDatabase::class.java, "desh.db")
-            .build()
-    }
+    fun provideRetrofit() : Retrofit {
+        val host = "good-place.shop"
+        val domain = "http://$host/"
 
-    @Singleton
-    @Provides
-    fun provideRoomAccessDao(appDatabase: AppDatabase) : RoomAccessDao {
-        return appDatabase.RoomAccessDao()
+        return Retrofit.Builder()
+            .baseUrl(domain)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     }
 }

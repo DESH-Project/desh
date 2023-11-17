@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -40,18 +39,18 @@ import coil.compose.AsyncImage
 import com.demo.desh.model.RealtyPreview
 import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.User
-import com.demo.desh.ui.TopBarContent
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.util.MapViewManager
+import com.demo.desh.viewModel.RoomViewModel
 import com.demo.desh.viewModel.UserViewModel
 import com.kakao.vectormap.MapView
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
-    userId: Long,
     userViewModel: UserViewModel,
+    roomViewModel: RoomViewModel,
     goToRealtyDetailScreen: (Long, Long) -> Unit,
     goToProfileScreen: (Long) -> Unit,
     goToChatListScreen: (Long) -> Unit
@@ -60,10 +59,11 @@ fun MapScreen(
         userViewModel.fetchServiceList()
         userViewModel.getUserInfo()
         userViewModel.loadRecommendDistrict()
+        roomViewModel.findLocalUser()
     }
 
     /* STATES */
-    val user by userViewModel.targetUser.observeAsState()
+    val user by roomViewModel.user.observeAsState()
     val serviceList by userViewModel.serviceList.observeAsState(initial = mapOf())
     val recommendDistrictList by userViewModel.recommendDistrictList.observeAsState(initial = listOf())
     val nearbyStoreList by userViewModel.nearbyStoreList.observeAsState(initial = listOf())
@@ -76,23 +76,12 @@ fun MapScreen(
         selectedServiceName = serviceName
     }
 
-    val onDistrictButtonClick = { districtName: String -> userViewModel.fetchNearbyStores(districtName) }
-    val onStoreButtonClick = { storeId: Long -> goToRealtyDetailScreen(userId, storeId) }
-
     user?.let {
+        val onDistrictButtonClick = { districtName: String -> userViewModel.fetchNearbyStores(districtName) }
+        val onStoreButtonClick = { storeId: Long -> goToRealtyDetailScreen(user!!.id!!, storeId) }
+
         BottomSheetScaffold(
             scaffoldState = rememberBottomSheetScaffoldState(),
-
-            topBar = {
-                TopBarContent(
-                    goToProfileScreen = { goToProfileScreen(userId) },
-                    goToChatListScreen = { goToChatListScreen(userId) },
-                    goToRealtyDetailScreen = { goToRealtyDetailScreen(userId, 1L) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(DefaultBackgroundColor)
-                )
-            },
 
             sheetContent = {
                 DrawerContent(

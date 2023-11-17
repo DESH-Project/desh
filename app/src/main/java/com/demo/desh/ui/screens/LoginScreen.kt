@@ -1,5 +1,7 @@
 package com.demo.desh.ui.screens
 
+import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,23 +37,22 @@ import coil.compose.AsyncImage
 import com.demo.desh.R
 import com.demo.desh.model.LoginPreviewInfo
 import com.demo.desh.model.User
-import com.demo.desh.ui.CommonScaffoldForm
-import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
 import com.demo.desh.util.KakaoLogin
+import com.demo.desh.viewModel.RoomViewModel
 import com.demo.desh.viewModel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun LoginScreen(
-    userViewModel: UserViewModel,
-    goToMapScreen: (Long) -> Unit
-) {
+fun LoginScreen(userViewModel: UserViewModel, roomViewModel: RoomViewModel, intent: Intent) {
     LaunchedEffect(Unit) {
         userViewModel.loadPreviewImages()
     }
@@ -60,81 +62,77 @@ fun LoginScreen(
     val pagerState = rememberPagerState()
 
     /* STATES */
-    val open by userViewModel.open.observeAsState(initial = true)
     val previewImages by userViewModel.previewImages.observeAsState()
 
     /* HANDLERS */
     val onKakaoLoginButtonClick = {
         val goToMapScreenWithUser = { user: User ->
             userViewModel.fetchUser(user)
-            goToMapScreen(user.id!!)
+            userViewModel.user.value?.let { roomViewModel.insertLocalUser(it) }
+            Unit
         }
 
         KakaoLogin.login(context, goToMapScreenWithUser)
+        context.startActivity(intent)
     }
 
-    CommonScaffoldForm(
-        pbarOpen = open,
-        topBarContent = { /*TODO*/ }
-    ) {
-        val size = previewImages?.size ?: 1
+    val size = previewImages?.size ?: 1
 
-        HorizontalPager(
-            count = size,
-            state = pagerState
-        ) { pageIndex ->
-            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (imageRef, indicatorRef, userManualPageRef) = createRefs()
-                val model = previewImages?.get(pageIndex) ?: ""
+    HorizontalPager(
+        count = size,
+        state = pagerState
+    ) { pageIndex ->
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            val (imageRef, indicatorRef, userManualPageRef) = createRefs()
+            val model = previewImages?.get(pageIndex) ?: ""
 
-                AsyncImage(
-                    model = model,
-                    contentDescription = null,
-                    contentScale = ContentScale.Inside,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(530.dp)
-                        .constrainAs(imageRef) {
-                            centerHorizontallyTo(parent)
-                        }
-                )
-
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    indicatorHeight = 5.dp,
-                    spacing = 5.dp,
-                    activeColor = Color.White,
-                    indicatorShape = RectangleShape,
-                    indicatorWidth = 32.dp,
-                    modifier = Modifier
-                        .constrainAs(indicatorRef) {
-                            top.linkTo(anchor = imageRef.bottom)
-                            centerHorizontallyTo(imageRef)
-                            bottom.linkTo(anchor = userManualPageRef.top)
-                        }
-                )
-
-                when (pageIndex) {
-                    (size - 1) -> {
-                        LastPage(
-                            onKakaoLoginButtonClick = onKakaoLoginButtonClick,
-                            modifier = Modifier
-                                .constrainAs(userManualPageRef) {
-                                    top.linkTo(anchor = indicatorRef.bottom, margin = 16.dp)
-                                    centerHorizontallyTo(other = parent)
-                                }
-                        )
+            AsyncImage(
+                model = model,
+                contentDescription = null,
+                contentScale = ContentScale.Inside,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(530.dp)
+                    .constrainAs(imageRef) {
+                        centerHorizontallyTo(parent)
                     }
+            )
 
-                    in (0 until size - 1) -> {
-                        UserManualPage(
-                            textData = textData[pageIndex],
-                            modifier = Modifier.constrainAs(userManualPageRef) {
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                indicatorHeight = 5.dp,
+                spacing = 5.dp,
+                activeColor = Color.White,
+                indicatorShape = RectangleShape,
+                indicatorWidth = 32.dp,
+                modifier = Modifier
+                    .constrainAs(indicatorRef) {
+                        top.linkTo(anchor = imageRef.bottom)
+                        centerHorizontallyTo(imageRef)
+                        bottom.linkTo(anchor = userManualPageRef.top)
+                    }
+            )
+
+            when (pageIndex) {
+                (size - 1) -> {
+                    LastPage(
+                        onKakaoLoginButtonClick = onKakaoLoginButtonClick,
+                        modifier = Modifier
+                            .constrainAs(userManualPageRef) {
                                 top.linkTo(anchor = indicatorRef.bottom, margin = 16.dp)
-                                start.linkTo(anchor = parent.start, margin = 20.dp)
+                                centerHorizontallyTo(other = parent)
                             }
-                        )
-                    }
+                    )
+                }
+
+                in (0 until size - 1) -> {
+                    UserManualPage(
+                        textData = textData[pageIndex],
+                        modifier = Modifier.constrainAs(userManualPageRef) {
+                            top.linkTo(anchor = indicatorRef.bottom, margin = 16.dp)
+                            start.linkTo(anchor = parent.start, margin = 20.dp)
+                        }
+                    )
                 }
             }
         }

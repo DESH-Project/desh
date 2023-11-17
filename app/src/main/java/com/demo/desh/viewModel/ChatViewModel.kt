@@ -41,6 +41,8 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+
+
     /* 채팅방 상세조회 */
     private var _chatDetail = MutableLiveData<ChatDetail>()
     val chatDetail : LiveData<ChatDetail> get() = _chatDetail

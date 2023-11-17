@@ -13,7 +13,6 @@ import com.demo.desh.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.net.URLEncoder
@@ -57,16 +56,20 @@ class UserViewModel @Inject constructor(
     fun fetchUser(user: User) {
         _open.value = true
 
-        runBlocking {
-            val res = async(Dispatchers.IO) {
-                delay(1500)
-                userRetrofitRepository.login(user)
-            }.await()
+        viewModelScope.launch {
+            runBlocking {
+                val res = async(Dispatchers.IO) { userRetrofitRepository.login(user) }.await()
 
-            if (res.isSuccessful) {
-                user.id = res.body()
-                _user.value = user
-                _open.value = false
+                if (res.isSuccessful) {
+                    _user.value = User(
+                        id = res.body(),
+                        nickname = user.nickname,
+                        email = user.email,
+                        profileImageUrl = user.profileImageUrl,
+                        description = user.description
+                    )
+                    _open.value = false
+                }
             }
         }
     }
@@ -84,6 +87,8 @@ class UserViewModel @Inject constructor(
                 _targetUser.value = result
             }
         }
+
+
 
     /* 유저가 찜한 상가 목록 리스트 가져오기 */
     private var _userPickedStore = MutableLiveData<List<RealtyPreview>>()

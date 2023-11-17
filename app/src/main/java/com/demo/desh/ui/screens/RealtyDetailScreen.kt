@@ -51,8 +51,6 @@ import com.demo.desh.model.BuildingInfo
 import com.demo.desh.model.BuildingPreviewInfo
 import com.demo.desh.model.buildingInfo
 import com.demo.desh.model.buildingPreviewDummy
-import com.demo.desh.ui.CommonScaffoldForm
-import com.demo.desh.ui.TopBarContent
 import com.demo.desh.ui.UserProfileCard
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.ui.theme.Typography2
@@ -61,7 +59,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
-
 
 @Composable
 fun RealtyDetailScreen(
@@ -80,65 +77,53 @@ fun RealtyDetailScreen(
 
     /* HANDLERS */
 
-    CommonScaffoldForm(
-        pbarOpen = open,
-        topBarContent = {
-            TopBarContent(
-                goToProfileScreen = goToProfileScreen,
-                goToChatListScreen = { goToChatListScreen(userId) },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+    Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
-        Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
 
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-
-            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
-
-                // 건물 이미지 Pager & Indicator
-                BuildingImagePager(
-                    pageItems = buildingInfo.images,
-                    modifier = Modifier
-                        .constrainAs(buildingImagePagerRef) {
-                            top.linkTo(parent.top)
-                            centerHorizontallyTo(parent)
-                            width = Dimension.fillToConstraints
-                        }
-                )
-
-                // 건물 상세 정보
-                BuildingInfoUi(
-                    buildingInfo = buildingInfo,
-                    modifier = Modifier
-                        .constrainAs(buildingInfoUiRef) {
-                            top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
-                            linkTo(start = parent.start, end = parent.end)
-                            width = Dimension.fillToConstraints
-                        }
-                )
-
-                NearbyBuildingPreviewUi(
-                    nearbyBuildingInfo = buildingPreviewDummy,
-                    modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
-                        top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
+            // 건물 이미지 Pager & Indicator
+            BuildingImagePager(
+                pageItems = buildingInfo.images,
+                modifier = Modifier
+                    .constrainAs(buildingImagePagerRef) {
+                        top.linkTo(parent.top)
                         centerHorizontallyTo(parent)
                         width = Dimension.fillToConstraints
                     }
-                )
+            )
 
-                // 마지막 여백
-                Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                    top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
-                })
-            }
+            // 건물 상세 정보
+            BuildingInfoUi(
+                buildingInfo = buildingInfo,
+                modifier = Modifier
+                    .constrainAs(buildingInfoUiRef) {
+                        top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
+                        linkTo(start = parent.start, end = parent.end)
+                        width = Dimension.fillToConstraints
+                    }
+            )
+
+            NearbyBuildingPreviewUi(
+                nearbyBuildingInfo = buildingPreviewDummy,
+                modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
+                    top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
+                    centerHorizontallyTo(parent)
+                    width = Dimension.fillToConstraints
+                }
+            )
+
+            // 마지막 여백
+            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
+            })
         }
     }
 }

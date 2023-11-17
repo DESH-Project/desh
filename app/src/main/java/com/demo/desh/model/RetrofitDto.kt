@@ -25,7 +25,16 @@ data class User(
     var email: String,
     var profileImageUrl: String,
     var description: String = ""
-)
+) {
+    fun toRoomUser() =
+        RoomUser(
+            uid = this.id!!,
+            nickname = this.nickname,
+            email = this.email,
+            profileImageUrl = this.profileImageUrl,
+            description = this.description
+        )
+}
 
 data class RealtyCreationReq(
     val name: String,

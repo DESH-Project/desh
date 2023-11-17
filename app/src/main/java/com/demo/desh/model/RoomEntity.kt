@@ -11,4 +11,12 @@ data class RoomUser(
     val email: String,
     @ColumnInfo(name = "profile_image_url") val profileImageUrl: String,
     var description: String = ""
-)
+) {
+    fun toUser() = User(
+        id = uid,
+        nickname = nickname,
+        email = email,
+        profileImageUrl = profileImageUrl,
+        description = description
+    )
+}
