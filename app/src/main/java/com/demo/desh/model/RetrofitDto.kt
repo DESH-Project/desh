@@ -36,13 +36,21 @@ data class User(
         )
 }
 
+data class UserPreview(
+    val userId: Long,
+    val nickname: String,
+    val profileImage: String
+)
+
 data class RealtyCreationReq(
     val name: String,
-    val price: Double,
+    val deposit: Int,
+    val monthlyRental: Int,
     val address: String,
-    val pyung: Long,
+    val pyung: Int,
     val squareMeter: Double,
-    val userId: Long
+    val userId: Long,
+    val service: String
 )
 
 data class Realty(

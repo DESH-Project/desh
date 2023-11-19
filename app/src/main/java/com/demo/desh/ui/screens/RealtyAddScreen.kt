@@ -1,5 +1,16 @@
 package com.demo.desh.ui.screens
 
+import android.annotation.SuppressLint
+import android.content.ContentResolver
+import android.net.Uri
+import android.provider.OpenableColumns
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +29,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,17 +37,88 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.ui.theme.HighlightColor
+import com.demo.desh.viewModel.UserViewModel
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okio.BufferedSink
+import okio.source
+
+@SuppressLint("Range")
+fun Uri.asMultipart(name: String, contentResolver: ContentResolver): MultipartBody.Part? {
+    return contentResolver.query(this, null, null, null, null)?.let {
+        if (it.moveToNext()) {
+            val displayName = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+            val requestBody = object : RequestBody() {
+                override fun contentType(): MediaType? {
+                    return contentResolver.getType(this@asMultipart)?.toMediaType()
+                }
+
+                override fun writeTo(sink: BufferedSink) {
+                    sink.writeAll(contentResolver.openInputStream(this@asMultipart)?.source()!!)
+                }
+            }
+            it.close()
+            MultipartBody.Part.createFormData(name, displayName, requestBody)
+        } else {
+            it.close()
+            null
+        }
+    }
+}
 
 @Composable
-fun RealtyAddScreen() {
-    var pageState by rememberSaveable { mutableStateOf(1) }
+fun RealtyAddScreen(
+    userViewModel: UserViewModel,
+    goToHomeScreen: () -> Unit
+) {
+    val context = LocalContext.current
 
+    val user = userViewModel.user.value
+    Log.e("RealtyAddScreen", user.toString())
+
+    var pageState by rememberSaveable { mutableStateOf(1) }
     val onPageNext = { pageState += 1 }
+
+    var address by rememberSaveable { mutableStateOf("") }
+    val onAddressChanged = { text: String -> address = text }
+
+    var deposit by rememberSaveable { mutableStateOf("0") }
+    var monthly by rememberSaveable { mutableStateOf("0") }
+    val onDepositChanged = { text: String -> deposit = text }
+    val onMonthlyChanged = { text: String -> monthly = text }
+
+    var selectedImages by rememberSaveable { mutableStateOf(listOf<Uri>()) }
+    val onImageSelected = { uris: List<@JvmSuppressWildcards Uri> -> selectedImages = uris }
+
+    val onUploadInfo = {
+        val req = RealtyCreationReq(
+            name = "test",
+            address = address,
+            deposit = deposit.toInt(),
+            monthlyRental = monthly.toInt(),
+            pyung = 36,
+            squareMeter = (36 * 3.3).toDouble(),
+            service = "Test",
+            userId = user?.userId ?: 1L
+        )
+
+        Log.e("onUploadInfo", req.toString())
+
+        val parts = selectedImages.map { it.asMultipart("images", context.contentResolver) }
+        userViewModel.uploadRealtyInfo(images = parts, req = req)
+
+        Toast.makeText(context, "등록이 완료되었습니다!", Toast.LENGTH_SHORT).show()
+        goToHomeScreen()
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -45,9 +128,9 @@ fun RealtyAddScreen() {
             .fillMaxSize()
     ) {
         when (pageState) {
-            1 -> InputAddress(onPageNext)
-            2 -> InputRentalFee(onPageNext)
-            3 -> InputStorePics()
+            1 -> InputAddress(address, onAddressChanged, onPageNext)
+            2 -> InputRentalFee(deposit, onDepositChanged, monthly, onMonthlyChanged, onPageNext)
+            3 -> InputStorePics(selectedImages, onImageSelected, onUploadInfo)
         }
     }
 }
@@ -98,12 +181,11 @@ fun CustomNextButton(onPageNext: () -> Unit) {
 
 @Composable
 fun InputAddress(
+    address: String,
+    onAddressChanged: (String) -> Unit,
     onPageNext: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var address by rememberSaveable { mutableStateOf("") }
-    val onAddressChanged = { text: String -> address = text }
-
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top
@@ -125,15 +207,13 @@ fun InputAddress(
 
 @Composable
 fun InputRentalFee(
+    deposit: String,
+    onDepositChanged: (String) -> Unit,
+    monthly: String,
+    onMonthlyChanged: (String) -> Unit,
     onPageNext: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var deposit by rememberSaveable { mutableStateOf("0") }
-    var monthly by rememberSaveable { mutableStateOf("0") }
-
-    val onDepositChanged = { text: String -> deposit = text }
-    val onMonthlyChanged = { text: String -> monthly = text }
-
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -162,7 +242,17 @@ fun InputRentalFee(
 }
 
 @Composable
-fun InputStorePics(modifier: Modifier = Modifier) {
+fun InputStorePics(
+    selectedImageUris: List<Uri>,
+    setSelectedImageUris: (List<Uri>) -> Unit,
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(),
+        onResult = { uris -> setSelectedImageUris(uris) }
+    )
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -229,6 +319,13 @@ fun InputStorePics(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .height(48.dp)
                 .padding(horizontal = 25.dp)
+                .clickable {
+                    multiplePhotoPickerLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                }
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
@@ -243,6 +340,6 @@ fun InputStorePics(modifier: Modifier = Modifier) {
         
         Spacer(modifier = Modifier.padding(15.dp))
         
-        CustomNextButton({ })
+        CustomNextButton(onSubmit)
     }
 }

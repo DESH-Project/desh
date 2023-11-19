@@ -6,15 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demo.desh.repository.UserRetrofitRepository
 import com.demo.desh.model.Realty
+import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.model.RealtyPreview
 import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.User
+import com.demo.desh.model.UserPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import org.json.JSONObject
 import java.net.URLEncoder
 import javax.inject.Inject
 
@@ -90,7 +96,21 @@ class UserViewModel @Inject constructor(
         open.value = false
     }
 
+    /* 유저 미리보기 정보 조회 */
+    private var _userPreview = MutableLiveData<UserPreview>()
+    val userPreview : LiveData<UserPreview> get() = _userPreview
 
+    fun getUserPreviewInfo(userId: Long) {
+        open.value = true
+        viewModelScope.launch {
+            val def = async(Dispatchers.IO) { userRetrofitRepository.getUserPreviewInfo(userId) }.await()
+
+            if (def.isSuccessful) {
+                val res = def.body()!!
+                _userPreview.value = res.data
+            }
+        }
+    }
 
     /* 유저가 찜한 상가 목록 리스트 가져오기 */
     private var _userPickedStore = MutableLiveData<List<RealtyPreview>>()
@@ -210,5 +230,26 @@ class UserViewModel @Inject constructor(
             }
         }
         open.value = false
+    }
+
+    /* 상가 정보 업로드 */
+    fun uploadRealtyInfo(images: List<MultipartBody.Part?>, req: RealtyCreationReq) {
+        val jsonObj = JSONObject(
+            "{" +
+                    "\"userId\":\"${req.userId}\"," +
+                    "\"name\":\"${req.name}\"," +
+                    "\"deposit\":\"${req.deposit}\"," +
+                    "\"monthlyRental\":\"${req.monthlyRental}\"," +
+                    "\"address\":\"${req.address}\"," +
+                    "\"pyung\":\"${req.pyung}\"," +
+                    "\"squareMeter\":\"${req.squareMeter}\"," +
+                    "\"service\":\"${req.service}\"" +
+                "}"
+        ).toString()
+
+        viewModelScope.launch {
+            val jsonBody = RequestBody.create("application/json".toMediaTypeOrNull(), jsonObj)
+            async(Dispatchers.IO) { userRetrofitRepository.uploadRealtyInfo(images, jsonBody) }.await()
+        }
     }
 }

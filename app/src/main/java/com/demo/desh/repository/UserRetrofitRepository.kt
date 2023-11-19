@@ -9,8 +9,11 @@ import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
+import com.demo.desh.model.UserPreview
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -33,6 +36,12 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
         return userRetrofitDao
             .getUserInfo(userId)
             .also { logging("getUserInfo", it) }
+    }
+
+    suspend fun getUserPreviewInfo(userId: Long) : Response<ServerResponseObj<UserPreview>> {
+        return userRetrofitDao
+            .getUserPreviewInfo(userId)
+            .also { logging("getUserPreviewInfo", it) }
     }
 
     suspend fun getNearbyStoreList(encodedDistrictName: String): Response<ServerResponse<RealtyPreview>> {
@@ -97,4 +106,9 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .also { logging("sendPickedStore", it) }
     }
 
+    suspend fun uploadRealtyInfo(images: List<MultipartBody.Part?>, req: RequestBody) : Response<Unit> {
+        return userRetrofitDao
+            .uploadRealtyInfo(images, req)
+            .also { logging("uploadRealtyInfo", it) }
+    }
 }

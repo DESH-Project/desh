@@ -7,10 +7,15 @@ import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.ServerResponse
 import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
+import com.demo.desh.model.UserPreview
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -18,6 +23,10 @@ interface UserRetrofitDao {
     /* 소셜 로그인 성공시 서버에 유저 정보 전달 */
     @POST("login")
     suspend fun login(@Body user: User): Response<Long>
+
+    /* 유저 미리보기 조회 */
+    @GET("preview/user/{uid}")
+    suspend fun getUserPreviewInfo(@Path("uid") userId: Long) : Response<ServerResponseObj<UserPreview>>
 
     /* 유저 상세정보 조회 */
     @GET("user/{uid}")
@@ -65,4 +74,11 @@ interface UserRetrofitDao {
     /* 유저가 등록한 상가 미리보기 리스트 조회 */
     @GET("{uid}/realty")
     suspend fun getRegisterStoreList(@Path("uid") userId: Long) : Response<ServerResponse<RealtyPreview>>
+
+    @Multipart
+    @POST("realty")
+    suspend fun uploadRealtyInfo(
+        @Part images: List<MultipartBody.Part?>,
+        @Part("realty") realty: RequestBody
+    ) : Response<Unit>
 }

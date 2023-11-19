@@ -57,13 +57,13 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         userViewModel.getUserRegStore(userId)
         userViewModel.getUserPickedStore(userId)
-        roomViewModel.findLocalUser()
+        userViewModel.getUserInfo(userId)
     }
 
     /* STATES */
-    val user by roomViewModel.user.observeAsState()
     val rld by roomViewModel.open.observeAsState(initial = false)
     val uld by userViewModel.open.observeAsState(initial = false)
+    val user by userViewModel.targetUser.observeAsState()
     val userRegStore by userViewModel.userRegStore.observeAsState(initial = listOf())
     val userPickedStore by userViewModel.userPickedStore.observeAsState(initial = listOf())
 
@@ -82,44 +82,46 @@ fun ProfileScreen(
 
     if (uld || rld) { LoadingDialog() }
     else {
-        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (userProfileRef, postAndLikeButtonRef, postAndLikeContentRef, remainsMarginRef) = createRefs()
+        user?.let {
+            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                val (userProfileRef, postAndLikeButtonRef, postAndLikeContentRef, remainsMarginRef) = createRefs()
 
-            UserProfile(
-                userNickname = user!!.nickname,
-                profileImageUrl = user!!.profileImageUrl,
-                userDescription = user!!.description,
-                modifier = Modifier
-                    .constrainAs(userProfileRef) {
-                        centerHorizontallyTo(parent)
-                        top.linkTo(anchor = parent.top, margin = 70.dp)
-                    }
-            )
+                UserProfile(
+                    userNickname = it.nickname,
+                    profileImageUrl = it.profileImageUrl,
+                    userDescription = it.description,
+                    modifier = Modifier
+                        .constrainAs(userProfileRef) {
+                            centerHorizontallyTo(parent)
+                            top.linkTo(anchor = parent.top, margin = 70.dp)
+                        }
+                )
 
-            PostAndLikeButton(
-                onPostBtnClick = onPostBtnClick,
-                onStarBtnClick = onStarBtnClick,
-                btnSelected = btnSelected,
-                modifier = Modifier
-                    .constrainAs(postAndLikeButtonRef) {
-                        centerHorizontallyTo(parent)
-                        top.linkTo(anchor = userProfileRef.bottom, margin = 24.dp)
-                    },
-            )
+                PostAndLikeButton(
+                    onPostBtnClick = onPostBtnClick,
+                    onStarBtnClick = onStarBtnClick,
+                    btnSelected = btnSelected,
+                    modifier = Modifier
+                        .constrainAs(postAndLikeButtonRef) {
+                            centerHorizontallyTo(parent)
+                            top.linkTo(anchor = userProfileRef.bottom, margin = 24.dp)
+                        },
+                )
 
-            PostAndLikeContent(
-                userRealtyPreview = if (btnSelected) userRegStore else userPickedStore,
-                onRealtyPreviewClick = goToRealtyDetail,
-                modifier = Modifier
-                    .constrainAs(postAndLikeContentRef) {
-                        centerHorizontallyTo(parent)
-                        top.linkTo(anchor = postAndLikeButtonRef.bottom, margin = 24.dp)
-                    }
-            )
+                PostAndLikeContent(
+                    userRealtyPreview = if (btnSelected) userRegStore else userPickedStore,
+                    onRealtyPreviewClick = goToRealtyDetail,
+                    modifier = Modifier
+                        .constrainAs(postAndLikeContentRef) {
+                            centerHorizontallyTo(parent)
+                            top.linkTo(anchor = postAndLikeButtonRef.bottom, margin = 24.dp)
+                        }
+                )
 
-            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                top.linkTo(anchor = postAndLikeContentRef.bottom, margin = 60.dp)
-            })
+                Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                    top.linkTo(anchor = postAndLikeContentRef.bottom, margin = 60.dp)
+                })
+            }
         }
     }
 }

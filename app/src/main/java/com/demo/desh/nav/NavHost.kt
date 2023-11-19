@@ -95,7 +95,8 @@ fun NavigationHost(
         }
 
         composable(route = Screen.RealtyAdd.route) {
-            RealtyAddScreen()
+            val goToHomeScreen = { navController.navigate(Screen.Home.route) }
+            RealtyAddScreen(userViewModel, goToHomeScreen)
         }
     }
 }

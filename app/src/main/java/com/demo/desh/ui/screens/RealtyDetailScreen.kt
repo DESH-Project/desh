@@ -50,6 +50,7 @@ import coil.compose.AsyncImage
 import com.demo.desh.model.BuildingPreviewInfo
 import com.demo.desh.model.Realty
 import com.demo.desh.model.User
+import com.demo.desh.model.UserPreview
 import com.demo.desh.model.buildingPreviewDummy
 import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.UserProfileCard
@@ -69,65 +70,71 @@ fun RealtyDetailScreen(
     goToProfileScreen: (Long) -> Unit,
     goToChatListScreen: (Long) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        userViewModel.fetchRealtyDetail(realtyId, userId)
+        userViewModel.getUserPreviewInfo(userId)
+    }
+
     /* STATES */
     val open by userViewModel.open.observeAsState(initial = false)
     val realtyDetailInfo by userViewModel.realtyDetail.observeAsState()
-    val ownerInfo by userViewModel.targetUser.observeAsState()
+    val ownerPreview by userViewModel.userPreview.observeAsState()
 
-    LaunchedEffect(Unit) {
-        userViewModel.fetchRealtyDetail(realtyId, userId)
-        realtyDetailInfo?.let { userViewModel.getUserInfo(it.ownerId) }
-    }
+    val saveRealtyInfo = { userViewModel.sendPickedStore(userId, realtyId) }
 
     if (open) LoadingDialog()
     else {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
+        if (realtyDetailInfo != null && ownerPreview != null) {
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                    val (buildingImagePagerRef, buildingInfoUiRef, nearbyBuildingPreviewRef, remainsMarginRef) = createRefs()
 
-                // 건물 이미지 Pager & Indicator
-                BuildingImagePager(
-                    pageItems = realtyDetailInfo?.images ?: listOf(),
-                    modifier = Modifier
-                        .constrainAs(buildingImagePagerRef) {
-                            top.linkTo(parent.top)
+                    // 건물 이미지 Pager & Indicator
+                    BuildingImagePager(
+                        pageItems = realtyDetailInfo?.images ?: listOf(),
+                        modifier = Modifier
+                            .constrainAs(buildingImagePagerRef) {
+                                top.linkTo(parent.top)
+                                centerHorizontallyTo(parent)
+                                width = Dimension.fillToConstraints
+                            }
+                    )
+
+                    // 건물 상세 정보
+                    BuildingInfoUi(
+                        userId = userId,
+                        realtyInfo = realtyDetailInfo!!,
+                        ownerInfo = ownerPreview!!,
+                        goToProfileScreen = goToProfileScreen,
+                        saveRealtyInfo = saveRealtyInfo,
+                        modifier = Modifier
+                            .constrainAs(buildingInfoUiRef) {
+                                top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
+                                linkTo(start = parent.start, end = parent.end)
+                                width = Dimension.fillToConstraints
+                            }
+                    )
+
+                    NearbyBuildingPreviewUi(
+                        nearbyBuildingInfo = buildingPreviewDummy,
+                        modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
+                            top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
                             centerHorizontallyTo(parent)
                             width = Dimension.fillToConstraints
                         }
-                )
+                    )
 
-                // 건물 상세 정보
-                BuildingInfoUi(
-                    realtyInfo = realtyDetailInfo,
-                    ownerInfo = ownerInfo,
-                    goToProfileScreen = goToProfileScreen,
-                    modifier = Modifier
-                        .constrainAs(buildingInfoUiRef) {
-                            top.linkTo(buildingImagePagerRef.bottom, margin = 16.dp)
-                            linkTo(start = parent.start, end = parent.end)
-                            width = Dimension.fillToConstraints
-                        }
-                )
-
-                NearbyBuildingPreviewUi(
-                    nearbyBuildingInfo = buildingPreviewDummy,
-                    modifier = Modifier.constrainAs(nearbyBuildingPreviewRef) {
-                        top.linkTo(anchor = buildingInfoUiRef.bottom, margin = 16.dp)
-                        centerHorizontallyTo(parent)
-                        width = Dimension.fillToConstraints
-                    }
-                )
-
-                // 마지막 여백
-                Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                    top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
-                })
+                    // 마지막 여백
+                    Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+                        top.linkTo(anchor = nearbyBuildingPreviewRef.bottom, margin = 60.dp)
+                    })
+                }
             }
         }
     }
@@ -179,110 +186,106 @@ fun BuildingImagePager(
 
 @Composable
 fun BuildingInfoUi(
-    realtyInfo: Realty?,
-    ownerInfo: User?,
+    userId: Long,
+    realtyInfo: Realty,
+    ownerInfo: UserPreview,
     goToProfileScreen: (Long) -> Unit,
+    saveRealtyInfo: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var starButtonState by rememberSaveable { mutableStateOf(false) }
 
-    val onStarBtnClick = { buildingId: Long ->
+    val onStarBtnClick = {
         starButtonState = !starButtonState
 
-        // room 저장
-
         // 서버 전송
+        saveRealtyInfo()
     }
 
-    realtyInfo?.let {
-        Column(
-            modifier = modifier
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(all = 8.dp)
+    ) {
+        // Line 1 (건물 이름, 찜하기 버튼)
+        Row(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(all = 8.dp)
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Line 1 (건물 이름, 찜하기 버튼)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = it.name,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                )
-
-                IconButton(onClick = { onStarBtnClick(it.realtyId) }) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = if (starButtonState) Color.White else Color.Gray,
-                    )
-                }
-            }
-
-            // Line 2
-
-
-            // Line 3 (유저 프로필 카드, 문의하기 버튼)
-            ownerInfo?.let {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    UserProfileCard(
-                        userNickname = it.nickname,
-                        userImage = it.profileImageUrl,
-                        onProfileCardClick = { goToProfileScreen(it.userId!!) }
-                    )
-
-                    ChatButton()
-                }
-            }
-
-            Divider(
-                modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp),
-                color = Color.Gray
+            Text(
+                text = realtyInfo.name,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
             )
 
-            // Line 4 (건물 정보)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-            ) {
-                BuildingInfoMaker(
-                    imageVector = Icons.Default.LocationOn,
-                    text = it.address
-                )
-                BuildingInfoMaker(imageVector = Icons.Default.Info, text = "3000 / 200")
-                BuildingInfoMaker(
-                    imageVector = Icons.Default.Home,
-                    text = "${it.pyung}평(${
-                        String.format(
-                            "%.2f",
-                            it.squareMeter
-                        )
-                    })"
+            IconButton(onClick = onStarBtnClick) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = if (starButtonState) Color.White else Color.Gray,
                 )
             }
+        }
 
-            Divider(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                color = Color.Gray
+        // Line 2
+
+        // Line 3 (유저 프로필 카드, 문의하기 버튼)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            UserProfileCard(
+                userNickname = ownerInfo.nickname,
+                userImage = ownerInfo.profileImage,
+                onProfileCardClick = { goToProfileScreen(ownerInfo.userId) }
+            )
+
+            ChatButton()
+        }
+
+        Divider(
+            modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp),
+            color = Color.Gray
+        )
+
+        // Line 4 (건물 정보)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
+            BuildingInfoMaker(
+                imageVector = Icons.Default.LocationOn,
+                text = realtyInfo.address
+            )
+
+            BuildingInfoMaker(
+                imageVector = Icons.Default.Info,
+                text = "3000 / 200"
+            )
+
+            BuildingInfoMaker(
+                imageVector = Icons.Default.Home,
+                text = "${realtyInfo.pyung}평(${String.format("%.2f", realtyInfo.squareMeter)})"
             )
         }
+
+        Divider(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            color = Color.Gray
+        )
     }
 }
 
 @Composable
 fun ChatButton(modifier: Modifier = Modifier) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = { },
         colors = ButtonDefaults.buttonColors(backgroundColor = HighlightColor, contentColor = Color.White),
         shape = RoundedCornerShape(15.dp)
     ) {
