@@ -1,23 +1,32 @@
 package com.demo.desh
 
-import com.demo.desh.ui.screens.RealtyDetailScreen
 import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.demo.desh.ui.screens.ChatListScreen
-import com.demo.desh.ui.screens.ChatRoomScreen
-import com.demo.desh.ui.screens.LoginScreen
-import com.demo.desh.ui.screens.MapScreen
-import com.demo.desh.ui.screens.ProfileScreen
-import com.demo.desh.ui.screens.RealtyAddScreen
+import com.demo.desh.nav.BottomNavigationBar
+import com.demo.desh.nav.NavigationHost
+import com.demo.desh.ui.LoadingDialog
+import com.demo.desh.ui.TopBarContent
+import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.DeshprojectfeTheme
+import com.demo.desh.util.RoomManager
 import com.demo.desh.viewModel.ChatViewModel
+import com.demo.desh.viewModel.RoomViewModel
 import com.demo.desh.viewModel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
@@ -36,92 +45,48 @@ class MainActivity : AppCompatActivity() {
 
         val userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
         val chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
+        val roomViewModel = RoomManager.getRoomViewModel(application)
 
         setContent {
             DeshprojectfeTheme {
-                Root(userViewModel, chatViewModel)
+                Root(userViewModel, chatViewModel, roomViewModel)
             }
         }
     }
 }
 
-sealed class Screen(val route: String) {
-    object Login : Screen("login")
-    object Profile : Screen("profile")
-    object Map : Screen("map")
-    object RealtyDetail : Screen("realtyDetail")
-    object RealtyAdd : Screen("realtyAdd")
-    object ChatRoom : Screen("chatRoom")
-    object ChatList : Screen("chatList")
-}
-
 @Composable
 fun Root(
     userViewModel: UserViewModel,
-    chatViewModel: ChatViewModel
+    chatViewModel: ChatViewModel,
+    roomViewModel: RoomViewModel
 ) {
     val navController = rememberNavController()
+    val uld by userViewModel.open.observeAsState(initial = false)
+    val cld by chatViewModel.open.observeAsState(initial = false)
 
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Login.route
-    ) {
+    Scaffold(
+        scaffoldState = rememberScaffoldState(),
+        backgroundColor = DefaultBackgroundColor,
+        contentColor = Color.White,
+        modifier = Modifier.fillMaxSize(),
 
-        val realtyId = "realtyId"
-        val userId = "userId"
-        val chatRoomId = "chatRoomId"
+        topBar = { TopBarContent() },
+        bottomBar = { BottomNavigationBar(navController) }
 
-        composable(route = Screen.Login.route) {
-            val goToMapScreen = { userId: Long -> navController.navigate(Screen.Map.route + "/$userId") {
-                popUpTo(navController.graph.id) {
-                    inclusive = false
-                }
-            } }
-
-            LoginScreen(userViewModel, goToMapScreen)
-        }
-
-        composable(route = Screen.Map.route + "/{$userId}") { backStackEntry ->
-            val uid = backStackEntry.arguments?.getString(userId)
-
-            if (uid != null) {
-                val goToRealtyDetailScreen = { realtyId: Long -> navController.navigate(Screen.RealtyDetail.route + "/$realtyId") }
-                val goToProfileScreen = { userId: Long -> navController.navigate(Screen.Profile.route + "/$userId") }
-                MapScreen(uid.toLong(), userViewModel, goToRealtyDetailScreen, goToProfileScreen)
-            }
-        }
-
-        composable(route = Screen.RealtyDetail.route + "/{$userId}" + "/{$realtyId}") { backStackEntry ->
-            val uid = backStackEntry.arguments?.getString("userId")
-            val rid = backStackEntry.arguments?.getString("realtyId")
-
-            if (uid != null && rid != null) {
-                val goToProfileScreen = { navController.navigate(Screen.Profile.route) }
-                val goToChatListScreen = { userId: Long -> navController.navigate(Screen.ChatList.route + "/$userId") }
-                RealtyDetailScreen(uid.toLong(), rid.toLong(), userViewModel, goToProfileScreen, goToChatListScreen)
-            }
-        }
-        
-        composable(route = "${Screen.Profile.route}/{${userId}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(userId)?.let {
-                ProfileScreen(it.toLong(), userViewModel)
-            }
-        }
-
-        composable(route = "${Screen.ChatList.route}/{${userId}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(userId)?.let {
-                ChatListScreen(it.toLong(), userViewModel, chatViewModel)
-            }
-        }
-
-        composable(route = "${Screen.ChatRoom.route}/{${chatRoomId}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(chatRoomId)?.let {
-                ChatRoomScreen(it.toLong())
-            }
-        }
-
-        composable(route = Screen.RealtyAdd.route) {
-            RealtyAddScreen()
+    ) { innerPadding ->
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            NavigationHost(
+                navController = navController,
+                userViewModel = userViewModel,
+                chatViewModel = chatViewModel,
+                roomViewModel = roomViewModel
+            )
         }
     }
 }

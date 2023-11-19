@@ -79,7 +79,7 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .also { logging("getRecommendationInfo", it) }
     }
 
-    suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<ServerResponse<Realty>> = withContext(Dispatchers.IO) {
+    suspend fun getRealtyDetail(realtyId: Long, userId: Long): Response<ServerResponseObj<Realty>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .getRealtyDetail(realtyId, userId)
             .also { logging("getRealtyDetail", it) }
@@ -96,4 +96,5 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .sendPickedStore(userId, realtyId)
             .also { logging("sendPickedStore", it) }
     }
+
 }

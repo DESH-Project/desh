@@ -13,7 +13,6 @@ import com.demo.desh.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.net.URLEncoder
@@ -28,8 +27,7 @@ class UserViewModel @Inject constructor(
         private const val DEFAULT_ENCODE_TYPE = "UTF-8"
     }
 
-    private var _open = MutableLiveData(false)
-    val open : LiveData<Boolean> get() = _open
+    var open = MutableLiveData(false)
 
 
     /* 로그인 화면 미리보기 이미지 */
@@ -37,7 +35,7 @@ class UserViewModel @Inject constructor(
     val previewImages : LiveData<List<String>> get() = _previewImages
 
     fun loadPreviewImages() {
-        _open.value = true
+        open.value = true
 
         viewModelScope.launch {
             val def = async(Dispatchers.IO) { userRetrofitRepository.getIntroImage() }.await()
@@ -45,7 +43,7 @@ class UserViewModel @Inject constructor(
             if (def.isSuccessful) {
                 val images = def.body()?.data
                 _previewImages.value = images
-                _open.value = false
+                open.value = false
             }
         }
     }
@@ -55,18 +53,22 @@ class UserViewModel @Inject constructor(
     val user : LiveData<User> get() = _user
 
     fun fetchUser(user: User) {
-        _open.value = true
+        open.value = true
 
-        runBlocking {
-            val res = async(Dispatchers.IO) {
-                delay(1500)
-                userRetrofitRepository.login(user)
-            }.await()
+        viewModelScope.launch {
+            runBlocking {
+                val res = async(Dispatchers.IO) { userRetrofitRepository.login(user) }.await()
 
-            if (res.isSuccessful) {
-                user.id = res.body()
-                _user.value = user
-                _open.value = false
+                if (res.isSuccessful) {
+                    _user.value = User(
+                        userId = res.body(),
+                        nickname = user.nickname,
+                        email = user.email,
+                        profileImageUrl = user.profileImageUrl,
+                        description = user.description
+                    )
+                    open.value = false
+                }
             }
         }
     }
@@ -75,7 +77,8 @@ class UserViewModel @Inject constructor(
     private val _targetUser : MutableLiveData<User> = MutableLiveData()
     val targetUser : LiveData<User> get() = _targetUser
 
-    fun getUserInfo(userId: Long = 1L) =
+    fun getUserInfo(userId: Long) {
+        open.value = true
         viewModelScope.launch {
             val def = async(Dispatchers.IO) { userRetrofitRepository.getUserInfo(userId) }.await()
 
@@ -84,13 +87,17 @@ class UserViewModel @Inject constructor(
                 _targetUser.value = result
             }
         }
+        open.value = false
+    }
+
+
 
     /* 유저가 찜한 상가 목록 리스트 가져오기 */
     private var _userPickedStore = MutableLiveData<List<RealtyPreview>>()
     val userPickedStore : LiveData<List<RealtyPreview>> get() = _userPickedStore
 
     fun getUserPickedStore(userId: Long) {
-        _open.value = true
+        open.value = true
 
         viewModelScope.launch {
             val def = async(Dispatchers.IO) { userRetrofitRepository.getUserPickedStoreList(userId) }.await()
@@ -99,7 +106,7 @@ class UserViewModel @Inject constructor(
                 val res = def.body()!!.data
                 _userPickedStore.value = res
 
-                _open.value = false
+                open.value = false
             }
         }
     }
@@ -109,7 +116,7 @@ class UserViewModel @Inject constructor(
     val userRegStore : LiveData<List<RealtyPreview>> get() = _userRegStore
 
     fun getUserRegStore(userId: Long) {
-        _open.value = true
+        open.value = true
 
         viewModelScope.launch {
             val def = async(Dispatchers.IO) { userRetrofitRepository.getUserRegisterStoreList(userId) }.await()
@@ -118,7 +125,7 @@ class UserViewModel @Inject constructor(
                 val res = def.body()!!.data
                 _userRegStore.value = res
 
-                _open.value = false
+                open.value = false
             }
         }
     }
@@ -189,17 +196,19 @@ class UserViewModel @Inject constructor(
     }
 
     /* 상가 디테일 정보 가져오기 */
-    private val _realtyDetail = MutableLiveData<ServerResponse<Realty>>()
-    val realtyDetail: LiveData<ServerResponse<Realty>> get() = _realtyDetail
+    private val _realtyDetail = MutableLiveData<Realty>()
+    val realtyDetail: LiveData<Realty> get() = _realtyDetail
 
     fun fetchRealtyDetail(realtyId: Long, userId: Long) {
+        open.value = true
         viewModelScope.launch {
             val res = userRetrofitRepository.getRealtyDetail(realtyId, userId)
 
             if (res.isSuccessful) {
                 val body = res.body()!!
-                _realtyDetail.value = body
+                _realtyDetail.value = body.data
             }
         }
+        open.value = false
     }
 }

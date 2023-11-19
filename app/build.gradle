@@ -73,6 +73,8 @@ dependencies {
 
     // Hilt
     implementation "com.google.dagger:hilt-android:2.44"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
     kapt "com.google.dagger:hilt-compiler:2.44"
 
     // ViewPager
@@ -98,6 +100,11 @@ dependencies {
 
     // Kakao Map
     implementation 'com.kakao.maps.open:android:2.5.0'
+
+    // Room
+    def room_version = "2.6.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

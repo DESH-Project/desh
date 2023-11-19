@@ -41,18 +41,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
-import com.demo.desh.model.ChatInfo
-import com.demo.desh.ui.CommonScaffoldForm
+import com.demo.desh.model.ChatPreview
 import com.demo.desh.viewModel.ChatViewModel
 import com.demo.desh.viewModel.UserViewModel
 
 @Composable
 fun ChatListScreen(
     userId: Long,
+    goToChatroom: (Long) -> Unit,
     userViewModel: UserViewModel,
     chatViewModel: ChatViewModel
 ) {
-
     LaunchedEffect(Unit) {
         chatViewModel.getChatroomList(userId)
     }
@@ -60,43 +59,34 @@ fun ChatListScreen(
     /* STATES */
     val uOpen by userViewModel.open.observeAsState(initial = false)
     val cOpen by chatViewModel.open.observeAsState(initial = false)
-    val chatRoomList by chatViewModel.chatInfo.observeAsState()
+    val chatPreviewList by chatViewModel.chatPreviewList.observeAsState(initial = listOf())
 
-    /* HANDLERS */
-    val onChatroomClick = { chatroomId: Long -> chatViewModel.getChatDetail(chatroomId) }
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val (titleBarRef, chatRoomHolderRef, remainsMarginRef) = createRefs()
 
-    CommonScaffoldForm(
-        pbarOpen = uOpen || cOpen,
-        topBarContent = { /*TODO*/ }
-    ) {
-        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (titleBarRef, chatRoomHolderRef, remainsMarginRef) = createRefs()
+        ChatTitleBar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(titleBarRef) {
+                    top.linkTo(anchor = parent.top, margin = 48.dp)
+                }
+        )
 
-            ChatTitleBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(titleBarRef) {
-                        top.linkTo(anchor = parent.top, margin = 48.dp)
-                    }
-            )
+        ChatRoomHolder(
+            chatPreviewList = chatPreviewList,
+            onChatroomClick = goToChatroom,
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(chatRoomHolderRef) {
+                    top.linkTo(anchor = titleBarRef.bottom, margin = 24.dp)
+                    centerHorizontallyTo(parent)
+                }
+        )
 
-            ChatRoomHolder(
-                chatInfoList = chatRoomList ?: listOf(),
-                onChatroomClick = onChatroomClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(chatRoomHolderRef) {
-                        top.linkTo(anchor = titleBarRef.bottom, margin = 24.dp)
-                        centerHorizontallyTo(parent)
-                    }
-            )
-
-
-            // 마지막 여백
-            Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
-                top.linkTo(anchor = chatRoomHolderRef.bottom, margin = 60.dp)
-            })
-        }
+        // 마지막 여백
+        Spacer(modifier = Modifier.constrainAs(remainsMarginRef) {
+            top.linkTo(anchor = chatRoomHolderRef.bottom, margin = 60.dp)
+        })
     }
 }
 
@@ -125,7 +115,7 @@ fun ChatTitleBar(modifier: Modifier = Modifier) {
 
 @Composable
 fun ChatRoomHolder(
-    chatInfoList: List<ChatInfo>,
+    chatPreviewList: List<ChatPreview>,
     onChatroomClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -133,7 +123,7 @@ fun ChatRoomHolder(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxWidth()
     ) {
-        if (chatInfoList.isEmpty()) {
+        if (chatPreviewList.isEmpty()) {
             Text(
                 text = "아직 개설된 대화방이 없어요..",
                 fontSize = 20.sp,
@@ -141,33 +131,36 @@ fun ChatRoomHolder(
                 color = Color.LightGray
             )
         }
+        else {
+            LazyColumn {
+                items(chatPreviewList) {
+                    val chatroom = it.chatroom
 
-        LazyColumn {
-            items(chatInfoList) {
-                val chatroom = it.chatroom
+                    val cid = chatroom.chatroomId
+                    val cname = chatroom.name
+                    val cimage = chatroom.image
+                    val lastChat =
+                        if (chatroom.lastMessage == "") "마지막 대화가 없습니다."
+                        else chatroom.lastMessage
 
-                val cid = chatroom.id
-                val cname = chatroom.name
-                val cimage = chatroom.image
-                val lastChat = chatroom.chat.last()
+                    ChatRoomMaker(
+                        chatroomName = cname,
+                        senderName = "황승수",
+                        senderImage = cimage,
+                        chatPreview = lastChat,
+                        badgeCount = 1,
+                        onChatRoomClick = { onChatroomClick(cid) }
+                    )
 
-                ChatRoomMaker(
-                    chatroomName = cname,
-                    senderName = lastChat.writer,
-                    senderImage = cimage ?: "https://goodplacebucket.s3.ap-northeast-2.amazonaws.com/d3dbe6e2-6513-44a7-a261-c04ff6328bd1.png",
-                    chatPreview = lastChat.message,
-                    badgeCount = 1,
-                    onChatRoomClick = { onChatroomClick(cid) }
-                )
+                    val divMod = Modifier
+                        .background(color = Color.Gray)
+                        .fillMaxWidth()
+                        .alpha(0.2f)
 
-                val divMod = Modifier
-                    .background(color = Color.Gray)
-                    .fillMaxWidth()
-                    .alpha(0.2f)
-                
-                Spacer(modifier = Modifier.padding(vertical = 2.dp))
-                Divider(modifier = divMod, thickness = Dp.Hairline, startIndent = 8.dp)
-                Spacer(modifier = Modifier.padding(vertical = 2.dp))
+                    Spacer(modifier = Modifier.padding(vertical = 2.dp))
+                    Divider(modifier = divMod, thickness = Dp.Hairline, startIndent = 8.dp)
+                    Spacer(modifier = Modifier.padding(vertical = 2.dp))
+                }
             }
         }
     }

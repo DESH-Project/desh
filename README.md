@@ -3,7 +3,7 @@
 ---
 
 ## Project
-- [프로젝트 소개](document/intro.pdf)
+- [프로젝트 표지](document/intro.pdf)
 
 ## Contributors
 - 황승수
