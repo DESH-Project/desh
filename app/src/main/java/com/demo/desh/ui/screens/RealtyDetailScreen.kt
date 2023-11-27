@@ -79,6 +79,7 @@ fun RealtyDetailScreen(
     val open by userViewModel.open.observeAsState(initial = false)
     val realtyDetailInfo by userViewModel.realtyDetail.observeAsState()
     val ownerPreview by userViewModel.userPreview.observeAsState()
+    val starCount by userViewModel.starCount.observeAsState()
 
     val saveRealtyInfo = { userViewModel.sendPickedStore(userId, realtyId) }
 

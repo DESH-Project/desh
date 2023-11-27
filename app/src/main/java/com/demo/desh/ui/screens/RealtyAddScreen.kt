@@ -7,7 +7,6 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -31,6 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.ui.theme.HighlightColor
 import com.demo.desh.viewModel.UserViewModel
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -78,11 +79,16 @@ fun Uri.asMultipart(name: String, contentResolver: ContentResolver): MultipartBo
 @Composable
 fun RealtyAddScreen(
     userViewModel: UserViewModel,
-    goToHomeScreen: () -> Unit
+    goToHomeScreen: () -> Unit,
+    goToProfileScreen: (Long) -> Unit
 ) {
     val context = LocalContext.current
 
-    val user = userViewModel.user.value
+    LaunchedEffect(Unit) {
+        userViewModel.getUserInfo(1L)
+    }
+
+    val user by userViewModel.targetUser.observeAsState()
     Log.e("RealtyAddScreen", user.toString())
 
     var pageState by rememberSaveable { mutableStateOf(1) }
@@ -108,16 +114,18 @@ fun RealtyAddScreen(
             pyung = 36,
             squareMeter = (36 * 3.3).toDouble(),
             service = "Test",
-            userId = user?.userId ?: 1L
+            userId = user?.userId ?: 3L
         )
 
         Log.e("onUploadInfo", req.toString())
 
-        val parts = selectedImages.map { it.asMultipart("images", context.contentResolver) }
-        userViewModel.uploadRealtyInfo(images = parts, req = req)
+        val parts = selectedImages.mapNotNull { it.asMultipart("images", context.contentResolver) }
+
+        runBlocking {
+            userViewModel.uploadRealtyInfo(images = parts, req = req)
+        }
 
         Toast.makeText(context, "등록이 완료되었습니다!", Toast.LENGTH_SHORT).show()
-        goToHomeScreen()
     }
 
     Column(

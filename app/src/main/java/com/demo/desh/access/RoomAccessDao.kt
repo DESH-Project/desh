@@ -10,6 +10,9 @@ interface RoomAccessDao {
     @Insert
     fun insertUser(user: RoomUser)
 
-    @Query("select * from local_user where uid = 1")
-    fun findLocalUser() : RoomUser?
+    @Query("select * from local_user")
+    fun findLocalUser() : List<RoomUser>
+
+    @Query("delete from local_user")
+    fun deleteAll()
 }

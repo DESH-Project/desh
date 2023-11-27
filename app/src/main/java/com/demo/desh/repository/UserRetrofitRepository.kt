@@ -100,13 +100,13 @@ class UserRetrofitRepository @Inject constructor(private val userRetrofitDao: Us
             .also { logging("getIntroImage", it) }
     }
 
-    suspend fun sendPickedStore(userId: Long, realtyId: Long): Response<ServerResponse<Int>> = withContext(Dispatchers.IO) {
+    suspend fun sendPickedStore(userId: Long, realtyId: Long): Response<ServerResponseObj<Int>> = withContext(Dispatchers.IO) {
         userRetrofitDao
             .sendPickedStore(userId, realtyId)
             .also { logging("sendPickedStore", it) }
     }
 
-    suspend fun uploadRealtyInfo(images: List<MultipartBody.Part?>, req: RequestBody) : Response<Unit> {
+    suspend fun uploadRealtyInfo(images: List<MultipartBody.Part>, req: RequestBody) : Response<Unit> {
         return userRetrofitDao
             .uploadRealtyInfo(images, req)
             .also { logging("uploadRealtyInfo", it) }

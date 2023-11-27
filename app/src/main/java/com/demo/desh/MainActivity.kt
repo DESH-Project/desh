@@ -3,7 +3,6 @@ package com.demo.desh
 import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
 import com.demo.desh.nav.BottomNavigationBar
 import com.demo.desh.nav.NavigationHost
-import com.demo.desh.ui.LoadingDialog
 import com.demo.desh.ui.TopBarContent
 import com.demo.desh.ui.theme.DefaultBackgroundColor
 import com.demo.desh.ui.theme.DeshprojectfeTheme

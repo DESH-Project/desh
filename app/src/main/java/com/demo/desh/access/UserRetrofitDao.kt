@@ -53,11 +53,11 @@ interface UserRetrofitDao {
     suspend fun getIntroImage() : Response<ServerResponse<String>>
 
     /* 상가 찜하기 */
-    @GET("dibs")
+    @POST("dibs")
     suspend fun sendPickedStore(
         @Query("realty-id") userId: Long,
         @Query("user-id") realtyId: Long
-    ) : Response<ServerResponse<Int>>
+    ) : Response<ServerResponseObj<Int>>
 
     /* 상가 상세정보 조회 */
     @GET("store")
@@ -78,7 +78,7 @@ interface UserRetrofitDao {
     @Multipart
     @POST("realty")
     suspend fun uploadRealtyInfo(
-        @Part images: List<MultipartBody.Part?>,
+        @Part images: List<MultipartBody.Part>,
         @Part("realty") realty: RequestBody
     ) : Response<Unit>
 }

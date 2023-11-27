@@ -60,6 +60,7 @@ import com.kakao.vectormap.MapView
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun HomeScreen(
@@ -72,11 +73,12 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         userViewModel.fetchServiceList()
         userViewModel.loadRecommendDistrict()
-        roomViewModel.findLocalUser()
+        runBlocking { roomViewModel.findLocalUser() }
+        userViewModel.getUserInfo(1L)
     }
 
     /* STATES */
-    val user by roomViewModel.user.observeAsState()
+    val user by userViewModel.targetUser.observeAsState()
     val serviceList by userViewModel.serviceList.observeAsState(initial = mapOf())
     val recommendDistrictList by userViewModel.recommendDistrictList.observeAsState()
     val nearbyStoreList by userViewModel.nearbyStoreList.observeAsState(initial = listOf())
@@ -92,17 +94,17 @@ fun HomeScreen(
 
     val onSelectedLatLngChanged = { loc: LatLng -> selectedDistrictLatLng = loc }
 
-    user?.let {
-        val onDistrictButtonClick = { districtName: String -> userViewModel.fetchNearbyStores(districtName) }
-        val onStoreButtonClick = { storeId: Long -> goToRealtyDetail(storeId) }
+    val onDistrictButtonClick = { districtName: String -> userViewModel.fetchNearbyStores(districtName) }
+    val onStoreButtonClick = { storeId: Long -> goToRealtyDetail(storeId) }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        user?.let {
             RecommendContent(
-                user = user!!,
+                user = it,
                 serviceList = serviceList,
                 selectedServiceName = selectedServiceName,
                 onServiceItemClick = onServiceItemClick,

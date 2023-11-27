@@ -34,4 +34,8 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
         }
         open.value = false
     }
+
+    fun deleteAll() = viewModelScope.launch {
+        async(Dispatchers.IO) { roomRepository.deleteAll() }.await()
+    }
 }

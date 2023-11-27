@@ -1,5 +1,6 @@
 package com.demo.desh.viewModel
 
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import com.demo.desh.model.RealtyCreationReq
 import com.demo.desh.model.RealtyPreview
 import com.demo.desh.model.RecommendDistrict
 import com.demo.desh.model.ServerResponse
+import com.demo.desh.model.ServerResponseObj
 import com.demo.desh.model.User
 import com.demo.desh.model.UserPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -110,6 +112,7 @@ class UserViewModel @Inject constructor(
                 _userPreview.value = res.data
             }
         }
+        open.value = false
     }
 
     /* 유저가 찜한 상가 목록 리스트 가져오기 */
@@ -151,8 +154,8 @@ class UserViewModel @Inject constructor(
     }
 
     /* 상가 건물 찜하기 */
-    private var _starCount = MutableLiveData<ServerResponse<Int>>()
-    val starCount: LiveData<ServerResponse<Int>> get() = _starCount
+    private var _starCount = MutableLiveData<ServerResponseObj<Int>>()
+    val starCount: LiveData<ServerResponseObj<Int>> get() = _starCount
 
     fun sendPickedStore(userId: Long, realtyId: Long) {
         viewModelScope.launch {
@@ -233,7 +236,7 @@ class UserViewModel @Inject constructor(
     }
 
     /* 상가 정보 업로드 */
-    fun uploadRealtyInfo(images: List<MultipartBody.Part?>, req: RealtyCreationReq) {
+    fun uploadRealtyInfo(images: List<MultipartBody.Part>, req: RealtyCreationReq) {
         val jsonObj = JSONObject(
             "{" +
                     "\"userId\":\"${req.userId}\"," +
@@ -249,7 +252,11 @@ class UserViewModel @Inject constructor(
 
         viewModelScope.launch {
             val jsonBody = RequestBody.create("application/json".toMediaTypeOrNull(), jsonObj)
-            async(Dispatchers.IO) { userRetrofitRepository.uploadRealtyInfo(images, jsonBody) }.await()
+            val def = async(Dispatchers.IO) { userRetrofitRepository.uploadRealtyInfo(images, jsonBody) }.await()
+
+            if (!def.isSuccessful) {
+
+            }
         }
     }
 }

@@ -71,12 +71,12 @@ fun ProfileScreen(
 
     /* HANDLERS */
     val onPostBtnClick = {
-        userViewModel.getUserPickedStore(userId)
+        userViewModel.getUserRegStore(userId)
         btnSelected = true
     }
 
     val onStarBtnClick = {
-        userViewModel.getUserRegStore(userId)
+        userViewModel.getUserPickedStore(userId)
         btnSelected = false
     }
 

@@ -48,6 +48,7 @@ fun NavigationHost(
         val goToChatListScreen = { uid: Long -> navController.navigate(Screen.ChatList.route + "/$uid") }
         val goToRealtyDetail = { rid: Long -> navController.navigate(Screen.RealtyDetail.route + "/$rid") }
         val goToChatroom = { cid: Long -> navController.navigate(Screen.ChatRoom.route + "/$cid")}
+        val goToHomeScreen = { navController.navigate(Screen.Home.route) }
 
         composable(route = Screen.Home.route) {
             HomeScreen(userViewModel, roomViewModel, goToRealtyDetail, goToProfileScreen, goToChatListScreen)
@@ -95,8 +96,7 @@ fun NavigationHost(
         }
 
         composable(route = Screen.RealtyAdd.route) {
-            val goToHomeScreen = { navController.navigate(Screen.Home.route) }
-            RealtyAddScreen(userViewModel, goToHomeScreen)
+            RealtyAddScreen(userViewModel, goToHomeScreen, goToProfileScreen)
         }
     }
 }

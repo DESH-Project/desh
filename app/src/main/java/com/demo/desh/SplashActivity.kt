@@ -4,16 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.demo.desh.util.RoomManager
-import com.demo.desh.viewModel.RoomViewModel
 import com.kakao.sdk.common.KakaoSdk
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -25,21 +20,21 @@ class SplashActivity : AppCompatActivity() {
         KakaoSdk.init(this, getString(R.string.KAKAO_NATIVE_APP_KEY))
 
         val roomViewModel = RoomManager.getRoomViewModel(application)
-        runBlocking {
-            roomViewModel.findLocalUser()
+        roomViewModel.findLocalUser()
+        roomViewModel.deleteAll()
 
-            lifecycleScope.launchWhenCreated {
-                splashScreen.setKeepOnScreenCondition { true }
-                val localUser = roomViewModel.user.value
-                val intent =
-                    if (localUser == null) Intent(this@SplashActivity, LoginActivity::class.java)
-                    else Intent(this@SplashActivity, MainActivity::class.java)
+        lifecycleScope.launchWhenCreated {
+            splashScreen.setKeepOnScreenCondition { true }
+            val localUser = roomViewModel.user.value
+            val intent = Intent(this@SplashActivity, LoginActivity::class.java)
+                /*
+                if (localUser == null) Intent(this@SplashActivity, LoginActivity::class.java)
+                else Intent(this@SplashActivity, MainActivity::class.java)
+                */
+            delay(1500L)
 
-                delay(1500L)
-
-                startActivity(intent)
-                finish()
-            }
+            startActivity(intent)
+            finish()
         }
     }
 }

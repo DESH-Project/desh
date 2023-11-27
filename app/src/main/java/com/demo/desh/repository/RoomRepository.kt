@@ -15,16 +15,17 @@ class RoomRepository(private val roomAccessDao: RoomAccessDao) {
 
 
     fun insertLocalUser(user: User) =
-        user.toRoomUser()?.let {
+        user.toRoomUser().let {
                 roomAccessDao.insertUser(it)
                 logging("insertLocalUser", Unit)
             }
 
-    fun findLocalUser() : User? =
-        roomAccessDao.findLocalUser()
-            ?.toUser()
-            ?.let {
-                logging("findLocalUser", it.toString())
-                it
-            }
+    fun findLocalUser() : User? {
+        val lst = roomAccessDao.findLocalUser()
+        if (lst.isNotEmpty()) return lst.first().toUser()
+        return null
+    }
+
+    fun deleteAll() =
+        roomAccessDao.deleteAll()
 }

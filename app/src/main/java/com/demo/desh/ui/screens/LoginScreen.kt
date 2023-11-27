@@ -44,6 +44,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -62,9 +63,10 @@ fun LoginScreen(userViewModel: UserViewModel, roomViewModel: RoomViewModel, inte
     /* HANDLERS */
     val onKakaoLoginButtonClick = {
         val goToMapScreenWithUser = { user: User ->
-            userViewModel.fetchUser(user)
-            userViewModel.user.value?.let { roomViewModel.insertLocalUser(it) }
-            Unit
+            runBlocking {
+                runBlocking { userViewModel.fetchUser(user) }
+                roomViewModel.insertLocalUser(userViewModel.user.value!!)
+            }
         }
 
         KakaoLogin.login(context, goToMapScreenWithUser)
